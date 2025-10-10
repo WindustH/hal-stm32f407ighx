@@ -1,0 +1,8 @@
+#pragma once
+#define DMA_BUFFER_SIZE 256
+#define PROC_LIST_SIZE 32
+#define SYSCLK 168000000U
+#define APB1_CLK 42000000U
+#define APB2_CLK 84000000U
+#define TIM3_PRESCALER 419
+#define TIM3_PERIOD 99

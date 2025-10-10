@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "STM32",
+            "compilerPath": "arm-none-eabi-gcc",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "linux-gcc-arm"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,37 @@
+CompileFlags:
+  Add: [
+    -isystem/usr/arm-none-eabi/include,
+    -isystem/usr/lib/gcc/arm-none-eabi/14.2.0/include,
+    -isystem/usr/lib/gcc/arm-none-eabi/14.2.0/include-fixed,
+  ]
+
+InlayHints:
+  Enabled: true
+
+---
+If:
+  PathMatch: [.*cmsis.*, .*CMSIS.*, .*Drivers/CMSIS.*]
+CompileFlags:
+  Remove: [-Wall, -Wextra]
+Diagnostics:
+  Suppress: "*"
+
+---
+If:
+  PathMatch:
+    [
+      .*StdPeriph.*,
+      .*stdperiph.*,
+      .*STM32F4xx_StdPeriph_Driver.*,
+      .*stm32f4xx_.*\.h,
+      .*misc\.h,
+    ]
+CompileFlags:
+  Remove: [-Wall, -Wextra]
+Diagnostics:
+  Suppress: "*"
+---
+If:
+  PathMatch: [.*dbg.*, .*DBGMCU.*]
+Diagnostics:
+  Suppress: "*"
