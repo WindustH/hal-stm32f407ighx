@@ -3,50 +3,61 @@
 
 #include "type.h"
 
-// DM-J4310 Error Codes
-#define DMJ4310_ERROR_OVERVOLTAGE 0x8U
-#define DMJ4310_ERROR_UNDERVOLTAGE 0x9U
-#define DMJ4310_ERROR_OVERCURRENT 0xAU
-#define DMJ4310_ERROR_MOS_OVERTEMP 0xBU
-#define DMJ4310_ERROR_MOTOR_OVERTEMP 0xCU
-#define DMJ4310_ERROR_COMM_LOST 0xDU
-#define DMJ4310_ERROR_OVERLOAD 0xEU
+// DM-J4310错误代码
+#define DMJ4310_ERROR_OVERVOLTAGE 0x8U    // 过压错误
+#define DMJ4310_ERROR_UNDERVOLTAGE 0x9U   // 欠压错误
+#define DMJ4310_ERROR_OVERCURRENT 0xAU    // 过流错误
+#define DMJ4310_ERROR_MOS_OVERTEMP 0xBU   // MOS管过温错误
+#define DMJ4310_ERROR_MOTOR_OVERTEMP 0xCU // 电机过温错误
+#define DMJ4310_ERROR_COMM_LOST 0xDU      // 通信丢失错误
+#define DMJ4310_ERROR_OVERLOAD 0xEU       // 过载错误
 
-// MIT Control Parameter Ranges
-#define DMJ4310_KP_RANGE_MIN 0.0f
-#define DMJ4310_KP_RANGE_MAX 500.0f
-#define DMJ4310_KD_RANGE_MIN 0.0f
-#define DMJ4310_KD_RANGE_MAX 5.0f
+// MIT控制参数范围
+#define DMJ4310_KP_RANGE_MIN 0.0f   // Kp最小值
+#define DMJ4310_KP_RANGE_MAX 500.0f // Kp最大值
+#define DMJ4310_KD_RANGE_MIN 0.0f   // Kd最小值
+#define DMJ4310_KD_RANGE_MAX 5.0f   // Kd最大值
 
-// Motor feedback data structure
+// 电机反馈数据结构体
 typedef struct {
-  f32 x;         // Actual position (rad, multi-turn)
-  f32 v;         // Actual velocity (rad/s)
-  f32 tor;       // Actual torque (Nm)
-  u8 error_code; // Error code (0 = no error)
-  u8 T_mos;      // MOSFET temperature (°C)
-  u8 T_mot;      // Motor (rotor) temperature (°C)
-  u8 motor_id;   // Motor ID from feedback
+  f32 x;         // 实际位置(弧度，多圈)
+  f32 v;         // 实际速度(弧度/秒)
+  f32 tor;       // 实际扭矩(Nm)
+  u8 error_code; // 错误代码(0表示无错误)
+  u8 T_mos;      // MOSFET温度(°C)
+  u8 T_mot;      // 电机(转子)温度(°C)
+  u8 motor_id;   // 来自反馈的电机ID
 } motStat_DMJ4310;
 
-// MIT-mode control command structure
+// MIT模式控制命令结构体
 typedef struct {
-  f32 x;   // Desired position (rad)
-  f32 v;   // Desired velocity (rad/s)
-  f32 kp;  // Position gain
-  f32 kd;  // Damping gain
-  f32 tor; // Torque feedforward (Nm)
+  f32 x;   // 期望位置(弧度)
+  f32 v;   // 期望速度(弧度/秒)
+  f32 kp;  // 位置增益
+  f32 kd;  // 阻尼增益
+  f32 tor; // 扭矩前馈(Nm)
 } motCtrl_DMJ4310;
 
-// CAN message container for transmission
+// 用于传输的CAN消息容器
 typedef struct {
-  canTxH header;
-  u8 *data;
+  canTxH header; // CAN发送头
+  u8 *data;      // 数据指针
 } motCtrlCanMsg_DMJ4310;
 
-// Function declarations
+/**
+ * @brief 解析DMJ4310电机的CAN反馈消息
+ * @param msg CAN接收头指针
+ * @param data CAN数据指针
+ * @param mot_stat_dmj4310 电机状态结构体指针
+ */
 void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
                           motStat_DMJ4310 *mot_stat_dmj4310);
+
+/**
+ * @brief 将MIT模式控制命令打包为CAN消息
+ * @param ctrl_msg 控制命令结构体指针
+ * @param can_msg CAN消息结构体指针
+ */
 void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                                motCtrlCanMsg_DMJ4310 *can_msg);
 

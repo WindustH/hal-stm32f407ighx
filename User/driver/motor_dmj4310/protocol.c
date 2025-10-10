@@ -1,64 +1,77 @@
 #include "driver/motor_dmj4310/protocol.h"
 #include "driver/motor_dmj4310/conf.h"
 
-static f32 s_pos_scale = DMJ4310_X_SCALE;   // raw -> rad
-static f32 s_vel_scale = DMJ4310_V_SCALE;   // raw -> rad/s
-static f32 s_trq_scale = DMJ4310_TOR_SCALE; // raw -> Nm
+// 位置缩放因子 - 原始值转弧度
+static f32 s_pos_scale = DMJ4310_X_SCALE;
+// 速度缩放因子 - 原始值转弧度/秒
+static f32 s_vel_scale = DMJ4310_V_SCALE;
+// 扭矩缩放因子 - 原始值转牛顿米
+static f32 s_trq_scale = DMJ4310_TOR_SCALE;
 
-// Configure scaling factors
+/**
+ * @brief 配置DMJ4310电机的缩放因子
+ * @param pos_scale 位置缩放因子
+ * @param vel_scale 速度缩放因子
+ * @param trq_scale 扭矩缩放因子
+ */
 void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
   s_pos_scale = pos_scale;
   s_vel_scale = vel_scale;
   s_trq_scale = trq_scale;
 }
 
-// Parse motor feedback from CAN message
+/**
+ * @brief 从CAN消息解析电机反馈数据
+ * @param msg CAN接收头指针
+ * @param data CAN数据指针
+ * @param mot_stat_dmj4310 电机状态结构体指针
+ */
 void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
                           motStat_DMJ4310 *mot_stat_dmj4310) {
-  // Only process the expected feedback CAN ID
+  // 只处理预期的反馈CAN ID
   if (msg->StdId != DMJ4310_PITCH_FEEDBACK_ID) {
     return;
   }
 
-  // ---- CAN Data Layout (8 bytes) ----
-  // D[0]: [ID (4b) | Error Code (4b)]
-  // D[1]: Position[15:8]
-  // D[2]: Position[7:0]
-  // D[3]: Velocity[11:4]
-  // D[4]: [Velocity[3:0] | Torque[11:8]]
-  // D[5]: Torque[7:0]
-  // D[6]: MOS Temperature (°C)
-  // D[7]: Rotor Temperature (°C)
+  // ---- CAN数据布局(8字节) ----
+  // D[0]: [ID (4位) | 错误代码 (4位)]
+  // D[1]: 位置[15:8]
+  // D[2]: 位置[7:0]
+  // D[3]: 速度[11:4]
+  // D[4]: [速度[3:0] | 扭矩[11:8]]
+  // D[5]: 扭矩[7:0]
+  // D[6]: MOS温度(°C)
+  // D[7]: 转子温度(°C)
 
   u8 id_and_error = data[0];
   u8 parsed_id = id_and_error & 0x0F;
   u8 error_code = (id_and_error >> 4) & 0x0F;
 
-  // ---- Position: 16-bit signed integer ----
+  // ---- 位置: 16位有符号整数 ----
   u16 raw_pos_u16 = (u16)((data[1] << 8) | data[2]);
   i16 raw_pos = (i16)raw_pos_u16;
 
-  // ---- Velocity: 12-bit signed integer (bits 11..0) ----
+  // ---- 速度: 12位有符号整数 ----
   i16 raw_vel = (i16)((data[3] << 4) | ((data[4] >> 4) & 0x0F));
   if (raw_vel & 0x0800)
-    raw_vel |= 0xF000; // sign-extend
+    raw_vel |= 0xF000; // 符号扩展
 
-  // ---- Torque: 12-bit signed integer (bits 11..0) ----
+  // ---- 扭矩: 12位有符号整数 ----
   i16 raw_trq = (i16)(((data[4] & 0x0F) << 8) | data[5]);
   if (raw_trq & 0x0800)
-    raw_trq |= 0xF000; // sign-extend
+    raw_trq |= 0xF000; // 符号扩展
 
-  // ---- Temperatures ----
+  // ---- 温度 ----
   u8 temp_mos = data[6];
   u8 temp_rotor = data[7];
 
-  // ---- Multi-turn position handling (for single motor) ----
+  // ---- 多圈位置处理(单电机) ----
   static i16 prev_raw_pos = 0;
   static i32 round_count = 0;
 
   i16 delta_raw = raw_pos - prev_raw_pos;
 
-  // Detect overflow/underflow (position wraps around ±32768)
+  // 检测溢出/下溢(位置在±32768之间循环)
   if (delta_raw > DMJ4310_PI) {
     round_count--;
   } else if (delta_raw < -DMJ4310_PI) {
@@ -67,20 +80,24 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
 
   prev_raw_pos = raw_pos;
 
-  // Compute total unwrapped position in radians
+  // 计算总的位置(去缠绕)并转换为弧度
   f32 pos_total = (raw_pos + round_count * DMJ4310_PI * 2) * s_pos_scale;
 
-  // Fill feedback structure
-  mot_stat_dmj4310->x = pos_total;               // rad (multi-turn)
-  mot_stat_dmj4310->v = raw_vel * s_vel_scale;   // rad/s
-  mot_stat_dmj4310->tor = raw_trq * s_trq_scale; // Nm
+  // 填充反馈结构体
+  mot_stat_dmj4310->x = pos_total;               // 弧度(多圈)
+  mot_stat_dmj4310->v = raw_vel * s_vel_scale;   // 弧度/秒
+  mot_stat_dmj4310->tor = raw_trq * s_trq_scale; // 牛顿米
   mot_stat_dmj4310->error_code = error_code;
   mot_stat_dmj4310->T_mos = temp_mos;
   mot_stat_dmj4310->T_mot = temp_rotor;
   mot_stat_dmj4310->motor_id = parsed_id;
 }
 
-// Pack MIT-mode control command into CAN message
+/**
+ * @brief 将MIT模式控制命令打包为CAN消息
+ * @param ctrl_msg 控制命令结构体指针
+ * @param can_msg CAN消息结构体指针
+ */
 void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                                motCtrlCanMsg_DMJ4310 *can_msg) {
   static canTxH tx_header = {
@@ -92,18 +109,18 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
       .StdId = DMJ4310_PITCH_CAN_ID,
   };
 
-  // Convert physical units to raw integers using scaling
+  // 使用缩放因子将物理单位转换为原始整数
   i16 p_des_raw = (i16)(ctrl_msg->x / s_pos_scale);
   i16 v_des_raw = (i16)(ctrl_msg->v / s_vel_scale);
   i16 t_ff_raw = (i16)(ctrl_msg->tor / s_trq_scale);
 
-  // Map Kp/Kd from float range to 12-bit unsigned integers
+  // 将Kp/Kd从浮点范围映射到12位无符号整数
   u16 kp_raw = (u16)((ctrl_msg->kp - DMJ4310_KP_RANGE_MIN) /
                      (DMJ4310_KP_RANGE_MAX - DMJ4310_KP_RANGE_MIN) * 4095.0f);
   u16 kd_raw = (u16)((ctrl_msg->kd - DMJ4310_KD_RANGE_MIN) /
                      (DMJ4310_KD_RANGE_MAX - DMJ4310_KD_RANGE_MIN) * 4095.0f);
 
-  // Saturate to valid bit ranges
+  // 饱和到有效的位范围
   p_des_raw = (p_des_raw > 32767)    ? 32767
               : (p_des_raw < -32768) ? -32768
                                      : p_des_raw;
@@ -114,7 +131,7 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
   kp_raw = (kp_raw > 4095) ? 4095 : kp_raw;
   kd_raw = (kd_raw > 4095) ? 4095 : kd_raw;
 
-  // Pack into 8-byte CAN frame
+  // 打包到8字节CAN帧
   can_msg->data[0] = DMJ4310_PITCH_CAN_ID;
   can_msg->data[1] = (u8)((p_des_raw >> 8) & 0xFF);
   can_msg->data[2] = (u8)(p_des_raw & 0xFF);
@@ -123,8 +140,8 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
   can_msg->data[5] = (u8)(kp_raw & 0xFF);
   can_msg->data[6] = (u8)((kd_raw >> 4) & 0xFF);
   can_msg->data[7] = (u8)(((kd_raw & 0x0F) << 4) | ((t_ff_raw >> 8) & 0x0F));
-  // Note: Lower 8 bits of torque feedforward are omitted due to 8-byte CAN
-  // limit. On CAN-FD, you could send them in a 9th byte.
+  // 注意: 由于CAN的8字节限制，扭矩前馈的低8位被省略。
+  // 在CAN-FD中，可以在第9字节发送它们。
 
   can_msg->header = tx_header;
 }
