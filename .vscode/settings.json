@@ -5,7 +5,7 @@
         "*.svd": true,
         "*.ld": true,
         "*.cmake": true,
-        ".clangd": true,
+        // ".clangd": true,
         // ".gitignore": true,
         "dev.py": true,
         "startup": true,

@@ -1,0 +1,5 @@
+#ifndef __USER_DRIVER_RC_DR16_DRIVER__
+#define __USER_DRIVER_RC_DR16_DRIVER__
+
+
+#endif /* __USER_DRIVER_RC_DR16_DRIVER__ */

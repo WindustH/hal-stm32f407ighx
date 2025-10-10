@@ -1,10 +1,10 @@
 #include "cron.h"
-#include "stm32f4xx.h"
+#include "tim.h"
 #include "type.h"
 
 static volatile procList proc_list = {.state = 0, .procs = {NULL}};
 
-static u8 add_cron_job(const proc p) {
+u8 bsp_cron_job_add(const proc p) {
   // Check for null pointer
   if (p == NULL) {
     return PROC_LIST_SIZE;
@@ -22,7 +22,7 @@ static u8 add_cron_job(const proc p) {
   return PROC_LIST_SIZE;
 }
 
-static void remove_cron_job(const u8 idx) {
+void bsp_cron_job_remove(const u8 idx) {
   // Check bounds
   if (idx < PROC_LIST_SIZE) {
     // Use interrupt control to prevent race condition
@@ -30,12 +30,10 @@ static void remove_cron_job(const u8 idx) {
   }
 }
 
-void TIM3_IRQHandler() {
-  // Check if the update interrupt flag is set
-  if (TIM3->SR & TIM_SR_UIF) {
-    // Clear the update interrupt flag
-    TIM3->SR &= ~TIM_SR_UIF;
-
+// HAL TIM3 Period Elapsed Callback
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  // Check if the interrupt is from TIM3
+  if (htim->Instance == TIM3) {
     // Execute cron jobs
     for (u8 i = 0; i < PROC_LIST_SIZE; i++) {
       if ((proc_list.state & (1U << i)) && (proc_list.procs[i] != NULL)) {

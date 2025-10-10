@@ -15,6 +15,7 @@ endif()
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407IGHX_FLASH.ld)
 set(CORE_DIR ${CMAKE_SOURCE_DIR}/Core)
 set(USER_DIR ${CMAKE_SOURCE_DIR}/User)
+set(LIB_DIR ${CMAKE_SOURCE_DIR}/Lib)
 set(DRIVER_DIR ${CMAKE_SOURCE_DIR}/Drivers)
 set(CMSIS_DIR ${DRIVER_DIR}/CMSIS)
 set(HAL_DIR ${DRIVER_DIR}/STM32F4xx_HAL_Driver)
@@ -29,9 +30,13 @@ set(ASM_SOURCES
     ${STARTUP_DIR}/startup_stm32f407ighx.s
 )
 
+set(PKG_BMI088_ALGO_DIR ${LIB_DIR}/bmi088_algo)
+file(GLOB_RECURSE PKG_BMI088_ALGO_SOURCES ${PKG_BMI088_ALGO_DIR}/Src/*.c)
+
 target_sources(${TARGET}
     PRIVATE
     ${USER_SOURCES}
+    ${PKG_BMI088_ALGO_SOURCES}
     ${CORE_SOURCES}
     ${HAL_SOURCES}
     ${CMSIS_SOURCES}
@@ -41,6 +46,7 @@ target_sources(${TARGET}
 target_include_directories(${TARGET}
     PUBLIC
     ${USER_DIR}
+    ${PKG_BMI088_ALGO_DIR}/Inc
     ${CORE_DIR}/Inc
     ${CMSIS_DIR}/Include
     ${CMSIS_DIR}/Device/ST/STM32F4xx/Include
