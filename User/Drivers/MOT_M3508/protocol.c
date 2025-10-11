@@ -1,5 +1,5 @@
-#include "driver/motor_m3508/protocol.h"
-#include "driver/motor_m3508/conf.h"
+#include "protocol.h"
+#include "conf.h"
 
 // CAN头和数据缓冲区
 static const canTxH tx_header_1_4 = {

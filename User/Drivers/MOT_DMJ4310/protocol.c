@@ -1,5 +1,5 @@
-#include "driver/motor_dmj4310/protocol.h"
-#include "driver/motor_dmj4310/conf.h"
+#include "protocol.h"
+#include "conf.h"
 
 // 位置缩放因子 - 原始值转弧度
 static f32 s_pos_scale = DMJ4310_X_SCALE;
