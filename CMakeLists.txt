@@ -30,13 +30,15 @@ set(ASM_SOURCES
     ${STARTUP_DIR}/startup_stm32f407ighx.s
 )
 
-set(PKG_BMI088_ALGO_DIR ${LIB_DIR}/bmi088_algo)
-file(GLOB_RECURSE PKG_BMI088_ALGO_SOURCES ${PKG_BMI088_ALGO_DIR}/Src/*.c)
+set(PKG_BMI088D_DIR ${LIB_DIR}/bmi088d)
+file(GLOB_RECURSE PKG_BMI088D_SOURCES ${PKG_BMI088D_DIR}/Src/*.c)
+
+set(PKG_CMSIS_DAP_DIR ${LIB_DIR}/CMSIS-DAP)
 
 target_sources(${TARGET}
     PRIVATE
     ${USER_SOURCES}
-    ${PKG_BMI088_ALGO_SOURCES}
+    ${PKG_BMI088D_SOURCES}
     ${CORE_SOURCES}
     ${HAL_SOURCES}
     ${CMSIS_SOURCES}
@@ -46,10 +48,11 @@ target_sources(${TARGET}
 target_include_directories(${TARGET}
     PUBLIC
     ${USER_DIR}
-    ${PKG_BMI088_ALGO_DIR}/Inc
+    ${PKG_BMI088D_DIR}/Inc
     ${CORE_DIR}/Inc
     ${CMSIS_DIR}/Include
     ${CMSIS_DIR}/Device/ST/STM32F4xx/Include
+    ${PKG_CMSIS_DAP_DIR}/Include
     ${HAL_DIR}/Inc
 )
 
