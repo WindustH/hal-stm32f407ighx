@@ -16,7 +16,7 @@
  * @return 成功返回索引（0 ~ CAN_FIFO1_CB_LIST_SIZE-1），失败返回
  * CAN_FIFO1_CB_LIST_SIZE
  */
-u8 bsp_can_fifo1_cb_add(canFifo1MsgPendingCb callback);
+u8 bsp_can_fifo1_cb_add(canFifo1Cb callback);
 
 /**
  * @brief 注销一个已注册的 CAN FIFO1 回调函数

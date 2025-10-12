@@ -8,6 +8,7 @@
 #include "driver.h"
 #include "main.h"
 
+u8 DMJ4310_PROTECT_ON = false;
 static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat;
 static volatile motCtrl_DMJ4310 mot_ctrl;
@@ -33,23 +34,12 @@ void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcan) {
     Error_Handler();
   }
 
-  // 启动 CAN 外设
-  if (HAL_CAN_Start(hcan) != HAL_OK) {
-    Error_Handler();
-  }
-
-  // 激活CAN RX 中断仅用于 FIFO0
-  if (HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING) !=
-      HAL_OK) {
-    Error_Handler();
-  }
-
   // 保存配置的 can 对象
   hcanx = hcan;
 }
 
 void mot_set_torque_dmj4310(f32 trq) {
-  if (!PROTECT_ON) {
+  if (!DMJ4310_PROTECT_ON) {
     mot_ctrl.trq = trq;
     mot_ctrl.kd = 0.0f;
     mot_ctrl.kp = 0.0f;
@@ -59,7 +49,7 @@ void mot_set_torque_dmj4310(f32 trq) {
 }
 
 void mot_send_ctrl_msg_dmj4310() {
-  if (!PROTECT_ON) {
+  if (!DMJ4310_PROTECT_ON) {
     motCtrlCanMsg_DMJ4310 can_msg;
     u32 unused_mailbox;
     mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);

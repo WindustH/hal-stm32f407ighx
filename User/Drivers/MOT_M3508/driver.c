@@ -8,6 +8,7 @@
 #include "driver.h"
 #include "main.h"
 
+u8 M3508_PROTECT_ON = false;
 static CAN_HandleTypeDef *hcanx;           ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8]; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8]; ///< 8个电机的控制信息数组
@@ -58,28 +59,17 @@ void mot_setup_can_m3508(CAN_HandleTypeDef *hcan) {
     Error_Handler();
   }
 
-  // 启动 CAN 外设
-  if (HAL_CAN_Start(hcan) != HAL_OK) {
-    Error_Handler();
-  }
-
-  // 激活CAN RX 中断仅用于 FIFO0
-  if (HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING) !=
-      HAL_OK) {
-    Error_Handler();
-  }
-
   // 保存配置的 can 对象
   hcanx = hcan;
 }
 
 void mot_set_current_m3508(u8 mot_id, i16 cur) {
-  if (!PROTECT_ON)
+  if (!M3508_PROTECT_ON)
     mot_ctrl[mot_id].I = cur;
 }
 
 void mot_send_ctrl_msg_m3508() {
-  if (!PROTECT_ON) {
+  if (!M3508_PROTECT_ON) {
     motCtrlCanMsg_M3508 can_msg;
     u32 unused_mailbox;
     mot_ctrl_pack_msg_m3508(mot_ctrl, &can_msg);

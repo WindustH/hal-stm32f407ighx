@@ -11,7 +11,7 @@
 #include "protocol.h"
 #include "type.h"
 
-u8 PROTECT_ON = false;
+extern u8 M3508_PROTECT_ON;
 
 /**
  * @brief 配置与启用M3508电机的CAN通信

@@ -10,10 +10,10 @@
 #include <string.h>
 
 // 静态全局回调列表
-static volatile canFifo0MsgPendingCbList can_fifo0_msg_pending_cb_list = {0};
+static volatile canFifo0CbList can_fifo0_msg_pending_cb_list = {0};
 
 
-u8 bsp_can_fifo0_cb_add(canFifo0MsgPendingCb callback) {
+u8 bsp_can_fifo0_cb_add(canFifo0Cb callback) {
   if (callback == NULL) {
     return CAN_FIFO0_CB_LIST_SIZE;
   }

@@ -53,24 +53,24 @@ typedef struct {
 // 定义 CAN FIFO0 消息挂起回调函数类型
 // 参数说明：
 //   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo0MsgPendingCb)(CAN_HandleTypeDef *hcan);
+typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan);
 
 // 定义 CAN FIFO1 消息挂起回调函数类型
 // 参数说明：
 //   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo1MsgPendingCb)(CAN_HandleTypeDef *hcan);
+typedef void (*canFifo1Cb)(CAN_HandleTypeDef *hcan);
 
 // CAN FIFO0 回调函数列表结构
 typedef struct {
   volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
-  canFifo0MsgPendingCb callbacks[CAN_FIFO0_CB_LIST_SIZE];
-} canFifo0MsgPendingCbList;
+  canFifo0Cb callbacks[CAN_FIFO0_CB_LIST_SIZE];
+} canFifo0CbList;
 
 // CAN FIFO1 回调函数列表结构
 typedef struct {
   volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
-  canFifo1MsgPendingCb callbacks[CAN_FIFO1_CB_LIST_SIZE];
-} canFifo1MsgPendingCbList;
+  canFifo1Cb callbacks[CAN_FIFO1_CB_LIST_SIZE];
+} canFifo1CbList;
 
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;

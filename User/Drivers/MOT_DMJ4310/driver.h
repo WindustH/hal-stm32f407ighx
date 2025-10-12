@@ -11,7 +11,7 @@
 #include "protocol.h"
 #include "type.h"
 
-u8 PROTECT_ON = false;
+extern u8 DMJ4310_PROTECT_ON;
 
 /**
  * @brief 配置与启用DMJ4310电机的CAN通信
