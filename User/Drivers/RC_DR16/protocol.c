@@ -1,11 +1,7 @@
 #include "protocol.h"
 
-/**
- * @brief 将原始18字节SBUS-like数据解析为结构化的遥控器控制数据
- * @param raw_data 指向18字节缓冲区的指针(不能为空)
- * @param out      指向输出结构体的指针(不能为空)
- */
-void rc_ctrl_msg_parse_dr16(const volatile u8 *raw_data, rcCtrl_dr16 *out) {
+void rc_ctrl_msg_parse_dr16(const volatile u8 *raw_data,
+                            volatile rcCtrl_dr16 *out) {
   // 通道0: byte0 + byte1的低3位
   out->rc.ch0 = (raw_data[0] | ((u16)(raw_data[1] & 0x07) << 8)) & 0x07FF;
 

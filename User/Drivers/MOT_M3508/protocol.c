@@ -26,23 +26,12 @@ static f32 s_vel_scale = M3508_V_SCALE;
 // 电流缩放因子
 static f32 s_cur_scale = M3508_I_SCALE;
 
-/**
- * @brief 配置M3508电机的缩放因子
- * @param pos_scale 位置缩放因子
- * @param vel_scale 速度缩放因子
- * @param cur_scale 电流缩放因子
- */
 void mot_m3508_set_scaling(f32 pos_scale, f32 vel_scale, f32 cur_scale) {
   s_pos_scale = pos_scale;
   s_vel_scale = vel_scale;
   s_cur_scale = cur_scale;
 }
 
-/**
- * @brief 将控制命令打包为8个电机的控制消息(1-4和5-8)
- * @param ctrl 控制命令结构体指针
- * @param can_msg CAN消息结构体指针
- */
 void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
                              motCtrlCanMsg_M3508 *can_msg) {
   *can_msg = (motCtrlCanMsg_M3508){
@@ -59,12 +48,6 @@ void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
   }
 }
 
-/**
- * @brief 从CAN解析反馈数据(处理电机1-8)
- * @param msg CAN接收头指针
- * @param data CAN数据指针
- * @param mot_stat 电机状态结构体指针
- */
 void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
                         volatile motStat_M3508 *mot_stat) {
   u32 std_id = msg->StdId;

@@ -1,12 +1,19 @@
+/**
+ * @file drvier.c
+ * @brief DMJ4310电机驱动实现文件
+ *
+ * 实现DMJ4310电机的CAN通信配置、控制命令发送和状态更新功能
+ */
+
 #include "driver.h"
 #include "main.h"
 #include "protocol.h"
 
-static CAN_HandleTypeDef *hcan;
+static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat;
 static volatile motCtrl_DMJ4310 mot_ctrl;
 
-void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcanx) {
+void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 14
@@ -23,23 +30,23 @@ void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcanx) {
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
   can_filter.FilterActivation = ENABLE;
 
-  if (HAL_CAN_ConfigFilter(hcanx, &can_filter) != HAL_OK) {
+  if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {
     Error_Handler();
   }
 
   // 启动 CAN 外设
-  if (HAL_CAN_Start(hcanx) != HAL_OK) {
+  if (HAL_CAN_Start(hcan) != HAL_OK) {
     Error_Handler();
   }
 
   // 激活CAN RX 中断仅用于 FIFO0
-  if (HAL_CAN_ActivateNotification(hcanx, CAN_IT_RX_FIFO0_MSG_PENDING) !=
+  if (HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING) !=
       HAL_OK) {
     Error_Handler();
   }
 
   // 保存配置的 can 对象
-  hcan = hcanx;
+  hcanx = hcan;
 }
 
 void mot_set_torque_dmj4310(f32 trq) {
@@ -55,13 +62,19 @@ void mot_send_ctrl_msg_dmj4310() {
   u32 unused_mailbox;
   mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);
 
-  if (HAL_CAN_AddTxMessage(hcan, &can_msg.header, can_msg.data,
+  if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                            &unused_mailbox) != HAL_OK) {
     return;
   }
 }
 
-void mot_update_stat_dmj4310(const volatile canRxH *msg,
-                             const volatile u8 *data) {
-  mot_fb_parse_dmj4310(msg, data, &mot_stat);
+void mot_update_stat_dmj4310(CAN_HandleTypeDef *hcan) {
+  if (hcanx == hcan) {
+    canRxH header;
+    u8 *data = {0};
+    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
+      return;
+    }
+    mot_fb_parse_dmj4310(&header, data, &mot_stat);
+  }
 }

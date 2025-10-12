@@ -24,7 +24,7 @@ extern const u32 TICK_PER_SECOND;
 extern const f32 SECOND_PER_TICK;
 
 // 函数指针类型定义
-typedef void (*proc)(void);
+typedef void (*cronJob)(void);
 
 // 缓冲区结构体定义
 typedef struct {
@@ -34,9 +34,43 @@ typedef struct {
 
 // 进程列表结构体定义
 typedef struct {
-  proc procs[PROC_LIST_SIZE]; // 进程函数指针数组
-  u32 state;                  // 进程状态位图
-} procList;
+  cronJob procs[CRON_JOB_MAX_CNT]; // 进程函数指针数组
+  u32 state;                       // 进程状态位图
+} cronJobList;
+
+// 定义 UART 接收回调函数类型
+// 参数说明：
+//   huart: 触发中断的 UART 句柄
+//   Size:  实际接收到的数据字节数（由 HAL 提供）
+typedef void (*uartRxCb)(UART_HandleTypeDef *huart, u16 size);
+
+// 回调函数列表结构
+typedef struct {
+  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
+  uartRxCb callbacks[UART_CB_LIST_SIZE];
+} uartRxCbList;
+
+// 定义 CAN FIFO0 消息挂起回调函数类型
+// 参数说明：
+//   hcan: 触发中断的 CAN 句柄
+typedef void (*canFifo0MsgPendingCb)(CAN_HandleTypeDef *hcan);
+
+// 定义 CAN FIFO1 消息挂起回调函数类型
+// 参数说明：
+//   hcan: 触发中断的 CAN 句柄
+typedef void (*canFifo1MsgPendingCb)(CAN_HandleTypeDef *hcan);
+
+// CAN FIFO0 回调函数列表结构
+typedef struct {
+  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
+  canFifo0MsgPendingCb callbacks[CAN_FIFO0_CB_LIST_SIZE];
+} canFifo0MsgPendingCbList;
+
+// CAN FIFO1 回调函数列表结构
+typedef struct {
+  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
+  canFifo1MsgPendingCb callbacks[CAN_FIFO1_CB_LIST_SIZE];
+} canFifo1MsgPendingCbList;
 
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;

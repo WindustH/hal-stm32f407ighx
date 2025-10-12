@@ -8,24 +8,12 @@ static f32 s_vel_scale = DMJ4310_V_SCALE;
 // 扭矩缩放因子 - 原始值转牛顿米
 static f32 s_trq_scale = DMJ4310_TOR_SCALE;
 
-/**
- * @brief 配置DMJ4310电机的缩放因子
- * @param pos_scale 位置缩放因子
- * @param vel_scale 速度缩放因子
- * @param trq_scale 扭矩缩放因子
- */
 void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
   s_pos_scale = pos_scale;
   s_vel_scale = vel_scale;
   s_trq_scale = trq_scale;
 }
 
-/**
- * @brief 从CAN消息解析电机反馈数据
- * @param msg CAN接收头指针
- * @param data CAN数据指针
- * @param mot_stat_dmj4310 电机状态结构体指针
- */
 void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
                           volatile motStat_DMJ4310 *mot_stat_dmj4310) {
   // 只处理预期的反馈CAN ID
@@ -93,11 +81,6 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
   mot_stat_dmj4310->motor_id = parsed_id;
 }
 
-/**
- * @brief 将MIT模式控制命令打包为CAN消息
- * @param ctrl_msg 控制命令结构体指针
- * @param can_msg CAN消息结构体指针
- */
 void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                                motCtrlCanMsg_DMJ4310 *can_msg) {
   static canTxH tx_header = {

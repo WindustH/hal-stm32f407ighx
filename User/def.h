@@ -4,7 +4,13 @@
 // DMA缓冲区大小
 #define DMA_BUFFER_SIZE 256
 // 进程列表大小
-#define PROC_LIST_SIZE 32
+#define CRON_JOB_MAX_CNT 32
+// 最大支持的 UART 回调任务数
+#define UART_CB_LIST_SIZE 32
+// 最大支持的 CAN FIFO0 回调任务数
+#define CAN_FIFO0_CB_LIST_SIZE 32
+// 最大支持的 CAN FIFO1 回调任务数
+#define CAN_FIFO1_CB_LIST_SIZE 32
 // 系统时钟频率(Hz)
 #define SYSCLK 168000000U
 // APB1总线时钟频率(Hz)
