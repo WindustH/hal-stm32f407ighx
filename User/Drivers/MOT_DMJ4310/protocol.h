@@ -22,7 +22,7 @@
 typedef struct {
   f32 x;         // 实际位置(弧度，多圈)
   f32 v;         // 实际速度(弧度/秒)
-  f32 tor;       // 实际扭矩(Nm)
+  f32 trq;       // 实际扭矩(Nm)
   u8 error_code; // 错误代码(0表示无错误)
   u8 T_mos;      // MOSFET温度(°C)
   u8 T_mot;      // 电机(转子)温度(°C)
@@ -35,7 +35,7 @@ typedef struct {
   f32 v;   // 期望速度(弧度/秒)
   f32 kp;  // 位置增益
   f32 kd;  // 阻尼增益
-  f32 tor; // 扭矩前馈(Nm)
+  f32 trq; // 扭矩前馈(Nm)
 } motCtrl_DMJ4310;
 
 // 用于传输的CAN消息容器
@@ -51,7 +51,7 @@ typedef struct {
  * @param mot_stat_dmj4310 电机状态结构体指针
  */
 void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
-                          motStat_DMJ4310 *mot_stat_dmj4310);
+                          volatile motStat_DMJ4310 *mot_stat_dmj4310);
 
 /**
  * @brief 将MIT模式控制命令打包为CAN消息

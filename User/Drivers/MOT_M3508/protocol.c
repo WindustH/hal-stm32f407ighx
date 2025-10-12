@@ -66,7 +66,7 @@ void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
  * @param mot_stat 电机状态结构体指针
  */
 void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
-                        motStat_M3508 *mot_stat) {
+                        volatile motStat_M3508 *mot_stat) {
   u32 std_id = msg->StdId;
 
   // M3508反馈ID范围: 0x201到0x208

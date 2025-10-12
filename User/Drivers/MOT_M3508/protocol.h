@@ -43,7 +43,7 @@ void mot_m3508_set_scaling(f32 pos_scale, f32 vel_scale, f32 cur_scale);
  * @param mot_stat 电机状态结构体指针
  */
 void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
-                        motStat_M3508 *mot_stat);
+                        volatile motStat_M3508 *mot_stat);
 
 /**
  * @brief 将控制命令打包为M3508电机的CAN消息

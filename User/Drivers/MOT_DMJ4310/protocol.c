@@ -27,7 +27,7 @@ void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
  * @param mot_stat_dmj4310 电机状态结构体指针
  */
 void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
-                          motStat_DMJ4310 *mot_stat_dmj4310) {
+                          volatile motStat_DMJ4310 *mot_stat_dmj4310) {
   // 只处理预期的反馈CAN ID
   if (msg->StdId != DMJ4310_PITCH_FEEDBACK_ID) {
     return;
@@ -86,7 +86,7 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
   // 填充反馈结构体
   mot_stat_dmj4310->x = pos_total;               // 弧度(多圈)
   mot_stat_dmj4310->v = raw_vel * s_vel_scale;   // 弧度/秒
-  mot_stat_dmj4310->tor = raw_trq * s_trq_scale; // 牛顿米
+  mot_stat_dmj4310->trq = raw_trq * s_trq_scale; // 牛顿米
   mot_stat_dmj4310->error_code = error_code;
   mot_stat_dmj4310->T_mos = temp_mos;
   mot_stat_dmj4310->T_mot = temp_rotor;
@@ -112,7 +112,7 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
   // 使用缩放因子将物理单位转换为原始整数
   i16 p_des_raw = (i16)(ctrl_msg->x / s_pos_scale);
   i16 v_des_raw = (i16)(ctrl_msg->v / s_vel_scale);
-  i16 t_ff_raw = (i16)(ctrl_msg->tor / s_trq_scale);
+  i16 t_ff_raw = (i16)(ctrl_msg->trq / s_trq_scale);
 
   // 将Kp/Kd从浮点范围映射到12位无符号整数
   u16 kp_raw = (u16)((ctrl_msg->kp - DMJ4310_KP_RANGE_MIN) /

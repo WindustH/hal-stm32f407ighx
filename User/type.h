@@ -2,6 +2,7 @@
 #define __USER_TYPE__
 
 #include "def.h"
+#include "stm32f4xx_hal.h" // IWYU pragma: keep
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -27,35 +28,17 @@ typedef void (*proc)(void);
 
 // 缓冲区结构体定义
 typedef struct {
-  u8 dat[DMA_BUFFER_SIZE];  // 数据缓冲区
-  u16 len;                  // 数据长度
+  u8 dat[DMA_BUFFER_SIZE]; // 数据缓冲区
+  u16 len;                 // 数据长度
 } buf;
 
 // 进程列表结构体定义
 typedef struct {
-  proc procs[PROC_LIST_SIZE];  // 进程函数指针数组
-  u32 state;                   // 进程状态位图
+  proc procs[PROC_LIST_SIZE]; // 进程函数指针数组
+  u32 state;                  // 进程状态位图
 } procList;
 
-// CAN发送头结构体定义
-typedef struct {
-  u32 StdId;              // 标准标识符
-  u32 ExtId;              // 扩展标识符
-  u32 IDE;                // 标识符类型
-  u32 RTR;                // 远程传输请求
-  u32 DLC;                // 数据长度码
-  u32 TransmitGlobalTime; // 发送全局时间
-} canTxH;
-
-// CAN接收头结构体定义
-typedef struct {
-  u32 StdId;            // 标准标识符
-  u32 ExtId;            // 扩展标识符
-  u32 IDE;              // 标识符类型
-  u32 RTR;              // 远程传输请求
-  u32 DLC;              // 数据长度码
-  u32 FilterMatchIndex; // 过滤器匹配索引
-  u32 Timestamp;        // 时间戳
-} canRxH;
+typedef CAN_RxHeaderTypeDef canRxH;
+typedef CAN_TxHeaderTypeDef canTxH;
 
 #endif /* __USER_TYPE__ */
