@@ -7,7 +7,6 @@
 
 #include "driver.h"
 #include "main.h"
-#include "protocol.h"
 
 static CAN_HandleTypeDef *hcanx;           ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8]; ///< 8个电机的状态信息数组
@@ -74,23 +73,28 @@ void mot_setup_can_m3508(CAN_HandleTypeDef *hcan) {
   hcanx = hcan;
 }
 
-void mot_set_current_m3508(u8 mot_id, i16 cur) { mot_ctrl[mot_id].I = cur; }
+void mot_set_current_m3508(u8 mot_id, i16 cur) {
+  if (!PROTECT_ON)
+    mot_ctrl[mot_id].I = cur;
+}
 
 void mot_send_ctrl_msg_m3508() {
-  motCtrlCanMsg_M3508 can_msg;
-  u32 unused_mailbox;
-  mot_ctrl_pack_msg_m3508(mot_ctrl, &can_msg);
+  if (!PROTECT_ON) {
+    motCtrlCanMsg_M3508 can_msg;
+    u32 unused_mailbox;
+    mot_ctrl_pack_msg_m3508(mot_ctrl, &can_msg);
 
-  // 发送电机1-4的控制消息
-  if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_1_4, can_msg.data_1_4,
-                           &unused_mailbox) != HAL_OK) {
-    return;
-  }
+    // 发送电机1-4的控制消息
+    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_1_4, can_msg.data_1_4,
+                             &unused_mailbox) != HAL_OK) {
+      return;
+    }
 
-  // 发送电机5-8的控制消息
-  if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_5_8, can_msg.data_5_8,
-                           &unused_mailbox) != HAL_OK) {
-    return;
+    // 发送电机5-8的控制消息
+    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_5_8, can_msg.data_5_8,
+                             &unused_mailbox) != HAL_OK) {
+      return;
+    }
   }
 }
 
@@ -104,3 +108,5 @@ void mot_update_stat_m3508(CAN_HandleTypeDef *hcan) {
     mot_fb_parse_m3508(&header, data, mot_stat);
   }
 }
+
+volatile motStat_M3508 *mot_get_stat_m3508(u8 id) { return &mot_stat[id]; }

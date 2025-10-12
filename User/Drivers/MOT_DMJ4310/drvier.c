@@ -7,7 +7,6 @@
 
 #include "driver.h"
 #include "main.h"
-#include "protocol.h"
 
 static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat;
@@ -50,21 +49,25 @@ void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcan) {
 }
 
 void mot_set_torque_dmj4310(f32 trq) {
-  mot_ctrl.trq = trq;
-  mot_ctrl.kd = 0.0f;
-  mot_ctrl.kp = 0.0f;
-  mot_ctrl.v = 0.0f;
-  mot_ctrl.x = 0.0f;
+  if (!PROTECT_ON) {
+    mot_ctrl.trq = trq;
+    mot_ctrl.kd = 0.0f;
+    mot_ctrl.kp = 0.0f;
+    mot_ctrl.v = 0.0f;
+    mot_ctrl.x = 0.0f;
+  }
 }
 
 void mot_send_ctrl_msg_dmj4310() {
-  motCtrlCanMsg_DMJ4310 can_msg;
-  u32 unused_mailbox;
-  mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);
+  if (!PROTECT_ON) {
+    motCtrlCanMsg_DMJ4310 can_msg;
+    u32 unused_mailbox;
+    mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);
 
-  if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
-                           &unused_mailbox) != HAL_OK) {
-    return;
+    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
+                             &unused_mailbox) != HAL_OK) {
+      return;
+    }
   }
 }
 
@@ -78,3 +81,5 @@ void mot_update_stat_dmj4310(CAN_HandleTypeDef *hcan) {
     mot_fb_parse_dmj4310(&header, data, &mot_stat);
   }
 }
+
+volatile motStat_DMJ4310 *mot_get_stat_dmj4310() { return &mot_stat; }

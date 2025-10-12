@@ -7,7 +7,6 @@
 
 #include "driver.h"
 #include "main.h"
-#include "protocol.h"
 
 static UART_HandleTypeDef *huartx;         ///< UART对象指针
 static u8 uart_rx_buffer[DMA_BUFFER_SIZE]; ///< UART接收缓冲区
@@ -34,3 +33,5 @@ void rc_update_ctrl_msg_dr16(UART_HandleTypeDef *huart, u16 size) {
     HAL_UARTEx_ReceiveToIdle_DMA(huartx, uart_rx_buffer, DMA_BUFFER_SIZE);
   }
 }
+
+volatile rcCtrl_dr16 *rc_get_ctrl_sig_dr16() { return &rc_ctrl; }

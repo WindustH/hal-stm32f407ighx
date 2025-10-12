@@ -1,5 +1,0 @@
-#ifndef __USER_DRIVER_RC_DR16_PROTECT__
-#define __USER_DRIVER_RC_DR16_PROTECT__
-
-
-#endif /* __USER_DRIVER_RC_DR16_PROTECT__ */

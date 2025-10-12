@@ -17,7 +17,7 @@ static volatile uartRxCbList uart_cb_list = {0};
  * @param callback 要注册的回调函数指针
  * @return 成功返回索引，失败返回 UART_CB_LIST_SIZE
  */
-u8 bsp_uart_rx_callback_add(uartRxCb callback) {
+u8 bsp_uart_rx_cb_add(uartRxCb callback) {
   if (callback == NULL) {
     return UART_CB_LIST_SIZE;
   }
@@ -40,7 +40,7 @@ u8 bsp_uart_rx_callback_add(uartRxCb callback) {
  * @brief 注销 UART 回调
  * @param idx 要注销的回调索引
  */
-void bsp_uart_rx_callback_remove(u8 idx) {
+void bsp_uart_rx_cb_remove(u8 idx) {
   if (idx >= UART_CB_LIST_SIZE) {
     return;
   }

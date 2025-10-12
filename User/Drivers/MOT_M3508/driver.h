@@ -8,7 +8,10 @@
 #ifndef __USER_DRIVERS_MOT_M3508_DRIVER__
 #define __USER_DRIVERS_MOT_M3508_DRIVER__
 
+#include "protocol.h"
 #include "type.h"
+
+u8 PROTECT_ON = false;
 
 /**
  * @brief 配置与启用M3508电机的CAN通信
@@ -28,7 +31,8 @@ void mot_send_ctrl_msg_m3508();
  */
 void mot_set_current_m3508(u8 mot_id, i16 cur);
 
-
 void mot_update_stat_m3508(CAN_HandleTypeDef *hcan);
+
+volatile motStat_M3508 *mot_get_stat_m3508(u8 id);
 
 #endif /* __USER_DRIVERS_MOT_M3508_DRIVER__ */

@@ -12,12 +12,8 @@
 // 静态全局回调列表
 static volatile canFifo0MsgPendingCbList can_fifo0_msg_pending_cb_list = {0};
 
-/**
- * @brief 注册 CAN FIFO0 消息挂起回调
- * @param callback 要注册的回调函数指针
- * @return 成功返回索引，失败返回 CAN_FIFO0_CB_LIST_SIZE
- */
-u8 bsp_can_fifo0_msg_pending_callback_add(canFifo0MsgPendingCb callback) {
+
+u8 bsp_can_fifo0_cb_add(canFifo0MsgPendingCb callback) {
   if (callback == NULL) {
     return CAN_FIFO0_CB_LIST_SIZE;
   }
@@ -36,11 +32,8 @@ u8 bsp_can_fifo0_msg_pending_callback_add(canFifo0MsgPendingCb callback) {
   return CAN_FIFO0_CB_LIST_SIZE; // 满了
 }
 
-/**
- * @brief 注销 CAN FIFO0 回调
- * @param idx 要注销的回调索引
- */
-void bsp_can_fifo0_msg_pending_callback_remove(u8 idx) {
+
+void bsp_can_fifo0_cb_remove(u8 idx) {
   if (idx >= CAN_FIFO0_CB_LIST_SIZE) {
     return;
   }
@@ -52,11 +45,6 @@ void bsp_can_fifo0_msg_pending_callback_remove(u8 idx) {
   __enable_irq();
 }
 
-/**
- * @brief HAL CAN FIFO0 消息挂起回调（由 HAL 库调用）
- *        此函数需在 stm32xxx_it.c 或 main.c 中保留为 weak 或直接实现
- * @param hcan CAN对象指针
- */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   // 遍历所有已注册的回调并调用
   u32 state_snapshot =

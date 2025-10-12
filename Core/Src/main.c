@@ -101,6 +101,8 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIME_
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -7,6 +7,7 @@
 
 #ifndef __USER_DRIVERS_RC_DR16_DRIVER__
 #define __USER_DRIVERS_RC_DR16_DRIVER__
+#include "protocol.h"
 #include "type.h" // IWYU pragma: keep
 
 /**
@@ -21,5 +22,7 @@ void rc_setup_uart_dr16(UART_HandleTypeDef *uartx);
  * @param size 接收数据大小
  */
 void rc_update_ctrl_msg_dr16(UART_HandleTypeDef *huart, u16 size);
+
+volatile rcCtrl_dr16 *rc_get_ctrl_sig_dr16();
 
 #endif /* __USER_DRIVERS_RC_DR16_DRIVER__ */

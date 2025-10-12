@@ -8,7 +8,10 @@
 #ifndef __USER_DRIVERS_MOT_DMJ4310_DRIVER__
 #define __USER_DRIVERS_MOT_DMJ4310_DRIVER__
 
+#include "protocol.h"
 #include "type.h"
+
+u8 PROTECT_ON = false;
 
 /**
  * @brief 配置与启用DMJ4310电机的CAN通信
@@ -28,5 +31,5 @@ void mot_send_ctrl_msg_dmj4310();
 void mot_set_torque_dmj4310(f32 trq);
 
 void mot_update_stat_dmj4310(CAN_HandleTypeDef *hcan);
-
+volatile motStat_DMJ4310 *mot_get_stat_dmj4310();
 #endif /* __USER_DRIVERS_MOT_DMJ4310_DRIVER__ */
