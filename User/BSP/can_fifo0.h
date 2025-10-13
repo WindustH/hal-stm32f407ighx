@@ -5,8 +5,8 @@
  * 提供CAN FIFO0消息挂起中断的回调函数管理接口，支持多回调函数注册
  */
 
-#ifndef __BSP_CAN_FIFO0_IT__
-#define __BSP_CAN_FIFO0_IT__
+#ifndef __BSP_CAN_FIFO0__
+#define __BSP_CAN_FIFO0__
 
 #include "type.h"
 

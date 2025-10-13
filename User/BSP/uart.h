@@ -5,8 +5,8 @@
  * 提供UART接收中断的回调函数管理接口，支持多回调函数注册
  */
 
-#ifndef __BSP_UART_IT__
-#define __BSP_UART_IT__
+#ifndef __BSP_UART__
+#define __BSP_UART__
 
 #include "type.h"
 

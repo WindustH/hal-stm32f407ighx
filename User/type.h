@@ -72,6 +72,17 @@ typedef struct {
   canFifo1Cb callbacks[CAN_FIFO1_CB_LIST_SIZE];
 } canFifo1CbList;
 
+// 定义 GPIO EXTI 中断回调函数类型
+// 参数说明：
+//   GPIO_Pin: 触发中断的 GPIO 引脚
+typedef void (*gpioExtiCb)(uint16_t GPIO_Pin);
+
+// GPIO EXTI 回调函数列表结构
+typedef struct {
+  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
+  gpioExtiCb callbacks[GPIO_EXTI_CB_LIST_SIZE];
+} gpioExtiCbList;
+
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;
 

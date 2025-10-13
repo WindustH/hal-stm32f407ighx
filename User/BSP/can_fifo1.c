@@ -5,7 +5,7 @@
  * 实现CAN FIFO1消息挂起中断的回调函数管理，支持多回调函数的注册、注销和调用
  */
 
-#include "can_fifo1_it.h"
+#include "can_fifo1.h"
 #include "stm32f4xx_hal.h" // IWYU pragma: keep
 #include <string.h>
 
