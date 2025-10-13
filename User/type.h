@@ -75,4 +75,28 @@ typedef struct {
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;
 
+typedef struct {
+  f32 dt;
+  f32 p;
+  f32 i;
+  f32 d;
+  f32 prev_error;
+} pidStat;
+
+typedef struct {
+  f32 r; // 使用第一套参数的控制域
+  f32 R; // 过渡控制域大小
+  f32 kpr;
+  f32 kir;
+  f32 kdr;
+  f32 kp;
+  f32 ki;
+  f32 kd;
+  f32 ol;
+
+  f32 target; // Target value
+
+  u8 enabled; // Controller enabled flag
+} pwPidArg;
+
 #endif /* __USER_TYPE__ */
