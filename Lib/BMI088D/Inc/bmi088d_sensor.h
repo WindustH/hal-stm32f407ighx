@@ -9,8 +9,8 @@
 #ifndef BMI088D_SENSOR_H
 #define BMI088D_SENSOR_H
 
-#include "bmi088d_types.h"
 #include "bmi088d_hal.h"
+#include "bmi088d_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,11 +20,11 @@ extern "C" {
  * @brief Error codes for sensor driver
  */
 typedef enum {
-    BMI088D_SENSOR_OK = 0,
-    BMI088D_SENSOR_ERROR_COMM = -1,
-    BMI088D_SENSOR_ERROR_ID = -2,
-    BMI088D_SENSOR_ERROR_CONFIG = -3,
-    BMI088D_SENSOR_ERROR_SELF_TEST = -4
+  BMI088D_SENSOR_OK = 0,
+  BMI088D_SENSOR_ERROR_COMM = -1,
+  BMI088D_SENSOR_ERROR_ID = -2,
+  BMI088D_SENSOR_ERROR_CONFIG = -3,
+  BMI088D_SENSOR_ERROR_SELF_TEST = -4
 } bmi088d_sensor_error_t;
 
 /**
@@ -33,18 +33,6 @@ typedef enum {
  * @return Error code
  */
 bmi088d_sensor_error_t bmi088d_sensor_init(const bmi088d_hw_config_t *config);
-
-/**
- * @brief Initialize accelerometer
- * @return Error code
- */
-bmi088d_sensor_error_t bmi088d_accel_init(void);
-
-/**
- * @brief Initialize gyroscope
- * @return Error code
- */
-bmi088d_sensor_error_t bmi088d_gyro_init(void);
 
 /**
  * @brief Read sensor data

@@ -14,7 +14,7 @@
  * @brief 配置与启用DR16遥控器的UART通信
  * @param uartx UART对象指针
  */
-void rc_setup_uart_dr16(UART_HandleTypeDef *uartx);
+void setup_rc_dr16(UART_HandleTypeDef *uartx);
 
 /**
  * @brief 更新遥控器控制消息

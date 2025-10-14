@@ -1,6 +1,7 @@
 /**
  * @file    bmi088d_ekf.h
- * @brief   BMI088 Driver Library - Extended Kalman Filter for Attitude Estimation
+ * @brief   BMI088 Driver Library - Extended Kalman Filter for Attitude
+ * Estimation
  * @author  Extracted from RoboMaster INS Example
  * @version 1.0.0
  * @date    2025-10-11
@@ -17,34 +18,34 @@ extern "C" {
 
 /* EKF configuration */
 typedef struct {
-    float process_noise_quat;     /* Quaternion process noise */
-    float process_noise_bias;     /* Gyro bias process noise */
-    float measurement_noise;      /* Accelerometer measurement noise */
-    float lambda;                 /* Fading coefficient */
-    float acc_lpf_coef;           /* Acceleration low-pass filter coefficient */
-    float chi_square_threshold;   /* Chi-square test threshold */
-    float gyro_norm_threshold;    /* Gyro norm threshold for stability */
-    float acc_norm_min;           /* Minimum acceleration norm */
-    float acc_norm_max;           /* Maximum acceleration norm */
+  float process_noise_quat;   /* Quaternion process noise */
+  float process_noise_bias;   /* Gyro bias process noise */
+  float measurement_noise;    /* Accelerometer measurement noise */
+  float lambda;               /* Fading coefficient */
+  float acc_lpf_coef;         /* Acceleration low-pass filter coefficient */
+  float chi_square_threshold; /* Chi-square test threshold */
+  float gyro_norm_threshold;  /* Gyro norm threshold for stability */
+  float acc_norm_min;         /* Minimum acceleration norm */
+  float acc_norm_max;         /* Maximum acceleration norm */
 } bmi088d_ekf_config_t;
 
 /* EKF state */
 typedef struct {
-    bmi088d_filter_status_t status;
-    bmi088d_quat_t quaternion;    /* Estimated quaternion */
-    bmi088d_vec3_t gyro_bias;     /* Estimated gyroscope bias */
-    bmi088d_vec3_t gyro;          /* Gyroscope data (bias compensated) */
-    bmi088d_vec3_t accel;         /* Accelerometer data (filtered) */
-    bmi088d_vec3_t orientation_cosine; /* Orientation cosine */
-    bmi088d_euler_t euler;        /* Euler angles */
-    float yaw_total_angle;        /* Total yaw angle (for continuous rotation) */
-    float gyro_norm;              /* Gyroscope norm */
-    float accel_norm;             /* Accelerometer norm */
-    float adaptive_gain_scale;    /* Adaptive gain scaling factor */
-    float dt;                     /* Update period */
-    float chi_square;             /* Chi-square test value */
-    int16_t yaw_round_count;      /* Yaw round counter */
-    float yaw_angle_last;         /* Last yaw angle */
+  bmi088d_filter_status_t status;
+  bmi088d_quat_t quaternion;         /* Estimated quaternion */
+  bmi088d_vec3_t gyro_bias;          /* Estimated gyroscope bias */
+  bmi088d_vec3_t gyro;               /* Gyroscope data (bias compensated) */
+  bmi088d_vec3_t accel;              /* Accelerometer data (filtered) */
+  bmi088d_vec3_t orientation_cosine; /* Orientation cosine */
+  bmi088d_euler_t euler;             /* Euler angles */
+  float yaw_total_angle;     /* Total yaw angle (for continuous rotation) */
+  float gyro_norm;           /* Gyroscope norm */
+  float accel_norm;          /* Accelerometer norm */
+  float adaptive_gain_scale; /* Adaptive gain scaling factor */
+  float dt;                  /* Update period */
+  float chi_square;          /* Chi-square test value */
+  int16_t yaw_round_count;   /* Yaw round counter */
+  float yaw_angle_last;      /* Last yaw angle */
 } bmi088d_ekf_state_t;
 
 /**
@@ -66,7 +67,8 @@ int32_t bmi088d_ekf_init(const bmi088d_ekf_config_t *config);
  * @return BMI088D_SUCCESS on success, error code on failure
  */
 int32_t bmi088d_ekf_update(float gyro_x, float gyro_y, float gyro_z,
-                          float accel_x, float accel_y, float accel_z, float dt);
+                           float accel_x, float accel_y, float accel_z,
+                           float dt);
 
 /**
  * @brief Get current EKF state

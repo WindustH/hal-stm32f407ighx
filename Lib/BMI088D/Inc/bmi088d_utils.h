@@ -78,14 +78,14 @@ float bmi088d_loop_constrain(float input, float min_value, float max_value);
  * @param[in] angle Input angle
  * @return Formatted angle
  */
-float bmi088d_theta_format(float angle);
+float bmi088d_format_deg(float angle);
 
 /**
  * @brief Format angle to -PI to PI radians
  * @param[in] angle Input angle
  * @return Formatted angle
  */
-float bmi088d_rad_format(float angle);
+float bmi088d_format_rad(float angle);
 
 /* Vector operations */
 
@@ -118,7 +118,8 @@ float bmi088d_vec_dot(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2);
  * @param[out] result Cross product
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_vec_cross(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2, bmi088d_vec3_t *result);
+int32_t bmi088d_vec_cross(const bmi088d_vec3_t *vec1,
+                          const bmi088d_vec3_t *vec2, bmi088d_vec3_t *result);
 
 /**
  * @brief Add two vectors
@@ -127,7 +128,8 @@ int32_t bmi088d_vec_cross(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2
  * @param[out] result Sum vector
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_vec_add(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2, bmi088d_vec3_t *result);
+int32_t bmi088d_vec_add(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2,
+                        bmi088d_vec3_t *result);
 
 /**
  * @brief Subtract two vectors
@@ -136,7 +138,9 @@ int32_t bmi088d_vec_add(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2, 
  * @param[out] result Difference vector
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_vec_subtract(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2, bmi088d_vec3_t *result);
+int32_t bmi088d_vec_subtract(const bmi088d_vec3_t *vec1,
+                             const bmi088d_vec3_t *vec2,
+                             bmi088d_vec3_t *result);
 
 /**
  * @brief Scale vector
@@ -145,7 +149,8 @@ int32_t bmi088d_vec_subtract(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *v
  * @param[out] result Scaled vector
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_vec_scale(const bmi088d_vec3_t *vec, float scale, bmi088d_vec3_t *result);
+int32_t bmi088d_vec_scale(const bmi088d_vec3_t *vec, float scale,
+                          bmi088d_vec3_t *result);
 
 /* Matrix operations (simplified for 3x3) */
 
@@ -156,7 +161,8 @@ int32_t bmi088d_vec_scale(const bmi088d_vec3_t *vec, float scale, bmi088d_vec3_t
  * @param[out] result Result vector
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_mat_vec_multiply(const float mat[9], const bmi088d_vec3_t *vec, bmi088d_vec3_t *result);
+int32_t bmi088d_mat_vec_multiply(const float mat[9], const bmi088d_vec3_t *vec,
+                                 bmi088d_vec3_t *result);
 
 /**
  * @brief Transpose 3x3 matrix
@@ -168,24 +174,11 @@ int32_t bmi088d_mat_transpose(const float mat[9], float result[9]);
 
 /* Time utilities */
 
-/**
- * @brief Get time difference using DWT counter
- * @param[in] last_cnt Pointer to last DWT counter value
- * @return Time difference in seconds
+/* Note: bmi088d_get_delta_t, bmi088d_delay_s, and bmi088d_delay_ms functions
+ * have been removed as they were unused in the BMI088D driver. The driver uses
+ * hardware abstraction layer delay functions (bmi088d_hal_delay_ms/us) instead
+ * and explicit time step parameters for PID control.
  */
-float bmi088d_get_delta_t(uint32_t *last_cnt);
-
-/**
- * @brief Simple delay function
- * @param[in] seconds Delay time in seconds
- */
-void bmi088d_delay_s(float seconds);
-
-/**
- * @brief Simple delay function in milliseconds
- * @param[in] ms Delay time in milliseconds
- */
-void bmi088d_delay_ms(uint32_t ms);
 
 #ifdef __cplusplus
 }

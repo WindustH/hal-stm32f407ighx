@@ -13,7 +13,7 @@ static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat;
 static volatile motCtrl_DMJ4310 mot_ctrl;
 
-void mot_setup_can_dmj4310(CAN_HandleTypeDef *hcan) {
+void setup_mot_dmj4310(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 14

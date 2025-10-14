@@ -13,7 +13,7 @@ static CAN_HandleTypeDef *hcanx;           ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8]; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8]; ///< 8个电机的控制信息数组
 
-void mot_setup_can_m3508(CAN_HandleTypeDef *hcan) {
+void setup_mot_m3508(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 0 - 配置电机ID 0x201-0x202

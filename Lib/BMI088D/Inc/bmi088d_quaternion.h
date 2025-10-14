@@ -36,7 +36,8 @@ int32_t bmi088d_quat_normalize(bmi088d_quat_t *quat);
  * @param[out] result Result quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_multiply(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2, bmi088d_quat_t *result);
+int32_t bmi088d_quat_multiply(const bmi088d_quat_t *q1,
+                              const bmi088d_quat_t *q2, bmi088d_quat_t *result);
 
 /**
  * @brief Get quaternion conjugate
@@ -44,7 +45,8 @@ int32_t bmi088d_quat_multiply(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2
  * @param[out] conjugate Conjugate quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_conjugate(const bmi088d_quat_t *quat, bmi088d_quat_t *conjugate);
+int32_t bmi088d_quat_conjugate(const bmi088d_quat_t *quat,
+                               bmi088d_quat_t *conjugate);
 
 /**
  * @brief Convert quaternion to Euler angles
@@ -52,7 +54,8 @@ int32_t bmi088d_quat_conjugate(const bmi088d_quat_t *quat, bmi088d_quat_t *conju
  * @param[out] euler Euler angles in degrees
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_to_euler(const bmi088d_quat_t *quat, bmi088d_euler_t *euler);
+int32_t bmi088d_quat_to_euler(const bmi088d_quat_t *quat,
+                              bmi088d_euler_t *euler);
 
 /**
  * @brief Convert Euler angles to quaternion
@@ -60,7 +63,8 @@ int32_t bmi088d_quat_to_euler(const bmi088d_quat_t *quat, bmi088d_euler_t *euler
  * @param[out] quat Output quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_euler_to_quat(const bmi088d_euler_t *euler, bmi088d_quat_t *quat);
+int32_t bmi088d_euler_to_quat(const bmi088d_euler_t *euler,
+                              bmi088d_quat_t *quat);
 
 /**
  * @brief Rotate vector by quaternion
@@ -69,7 +73,9 @@ int32_t bmi088d_euler_to_quat(const bmi088d_euler_t *euler, bmi088d_quat_t *quat
  * @param[out] result Rotated vector
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_rotate_vector(const bmi088d_quat_t *quat, const bmi088d_vec3_t *vec, bmi088d_vec3_t *result);
+int32_t bmi088d_quat_rotate_vector(const bmi088d_quat_t *quat,
+                                   const bmi088d_vec3_t *vec,
+                                   bmi088d_vec3_t *result);
 
 /**
  * @brief Get quaternion from axis-angle representation
@@ -78,7 +84,8 @@ int32_t bmi088d_quat_rotate_vector(const bmi088d_quat_t *quat, const bmi088d_vec
  * @param[out] quat Output quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_from_axis_angle(const bmi088d_vec3_t *axis, float angle, bmi088d_quat_t *quat);
+int32_t bmi088d_quat_from_axis_angle(const bmi088d_vec3_t *axis, float angle,
+                                     bmi088d_quat_t *quat);
 
 /**
  * @brief Get quaternion from gyroscope integration
@@ -87,7 +94,8 @@ int32_t bmi088d_quat_from_axis_angle(const bmi088d_vec3_t *axis, float angle, bm
  * @param[in,out] quat Current quaternion (updated in-place)
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_from_gyro(const bmi088d_vec3_t *gyro, float dt, bmi088d_quat_t *quat);
+int32_t bmi088d_quat_from_gyro(const bmi088d_vec3_t *gyro, float dt,
+                               bmi088d_quat_t *quat);
 
 /**
  * @brief Calculate quaternion difference
@@ -96,7 +104,8 @@ int32_t bmi088d_quat_from_gyro(const bmi088d_vec3_t *gyro, float dt, bmi088d_qua
  * @param[out] diff Difference quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_difference(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2, bmi088d_quat_t *diff);
+int32_t bmi088d_quat_difference(const bmi088d_quat_t *q1,
+                                const bmi088d_quat_t *q2, bmi088d_quat_t *diff);
 
 /**
  * @brief Spherical linear interpolation between two quaternions
@@ -106,7 +115,8 @@ int32_t bmi088d_quat_difference(const bmi088d_quat_t *q1, const bmi088d_quat_t *
  * @param[out] result Interpolated quaternion
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_quat_slerp(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2, float t, bmi088d_quat_t *result);
+int32_t bmi088d_quat_slerp(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2,
+                           float t, bmi088d_quat_t *result);
 
 /**
  * @brief Get quaternion magnitude

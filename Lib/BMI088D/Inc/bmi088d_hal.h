@@ -20,11 +20,13 @@ extern "C" {
  * @brief Hardware configuration structure
  */
 typedef struct {
-    SPI_HandleTypeDef *hspi;        /**< SPI handle */
-    GPIO_TypeDef *accel_cs_port;    /**< Accelerometer CS port */
-    uint16_t accel_cs_pin;          /**< Accelerometer CS pin */
-    GPIO_TypeDef *gyro_cs_port;     /**< Gyroscope CS port */
-    uint16_t gyro_cs_pin;           /**< Gyroscope CS pin */
+  SPI_HandleTypeDef *hspi;     /**< SPI handle */
+  GPIO_TypeDef *accel_cs_port; /**< Accelerometer CS port */
+  uint16_t accel_cs_pin;       /**< Accelerometer CS pin */
+  GPIO_TypeDef *gyro_cs_port;  /**< Gyroscope CS port */
+  uint16_t gyro_cs_pin;        /**< Gyroscope CS pin */
+  TIM_HandleTypeDef *htim;     /**< Timer handle for PWM output */
+  uint32_t tim_channel;        /**< Timer channel for PWM output */
 } bmi088d_hw_config_t;
 
 /**
@@ -32,6 +34,18 @@ typedef struct {
  * @param config Hardware configuration
  */
 void bmi088d_hal_init(const bmi088d_hw_config_t *config);
+
+/**
+ * @brief Get timer handle
+ * @return Timer handle
+ */
+TIM_HandleTypeDef *bmi088d_hal_get_timer(void);
+
+/**
+ * @brief Get timer channel
+ * @return Timer channel
+ */
+uint32_t bmi088d_hal_get_timer_channel(void);
 
 /**
  * @brief Delay in milliseconds

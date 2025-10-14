@@ -18,9 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "BSP/can_fifo0.h"
-#include "BSP/cron.h"
-#include "BSP/uart.h"
 #include "can.h"
 #include "dma.h"
 #include "gpio.h"
@@ -31,6 +28,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "BSP/can_fifo0.h"
+#include "BSP/cron.h"
+#include "BSP/uart.h"
 #include "Drivers/MOT_DMJ4310/driver.h"
 #include "Drivers/MOT_M3508/driver.h"
 #include "Drivers/RC_DR16/driver.h"
@@ -93,6 +93,14 @@ static void start_peripherals() {
       HAL_OK) {
     Error_Handler();
   }
+
+  if (HAL_TIM_Base_Start(&htim10) != HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1) != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 /* USER CODE END 0 */
@@ -138,15 +146,15 @@ int main(void) {
   /* USER CODE BEGIN 2 */
 
   // 配置 DMJ4310
-  mot_setup_can_dmj4310(&hcan2);
+  setup_mot_dmj4310(&hcan2);
   bsp_can_fifo0_cb_add(mot_update_stat_dmj4310);
   bsp_cron_job_add(mot_send_ctrl_msg_dmj4310);
   // 配置 M3508
-  mot_setup_can_m3508(&hcan1);
+  setup_mot_m3508(&hcan1);
   bsp_can_fifo0_cb_add(mot_update_stat_m3508);
   bsp_cron_job_add(mot_send_ctrl_msg_m3508);
   // 配置 RC DR16
-  rc_setup_uart_dr16(&huart3);
+  setup_rc_dr16(&huart3);
   bsp_uart_rx_cb_add(rc_update_ctrl_msg_dr16);
 
   // 外设启动

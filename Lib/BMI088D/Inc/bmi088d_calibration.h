@@ -17,21 +17,21 @@ extern "C" {
 
 /* Calibration configuration */
 typedef struct {
-    uint16_t sample_count;        /* Number of samples for calibration */
-    float max_timeout_s;          /* Maximum calibration timeout in seconds */
-    float gyro_diff_threshold;    /* Gyroscope difference threshold */
-    float g_norm_diff_threshold;  /* Gravity norm difference threshold */
-    float g_norm_expected;        /* Expected gravity norm (9.81 m/s²) */
-    float gyro_offset_threshold;  /* Gyroscope offset threshold */
+  uint16_t sample_count;       /* Number of samples for calibration */
+  float max_timeout_s;         /* Maximum calibration timeout in seconds */
+  float gyro_diff_threshold;   /* Gyroscope difference threshold */
+  float g_norm_diff_threshold; /* Gravity norm difference threshold */
+  float g_norm_expected;       /* Expected gravity norm (9.81 m/s²) */
+  float gyro_offset_threshold; /* Gyroscope offset threshold */
 } bmi088d_calib_config_t;
 
 /* Calibration status */
 typedef struct {
-    uint8_t calibrated;
-    uint8_t in_progress;
-    uint16_t current_sample;
-    float progress;
-    bmi088d_error_t last_error;
+  uint8_t calibrated;
+  uint8_t in_progress;
+  uint16_t current_sample;
+  float progress;
+  bmi088d_error_t last_error;
 } bmi088d_calib_status_t;
 
 /**
@@ -40,13 +40,6 @@ typedef struct {
  * @return BMI088D_SUCCESS on success, error code on failure
  */
 int32_t bmi088d_calib_init(const bmi088d_calib_data_t *default_calib);
-
-/**
- * @brief Perform gyroscope and accelerometer calibration
- * @param[in,out] imu_data IMU data structure to store calibration results
- * @return BMI088D_SUCCESS on success, error code on failure
- */
-int32_t bmi088d_calib_perform(bmi088d_imu_data_t *imu_data);
 
 /**
  * @brief Start calibration process
@@ -60,9 +53,11 @@ int32_t bmi088d_calib_start(bmi088d_imu_data_t *imu_data);
  * @param[in,out] imu_data IMU data structure
  * @param[in] accel_raw Raw accelerometer data
  * @param[in] gyro_raw Raw gyroscope data
- * @return BMI088D_SUCCESS if calibration complete, BMI088D_ERROR_CALIBRATION if failed, BMI088D_SUCCESS if still in progress
+ * @return BMI088D_SUCCESS if calibration complete, BMI088D_ERROR_CALIBRATION if
+ * failed, BMI088D_SUCCESS if still in progress
  */
-int32_t bmi088d_calib_update(bmi088d_imu_data_t *imu_data, const int16_t *accel_raw, const int16_t *gyro_raw);
+int32_t bmi088d_calib_update(bmi088d_imu_data_t *imu_data,
+                             const int16_t *accel_raw, const int16_t *gyro_raw);
 
 /**
  * @brief Get calibration status
@@ -78,7 +73,8 @@ int32_t bmi088d_calib_get_status(bmi088d_calib_status_t *status);
  * @param[in] gyro_raw Raw gyroscope data
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_calib_apply(bmi088d_imu_data_t *imu_data, const int16_t *accel_raw, const int16_t *gyro_raw);
+int32_t bmi088d_calib_apply(bmi088d_imu_data_t *imu_data,
+                            const int16_t *accel_raw, const int16_t *gyro_raw);
 
 /**
  * @brief Set pre-calibrated offsets
@@ -88,7 +84,9 @@ int32_t bmi088d_calib_apply(bmi088d_imu_data_t *imu_data, const int16_t *accel_r
  * @param[in] temp_calibration Temperature during calibration
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_calib_set_offsets(bmi088d_imu_data_t *imu_data, const float *gyro_offset, float g_norm, float temp_calibration);
+int32_t bmi088d_calib_set_offsets(bmi088d_imu_data_t *imu_data,
+                                  const float *gyro_offset, float g_norm,
+                                  float temp_calibration);
 
 /**
  * @brief Get default calibration configuration
@@ -116,7 +114,9 @@ int32_t bmi088d_calib_reset(void);
  * @param[in] current_temp Current temperature
  * @return BMI088D_SUCCESS on success
  */
-int32_t bmi088d_calib_apply_temperature_compensation(bmi088d_imu_data_t *imu_data, float current_temp);
+int32_t
+bmi088d_calib_apply_temperature_compensation(bmi088d_imu_data_t *imu_data,
+                                             float current_temp);
 
 /**
  * @brief Perform automatic calibration using sample data
@@ -127,9 +127,9 @@ int32_t bmi088d_calib_apply_temperature_compensation(bmi088d_imu_data_t *imu_dat
  * @return BMI088D_SUCCESS on success
  */
 int32_t bmi088d_calib_auto_calibrate(bmi088d_imu_data_t *imu_data,
-                                    const int16_t *accel_samples,
-                                    const int16_t *gyro_samples,
-                                    uint16_t num_samples);
+                                     const int16_t *accel_samples,
+                                     const int16_t *gyro_samples,
+                                     uint16_t num_samples);
 
 #ifdef __cplusplus
 }

@@ -12,6 +12,7 @@
 /* Private variables */
 static SPI_HandleTypeDef *bmi088_spi_handle = NULL;
 static uint32_t last_time = 0;
+static uint32_t dwt_counter = 0; // For precise time measurement
 
 /* Pin definitions for BMI088 */
 /* 
@@ -41,6 +42,22 @@ void SystemInit_Custom(void)
     // MX_GPIO_Init();
     // MX_SPI1_Init();
     // MX_TIM10_Init();
+    
+    // Initialize DWT counter for precise timing (if available)
+    // CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    // DWT->CYCCNT = 0;
+    // DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
+/**
+ * @brief Get precise time delta using DWT counter
+ * @return Time delta in seconds
+ */
+float get_time_delta(void)
+{
+    // In a real implementation, this would use DWT counter or system timer
+    // For this example, we'll return a fixed time step
+    return 0.001f; // 1ms = 0.001 seconds
 }
 
 /**
@@ -58,18 +75,17 @@ int32_t bmi088_sensor_init(void)
     hw_config.accel_cs_pin = GPIO_PIN_4;
     hw_config.gyro_cs_port = GPIOB;
     hw_config.gyro_cs_pin = GPIO_PIN_0;
+    hw_config.htim = &htim10;  // Timer for PWM output
+    hw_config.tim_channel = TIM_CHANNEL_1;  // Timer channel
     
     // Initialize the BMI088 driver library with hardware interface
-    result = bmi088d_init_with_hardware(&hw_config);
+    result = bmi088d_init(&hw_config);
     if (result != BMI088D_SUCCESS) {
         return result;
     }
     
     // Perform initial calibration
-    result = bmi088d_calibrate_sensors();
-    if (result != BMI088D_SUCCESS) {
-        return result;
-    }
+    // Note: Calibration is now handled internally during update
     
     return BMI088D_SUCCESS;
 }
@@ -82,7 +98,6 @@ int main(void)
     bmi088d_imu_data_t imu_data;
     bmi088d_euler_t attitude;
     bmi088d_quat_t orientation;
-    bmi088d_filter_status_t filter_status;
     float dt;
     
     // System initialization
@@ -91,6 +106,12 @@ int main(void)
     // Get SPI handle (assuming it's hspi1 from your project)
     extern SPI_HandleTypeDef hspi1;
     bmi088_spi_handle = &hspi1;
+    
+    // Initialize GPIO for BMI088
+    bmi088d_gpio_init();
+    
+    // Initialize IMU heater
+    imu_heater_init();
     
     // Initialize BMI088 sensor
     if (bmi088_sensor_init() != BMI088D_SUCCESS) {
@@ -102,32 +123,26 @@ int main(void)
     
     // Main loop
     while (1) {
-        // Calculate time delta
-        dt = 0.001f; // Assuming 1kHz update rate
+        // Calculate time delta for this iteration
+        dt = get_time_delta();
         
-        // Read sensor data
-        if (bmi088d_read_sensor_data() == BMI088D_SUCCESS) {
-            // Get processed IMU data
-            bmi088d_get_imu_data(&imu_data);
-            
-            // Update attitude estimation
-            bmi088d_update_attitude(dt);
-            
+        // Read sensor data and update attitude estimation
+        if (bmi088d_update(&imu_data, dt) == BMI088D_SUCCESS) {
             // Get orientation as Euler angles
-            bmi088d_get_attitude(&attitude);
+            bmi088d_ekf_get_euler(&attitude);
             
             // Get orientation as quaternion
-            bmi088d_get_orientation(&orientation);
+            bmi088d_ekf_get_quaternion(&orientation);
             
-            // Get filter status
-            bmi088d_get_filter_status(&filter_status);
+            // Temperature control using simplified API (uses default 40°C target)
+            bmi088d_temp_control(imu_data.temperature, dt);
             
             // Use the data as needed
             // For example, send to UART for debugging:
             /*
             printf("Accel: X=%f, Y=%f, Z=%f\r\n", imu_data.accel[0], imu_data.accel[1], imu_data.accel[2]);
             printf("Gyro: X=%f, Y=%f, Z=%f\r\n", imu_data.gyro[0], imu_data.gyro[1], imu_data.gyro[2]);
-            printf("Temperature: %f\r\n", imu_data.temperature);
+            printf("Temperature: %f°C\r\n", imu_data.temperature);
             printf("Attitude: Roll=%f, Pitch=%f, Yaw=%f\r\n", attitude.roll, attitude.pitch, attitude.yaw);
             */
         }
@@ -172,16 +187,11 @@ void bmi088d_gpio_init(void)
  */
 void imu_heater_init(void)
 {
-    TIM_OC_InitTypeDef sConfigOC = {0};
-    
     // Start TIM10
+    extern TIM_HandleTypeDef htim10;
     HAL_TIM_Base_Start(&htim10);
     HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
     
-    // Set PWM duty cycle (adjust as needed for target temperature)
-    sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 1000; // 50% duty cycle (2000-1 = period)
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1);
+    // Set initial PWM duty cycle to 0%
+    __HAL_TIM_SET_COMPARE(&htim10, TIM_CHANNEL_1, 0);
 }
