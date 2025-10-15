@@ -9,7 +9,7 @@
 #define DMJ4310_PITCH_FEEDBACK_ID 0x206U
 
 // 缩放因子
-#define DMJ4310_X_SCALE 9.587380e-5f // 1.0f / DMJ4310_PI * PI
+#define DMJ4310_X_SCALE 9.587380e-5f // PI / DMJ4310_PI
 #define DMJ4310_V_SCALE 1.0f         // 速度缩放因子
 #define DMJ4310_TOR_SCALE 1.0f       // 扭矩缩放因子
 

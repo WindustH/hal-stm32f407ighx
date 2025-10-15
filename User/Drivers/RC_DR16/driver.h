@@ -14,15 +14,15 @@
  * @brief 配置与启用DR16遥控器的UART通信
  * @param uartx UART对象指针
  */
-void setup_rc_dr16(UART_HandleTypeDef *uartx);
+void rc_dr16_setup(UART_HandleTypeDef *uartx);
 
 /**
  * @brief 更新遥控器控制消息
  * @param huart UART对象指针
  * @param size 接收数据大小
  */
-void rc_update_ctrl_msg_dr16(UART_HandleTypeDef *huart, u16 size);
+void rc_dr16_update_ctrl_msg(UART_HandleTypeDef *huart, u16 size);
 
-volatile rcCtrl_dr16 *rc_get_ctrl_sig_dr16();
+volatile rcCtrl_dr16 *rc_dr16_get_ctrl_sig();
 
 #endif /* __USER_DRIVERS_RC_DR16_DRIVER__ */

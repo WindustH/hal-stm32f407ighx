@@ -10,10 +10,10 @@
 
 u8 DMJ4310_PROTECT_ON = false;
 static CAN_HandleTypeDef *hcanx;
-static volatile motStat_DMJ4310 mot_stat;
-static volatile motCtrl_DMJ4310 mot_ctrl;
+static volatile motStat_DMJ4310 mot_stat = {0};
+static volatile motCtrl_DMJ4310 mot_ctrl = {0};
 
-void setup_mot_dmj4310(CAN_HandleTypeDef *hcan) {
+void mot_dmj4310_setup(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 14
@@ -38,7 +38,7 @@ void setup_mot_dmj4310(CAN_HandleTypeDef *hcan) {
   hcanx = hcan;
 }
 
-void mot_set_torque_dmj4310(f32 trq) {
+void dmj4310_set_torque(f32 trq) {
   if (!DMJ4310_PROTECT_ON) {
     mot_ctrl.trq = trq;
     mot_ctrl.kd = 0.0f;
@@ -48,7 +48,7 @@ void mot_set_torque_dmj4310(f32 trq) {
   }
 }
 
-void mot_send_ctrl_msg_dmj4310() {
+void dmj4310_send_ctrl_msg() {
   if (!DMJ4310_PROTECT_ON) {
     motCtrlCanMsg_DMJ4310 can_msg;
     u32 unused_mailbox;
@@ -61,7 +61,7 @@ void mot_send_ctrl_msg_dmj4310() {
   }
 }
 
-void mot_update_stat_dmj4310(CAN_HandleTypeDef *hcan) {
+void dmj4310_update_stat(CAN_HandleTypeDef *hcan) {
   if (hcanx == hcan) {
     canRxH header;
     u8 *data = {0};
@@ -72,4 +72,6 @@ void mot_update_stat_dmj4310(CAN_HandleTypeDef *hcan) {
   }
 }
 
-volatile motStat_DMJ4310 *mot_get_stat_dmj4310() { return &mot_stat; }
+volatile motStat_DMJ4310 *dmj4310_get_stat() { return &mot_stat; }
+
+void dmj4310_reset_pos() { mot_stat.x = 0.0f; }

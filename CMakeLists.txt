@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 3.16)
 project(hal-stm32f407ighx C ASM)
 
-set(TARGET ${PROJECT_NAME})
-add_executable(${TARGET})
-set_target_properties(${TARGET} PROPERTIES SUFFIX ".elf")
-
-set(MCU_DEVICE STM32F407xx)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
     message(STATUS "no build type specified, defaulting to 'Debug'")
 endif()
+
+set(TARGET ${PROJECT_NAME})
+set(MCU_DEVICE STM32F407xx)
+add_executable(${TARGET})
+set_target_properties(${TARGET} PROPERTIES SUFFIX ".elf")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407IGHX_FLASH.ld)
 set(CORE_DIR ${CMAKE_SOURCE_DIR}/Core)
@@ -21,21 +20,20 @@ set(CMSIS_DIR ${DRIVER_DIR}/CMSIS)
 set(HAL_DIR ${DRIVER_DIR}/STM32F4xx_HAL_Driver)
 set(STARTUP_DIR ${CMAKE_SOURCE_DIR}/startup)
 
+set(ASM_SOURCES ${STARTUP_DIR}/startup_stm32f407ighx.s)
 file(GLOB_RECURSE USER_SOURCES ${USER_DIR}/*.c)
 file(GLOB_RECURSE CORE_SOURCES ${CORE_DIR}/*.c)
 file(GLOB_RECURSE HAL_SOURCES ${HAL_DIR}/*.c)
 file(GLOB_RECURSE CMSIS_SOURCES ${CMSIS_DIR}/*.c)
 
-set(ASM_SOURCES
-    ${STARTUP_DIR}/startup_stm32f407ighx.s
-)
-
+# BMI088D Library
 set(PKG_BMI088D_DIR ${LIB_DIR}/BMI088D)
 file(GLOB_RECURSE PKG_BMI088D_SOURCES ${PKG_BMI088D_DIR}/Src/*.c)
 
+# for CMSIS-DAP Library
 set(CMSISDSP ${LIB_DIR}/CMSIS-DAP)
 set(CMSISCORE ${DRIVER_DIR}/CMSIS)
-add_subdirectory(${CMSISDSP}/Source bin_dsp)
+add_subdirectory(${CMSISDSP}/Source cmsis-dap-build)
 target_link_libraries(${TARGET} CMSISDSP)
 
 target_sources(${TARGET}

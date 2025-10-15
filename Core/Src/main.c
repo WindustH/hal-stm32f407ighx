@@ -18,12 +18,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "Tasks/PID_DMJ4310/pidv.h"
+#include "Tasks/PID_DMJ4310/pidx.h"
+#include "Tasks/PID_M3508/pidv.h"
+#include "Tasks/PID_M3508/pidx.h"
 #include "can.h"
 #include "dma.h"
 #include "gpio.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -151,18 +156,18 @@ int main(void) {
   /* USER CODE BEGIN 2 */
 
   // 配置 DMJ4310
-  setup_mot_dmj4310(&hcan2);
-  bsp_can_fifo0_cb_add(mot_update_stat_dmj4310);
-  bsp_cron_job_add(mot_send_ctrl_msg_dmj4310);
+  dmj4310_setup(&hcan2);
+  bsp_can_fifo0_cb_add(dmj4310_update_stat);
+  bsp_cron_job_add(dmj4310_send_ctrl_msg);
   // 配置 M3508
-  setup_mot_m3508(&hcan1);
-  bsp_can_fifo0_cb_add(mot_update_stat_m3508);
-  bsp_cron_job_add(mot_send_ctrl_msg_m3508);
+  m3508_setup(&hcan1);
+  bsp_can_fifo0_cb_add(m3508_update_stat);
+  bsp_cron_job_add(m3508_send_ctrl_msg);
   // 配置 RC DR16
-  setup_rc_dr16(&huart3);
-  bsp_uart_rx_cb_add(rc_update_ctrl_msg_dr16);
+  rc_dr16_setup(&huart3);
+  bsp_uart_rx_cb_add(rc_dr16_update_ctrl_msg);
   // 配置 BMI088
-  setup_bmi088(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
+  bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
                TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
   bsp_gpio_exti_cb_add(bmi088_update_pose);
   bsp_cron_job_add(bmi088_temp_ctrl);
@@ -170,7 +175,27 @@ int main(void) {
   // 外设启动
   start_hal_peripherals();
   // 启动陀螺仪
-  start_bmi088();
+  bmi088_start();
+
+  volatile f32 **m3508_pidv_feedback = {0};
+  volatile f32 **m3508_pidx_feedback = {0};
+  for (u8 i = 0; i < 8; i++) {
+    m3508_pidv_feedback[i] = &m3508_get_stat(i)->x;
+    m3508_pidx_feedback[i] = &m3508_get_stat(i)->v;
+  }
+  m3508_pidv_setup(m3508_pidv_feedback);
+  m3508_pidx_setup(m3508_pidx_feedback);
+  m3508_pidv_start();
+  m3508_pidx_start();
+
+  volatile f32 *dmj4310_pidv_feedback = {0};
+  volatile f32 *dmj4310_pidx_feedback = {0};
+  dmj4310_pidv_feedback = &dmj4310_get_stat()->x;
+  dmj4310_pidx_feedback = &dmj4310_get_stat()->v;
+  dmj4310_pidv_setup(dmj4310_pidv_feedback);
+  dmj4310_pidx_setup(dmj4310_pidx_feedback);
+  dmj4310_pidv_start();
+  dmj4310_pidx_start();
 
   /* USER CODE END 2 */
 

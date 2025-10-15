@@ -91,6 +91,7 @@ typedef struct {
   f32 p;
   f32 i;
   f32 d;
+  f32 target;
   f32 prev_error;
 } pidStat;
 
@@ -104,10 +105,6 @@ typedef struct {
   f32 ki;
   f32 kd;
   f32 ol;
-
-  f32 target; // Target value
-
-  u8 enabled; // Controller enabled flag
 } pwPidArg;
 
 #endif /* __USER_TYPE__ */

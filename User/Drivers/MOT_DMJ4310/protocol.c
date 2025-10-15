@@ -54,25 +54,24 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
   u8 temp_rotor = data[7];
 
   // ---- 多圈位置处理(单电机) ----
-  static i16 prev_raw_pos = 0;
-  static i32 round_count = 0;
+  static i32 prev_raw_pos = 0;
 
-  i16 delta_raw = raw_pos - prev_raw_pos;
+  i32 delta_raw = raw_pos - prev_raw_pos;
+  i8 sign = 0;
 
-  // 检测溢出/下溢(位置在±32768之间循环)
-  if (delta_raw > DMJ4310_PI) {
-    round_count--;
-  } else if (delta_raw < -DMJ4310_PI) {
-    round_count++;
-  }
+  // 检测溢出/下溢
+  if (delta_raw > DMJ4310_PI)
+    sign = -1;
+  else if (delta_raw < -DMJ4310_PI)
+    sign = 1;
+
+  // 计算总的位置(去缠绕)并转换为弧度
+  f32 delta = (delta_raw + sign * DMJ4310_PI * 2.0f) * s_pos_scale;
 
   prev_raw_pos = raw_pos;
 
-  // 计算总的位置(去缠绕)并转换为弧度
-  f32 pos_total = (raw_pos + round_count * DMJ4310_PI * 2) * s_pos_scale;
-
   // 填充反馈结构体
-  mot_stat_dmj4310->x = pos_total;               // 弧度(多圈)
+  mot_stat_dmj4310->x += delta;                  // 弧度(多圈)
   mot_stat_dmj4310->v = raw_vel * s_vel_scale;   // 弧度/秒
   mot_stat_dmj4310->trq = raw_trq * s_trq_scale; // 牛顿米
   mot_stat_dmj4310->error_code = error_code;

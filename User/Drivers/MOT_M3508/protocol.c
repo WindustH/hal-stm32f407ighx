@@ -53,9 +53,8 @@ void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
   u32 std_id = msg->StdId;
 
   // M3508反馈ID范围: 0x201到0x208
-  if (std_id < 0x201U || std_id > 0x208U) {
+  if (std_id < 0x201U || std_id > 0x208U)
     return;
-  }
 
   u8 motor_id = (u8)(std_id - 0x201U); // 0到7
 
@@ -67,25 +66,23 @@ void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
 
   // ---- 多圈位置跟踪 ----
   static u16 prev_raw_pos[8] = {0};
-  static i32 turn_count[8] = {0};
+  static i32 sign[8] = {0};
 
-  i16 delta = raw_pos - prev_raw_pos[motor_id];
+  i16 delta_raw = raw_pos - prev_raw_pos[motor_id];
 
-  // 处理编码器环绕(每圈8192个脉冲)
-  if (delta > M3508_PI) {
-    turn_count[motor_id]--;
-  } else if (delta < -M3508_PI) {
-    turn_count[motor_id]++;
-  }
+  // 处理编码器环绕
+  if (delta_raw > M3508_PI)
+    sign[motor_id] = -1;
+  else if (delta_raw < -M3508_PI)
+    sign[motor_id] = 1;
+
+  f32 delta = (delta_raw + sign[motor_id] * M3508_PI * 2.0f) * s_pos_scale;
 
   prev_raw_pos[motor_id] = raw_pos;
 
-  // 编码器总脉冲数
-  i32 total_ticks = (i32)raw_pos + turn_count[motor_id] * 8192;
-
   // 应用缩放因子转换为物理单位
-  mot_stat[motor_id].x = total_ticks * s_pos_scale; // 弧度
-  mot_stat[motor_id].v = raw_vel * s_vel_scale;     // 弧度/秒
-  mot_stat[motor_id].I = raw_cur * s_cur_scale;     // 安培
+  mot_stat[motor_id].x += delta;                // 弧度
+  mot_stat[motor_id].v = raw_vel * s_vel_scale; // 弧度/秒
+  mot_stat[motor_id].I = raw_cur * s_cur_scale; // 安培
   mot_stat[motor_id].T = temp;
 }

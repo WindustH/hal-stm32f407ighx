@@ -9,11 +9,11 @@
 #include "main.h"
 
 u8 M3508_PROTECT_ON = false;
-static CAN_HandleTypeDef *hcanx;           ///< CAN对象指针
-static volatile motStat_M3508 mot_stat[8]; ///< 8个电机的状态信息数组
-static volatile motCtrl_M3508 mot_ctrl[8]; ///< 8个电机的控制信息数组
+static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
+static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
+static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组
 
-void setup_mot_m3508(CAN_HandleTypeDef *hcan) {
+void m3508_setup(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 0 - 配置电机ID 0x201-0x202
@@ -63,12 +63,12 @@ void setup_mot_m3508(CAN_HandleTypeDef *hcan) {
   hcanx = hcan;
 }
 
-void mot_set_current_m3508(u8 mot_id, i16 cur) {
+void m3508_set_current(u8 mot_id, f32 cur) {
   if (!M3508_PROTECT_ON)
-    mot_ctrl[mot_id].I = cur;
+    mot_ctrl[mot_id].I = (i16)cur;
 }
 
-void mot_send_ctrl_msg_m3508() {
+void m3508_send_ctrl_msg() {
   if (!M3508_PROTECT_ON) {
     motCtrlCanMsg_M3508 can_msg;
     u32 unused_mailbox;
@@ -88,7 +88,7 @@ void mot_send_ctrl_msg_m3508() {
   }
 }
 
-void mot_update_stat_m3508(CAN_HandleTypeDef *hcan) {
+void m3508_update_stat(CAN_HandleTypeDef *hcan) {
   if (hcan == hcanx) {
     canRxH header;
     u8 *data = {0};
@@ -99,4 +99,9 @@ void mot_update_stat_m3508(CAN_HandleTypeDef *hcan) {
   }
 }
 
-volatile motStat_M3508 *mot_get_stat_m3508(u8 id) { return &mot_stat[id]; }
+volatile motStat_M3508 *m3508_get_stat(u8 id) { return &mot_stat[id]; }
+
+void m3508_reset_pos() {
+  for (u8 i = 0; i < 8; i++)
+    mot_stat[i].x = 0.0f;
+}

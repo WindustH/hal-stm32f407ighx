@@ -12,7 +12,7 @@ static UART_HandleTypeDef *huartx;         ///< UART对象指针
 static u8 uart_rx_buffer[DMA_BUFFER_SIZE]; ///< UART接收缓冲区
 static volatile rcCtrl_dr16 rc_ctrl;       ///< 遥控器控制信息
 
-void setup_rc_dr16(UART_HandleTypeDef *huart) {
+void rc_dr16_setup(UART_HandleTypeDef *huart) {
   // 使用DMA接收数据到空闲状态
   if (HAL_UARTEx_ReceiveToIdle_DMA(huart, uart_rx_buffer, DMA_BUFFER_SIZE) !=
       HAL_OK) {
@@ -21,7 +21,7 @@ void setup_rc_dr16(UART_HandleTypeDef *huart) {
   huartx = huart;
 }
 
-void rc_update_ctrl_msg_dr16(UART_HandleTypeDef *huart, u16 size) {
+void rc_dr16_update_ctrl_msg(UART_HandleTypeDef *huart, u16 size) {
   (void)size; // 避免未使用参数警告
 
   // 检查是否为配置的UART实例
@@ -34,4 +34,4 @@ void rc_update_ctrl_msg_dr16(UART_HandleTypeDef *huart, u16 size) {
   }
 }
 
-volatile rcCtrl_dr16 *rc_get_ctrl_sig_dr16() { return &rc_ctrl; }
+volatile rcCtrl_dr16 *rc_dr16_get_ctrl_sig() { return &rc_ctrl; }
