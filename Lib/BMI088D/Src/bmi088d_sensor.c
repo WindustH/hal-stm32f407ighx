@@ -7,6 +7,7 @@
  */
 
 #include "bmi088d_sensor.h"
+#include "bmi088d_calibration.h"
 #include "bmi088d_hal.h"
 #include "bmi088d_reg.h"
 
@@ -179,30 +180,21 @@ static bmi088d_sensor_error_t bmi088d_gyro_init(void) {
 void bmi088d_sensor_read_data(bmi088d_imu_data_t *data) {
   static uint8_t buf[8] = {0};
   static int16_t raw_temp;
+  static int16_t accel_raw[3], gyro_raw[3];
 
   // Read accelerometer data
   bmi088d_accel_read_multi_reg(BMI088_ACCEL_XOUT_L, buf, 6);
 
-  raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
-  data->accel[0] = raw_temp * BMI088_ACCEL_6G_SEN;
-
-  raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
-  data->accel[1] = raw_temp * BMI088_ACCEL_6G_SEN;
-
-  raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
-  data->accel[2] = raw_temp * BMI088_ACCEL_6G_SEN;
+  accel_raw[0] = (int16_t)((buf[1]) << 8) | buf[0];
+  accel_raw[1] = (int16_t)((buf[3]) << 8) | buf[2];
+  accel_raw[2] = (int16_t)((buf[5]) << 8) | buf[4];
 
   // Read gyroscope data
   bmi088d_gyro_read_multi_reg(BMI088_GYRO_X_L, buf, 6);
 
-  raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
-  data->gyro[0] = raw_temp * BMI088_GYRO_2000_SEN;
-
-  raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
-  data->gyro[1] = raw_temp * BMI088_GYRO_2000_SEN;
-
-  raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
-  data->gyro[2] = raw_temp * BMI088_GYRO_2000_SEN;
+  gyro_raw[0] = (int16_t)((buf[1]) << 8) | buf[0];
+  gyro_raw[1] = (int16_t)((buf[3]) << 8) | buf[2];
+  gyro_raw[2] = (int16_t)((buf[5]) << 8) | buf[4];
 
   // Read temperature data
   bmi088d_accel_read_multi_reg(BMI088_TEMP_M, buf, 2);
@@ -214,6 +206,9 @@ void bmi088d_sensor_read_data(bmi088d_imu_data_t *data) {
   }
 
   data->temperature = raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+
+  // Apply calibration to raw sensor data
+  bmi088d_calib_apply(data, accel_raw, gyro_raw);
 }
 
 /* Private functions */

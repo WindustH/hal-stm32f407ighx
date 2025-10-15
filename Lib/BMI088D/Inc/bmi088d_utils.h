@@ -18,13 +18,6 @@ extern "C" {
 /* Mathematical utility functions */
 
 /**
- * @brief Fast inverse square root approximation
- * @param[in] x Input value
- * @return 1/sqrt(x)
- */
-float bmi088d_inv_sqrt(float x);
-
-/**
  * @brief Square root approximation
  * @param[in] x Input value
  * @return sqrt(x)
@@ -39,21 +32,13 @@ float bmi088d_sqrt(float x);
  */
 float bmi088d_abs_limit(float num, float limit);
 
-/**
- * @brief Get sign of value
- * @param[in] value Input value
- * @return 1.0f if positive, -1.0f if negative
+/* Note: Removed bmi088d_sign function - can be replaced with (x >= 0 ? 1 : -1)
  */
-float bmi088d_sign(float value);
 
-/**
- * @brief Apply deadband to value
- * @param[in] value Input value
- * @param[in] min_value Minimum deadband value
- * @param[in] max_value Maximum deadband value
- * @return Value with deadband applied
+/* Note: Removed bmi088d_deadband function - implementation was incorrect and
+ * unused. Standard deadband should be: if (fabs(value) < threshold) return 0;
+ * else return value;
  */
-float bmi088d_deadband(float value, float min_value, float max_value);
 
 /**
  * @brief Constrain value to range
@@ -73,19 +58,12 @@ float bmi088d_constrain(float value, float min_value, float max_value);
  */
 float bmi088d_loop_constrain(float input, float min_value, float max_value);
 
-/**
- * @brief Format angle to -180 to 180 degrees
- * @param[in] angle Input angle
- * @return Formatted angle
+/* Note: Removed format functions:
+ * - bmi088d_format_deg: can be replaced with bmi088d_loop_constrain(angle,
+ * -180, 180)
+ * - bmi088d_format_rad: can be replaced with bmi088d_loop_constrain(angle, -PI,
+ * PI)
  */
-float bmi088d_format_deg(float angle);
-
-/**
- * @brief Format angle to -PI to PI radians
- * @param[in] angle Input angle
- * @return Formatted angle
- */
-float bmi088d_format_rad(float angle);
 
 /* Vector operations */
 
@@ -111,66 +89,27 @@ int32_t bmi088d_vec_normalize(bmi088d_vec3_t *vec);
  */
 float bmi088d_vec_dot(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2);
 
-/**
- * @brief Calculate cross product of two vectors
- * @param[in] vec1 First vector
- * @param[in] vec2 Second vector
- * @param[out] result Cross product
- * @return BMI088D_SUCCESS on success
+/* Note: Removed unused vector operations:
+ * - bmi088d_vec_cross
+ * - bmi088d_vec_add
+ * - bmi088d_vec_subtract
+ * - bmi088d_vec_scale
+ * These functions were not used in the BMI088D driver.
  */
-int32_t bmi088d_vec_cross(const bmi088d_vec3_t *vec1,
-                          const bmi088d_vec3_t *vec2, bmi088d_vec3_t *result);
 
-/**
- * @brief Add two vectors
- * @param[in] vec1 First vector
- * @param[in] vec2 Second vector
- * @param[out] result Sum vector
- * @return BMI088D_SUCCESS on success
+/* Note: Removed unused matrix operations:
+ * - bmi088d_mat_vec_multiply
+ * - bmi088d_mat_transpose
+ * These functions were not used in the BMI088D driver.
  */
-int32_t bmi088d_vec_add(const bmi088d_vec3_t *vec1, const bmi088d_vec3_t *vec2,
-                        bmi088d_vec3_t *result);
 
-/**
- * @brief Subtract two vectors
- * @param[in] vec1 First vector
- * @param[in] vec2 Second vector
- * @param[out] result Difference vector
- * @return BMI088D_SUCCESS on success
+/* Note: Removed unused matrix operations:
+ * - bmi088d_mat_multiply_6x6_6x6
+ * - bmi088d_mat_multiply_3x6_6x6
+ * - bmi088d_mat_multiply_3x6_6x3
+ * - bmi088d_mat_transpose_6x3
+ * These functions were redundant with CMSIS DSP library functionality.
  */
-int32_t bmi088d_vec_subtract(const bmi088d_vec3_t *vec1,
-                             const bmi088d_vec3_t *vec2,
-                             bmi088d_vec3_t *result);
-
-/**
- * @brief Scale vector
- * @param[in] vec Input vector
- * @param[in] scale Scale factor
- * @param[out] result Scaled vector
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_vec_scale(const bmi088d_vec3_t *vec, float scale,
-                          bmi088d_vec3_t *result);
-
-/* Matrix operations (simplified for 3x3) */
-
-/**
- * @brief Multiply 3x3 matrix by vector
- * @param[in] mat 3x3 matrix (row-major)
- * @param[in] vec Input vector
- * @param[out] result Result vector
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_mat_vec_multiply(const float mat[9], const bmi088d_vec3_t *vec,
-                                 bmi088d_vec3_t *result);
-
-/**
- * @brief Transpose 3x3 matrix
- * @param[in] mat Input matrix
- * @param[out] result Transposed matrix
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_mat_transpose(const float mat[9], float result[9]);
 
 /* Time utilities */
 

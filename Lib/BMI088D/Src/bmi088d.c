@@ -9,9 +9,9 @@
 #include "bmi088d.h"
 #include "bmi088d_calibration.h"
 #include "bmi088d_ekf.h"
+#include "bmi088d_pid.h"
 #include "bmi088d_sensor.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 /* Library state */
@@ -35,9 +35,6 @@ int32_t bmi088d_init(const bmi088d_hw_config_t *config) {
   }
 
   /* Initialize default configuration */
-  bmi088d_state.config.accel_sensitivity = BMI088_ACCEL_6G_SEN;
-  bmi088d_state.config.gyro_sensitivity = BMI088_GYRO_2000_SEN;
-  bmi088d_state.config.calibrate_on_init = 1;
   bmi088d_state.config.use_temperature_compensation = 1;
 
   /* Initialize IMU data structure */
@@ -64,7 +61,6 @@ int32_t bmi088d_init(const bmi088d_hw_config_t *config) {
                    0.0f,                    /* coef_b */
                    0.0f,                    /* output_lpf_rc */
                    0.0f,                    /* derivative_lpf_rc */
-                   0,                       /* ols_order */
                    0);                      /* improvements */
 
   bmi088d_state.initialized = 1;
@@ -82,6 +78,12 @@ int32_t bmi088d_update(bmi088d_imu_data_t *imu_data, float dt) {
 
   /* Read raw sensor data */
   bmi088d_sensor_read_data(&bmi088d_state.imu_data);
+
+  /* Apply temperature compensation if enabled */
+  if (bmi088d_state.config.use_temperature_compensation) {
+    bmi088d_calib_apply_temperature_compensation(
+        &bmi088d_state.imu_data, bmi088d_state.imu_data.temperature);
+  }
 
   /* Update attitude estimation */
   bmi088d_ekf_update(

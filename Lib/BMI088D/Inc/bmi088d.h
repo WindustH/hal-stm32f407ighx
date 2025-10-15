@@ -16,8 +16,8 @@
  * Dependencies: CMSIS, HAL, Standard C Library (GCC ARM)
  */
 
-#ifndef __INC_BMI088D__
-#define __INC_BMI088D__
+#ifndef __LIB_BMI088D_INC_BMI088D__
+#define __LIB_BMI088D_INC_BMI088D__
 
 #include <stdint.h>
 
@@ -58,17 +58,9 @@ extern "C" {
 #endif
 
 /* Include submodules */
-#include "bmi088d_calibration.h"
-#include "bmi088d_ekf.h"
-#include "bmi088d_fuzzy.h"
+
 #include "bmi088d_hal.h"
-#include "bmi088d_ols.h"
-#include "bmi088d_pid.h"
-#include "bmi088d_quaternion.h"
-#include "bmi088d_reg.h"
-#include "bmi088d_sensor.h"
 #include "bmi088d_types.h"
-#include "bmi088d_utils.h"
 
 /* Default target temperature from source project */
 #define BMI088D_DEFAULT_TARGET_TEMP 40.0f
@@ -102,4 +94,4 @@ int32_t bmi088d_temp_control(float current_temp, float dt);
 }
 #endif
 
-#endif /* __INC_BMI088D__ */
+#endif /* __LIB_BMI088D_INC_BMI088D__ */

@@ -10,8 +10,6 @@
 #ifndef BMI088D_PID_H
 #define BMI088D_PID_H
 
-#include "bmi088d_fuzzy.h"
-#include "bmi088d_ols.h"
 #include "bmi088d_types.h"
 
 #ifdef __cplusplus
@@ -79,13 +77,6 @@ struct bmi088d_pid_s {
   float output_lpf_rc; /* Output low-pass filter RC time constant */
   float derivative_lpf_rc; /* Derivative low-pass filter RC time constant */
 
-  /* OLS for derivative calculation */
-  uint16_t ols_order;
-  bmi088d_ols_t ols;
-
-  /* Fuzzy logic extension */
-  bmi088d_fuzzy_rule_t *fuzzy_rule;
-
   /* Improvement flags */
   uint8_t improvements;
 
@@ -110,8 +101,6 @@ struct bmi088d_pid_s {
  * @param[in] coef_b Changing integration coefficient B
  * @param[in] output_lpf_rc Output low-pass filter time constant
  * @param[in] derivative_lpf_rc Derivative low-pass filter time constant
- * @param[in] ols_order Order for OLS derivative calculation (e.g., 10). If < 2,
- * standard diff is used.
  * @param[in] improvements Improvement flags
  * @return BMI088D_SUCCESS on success, error code on failure
  */
@@ -119,10 +108,10 @@ int32_t bmi088d_pid_init(bmi088d_pid_t *pid, float max_output,
                          float integral_limit, float deadband, float kp,
                          float ki, float kd, float coef_a, float coef_b,
                          float output_lpf_rc, float derivative_lpf_rc,
-                         uint16_t ols_order, uint8_t improvements);
+                         uint8_t improvements);
 
 /**
- * @brief Deinitialize PID controller (frees OLS memory)
+ * @brief Deinitialize PID controller
  * @param[in] pid PID controller structure
  */
 void bmi088d_pid_deinit(bmi088d_pid_t *pid);

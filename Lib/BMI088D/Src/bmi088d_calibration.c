@@ -162,8 +162,8 @@ int32_t bmi088d_calib_auto_calibrate(bmi088d_imu_data_t *imu_data,
 
   float gyro_sum[3] = {0};
   float g_norm_sum = 0;
-  float gyro_max[3], gyro_min[3];
-  float g_norm_max, g_norm_min;
+  float gyro_max[3] = {0}, gyro_min[3] = {0};
+  float g_norm_max = 0, g_norm_min = 0;
   float gyro_diff[3], g_norm_diff;
 
   /* Calculate gyroscope offset and gravity norm from samples */

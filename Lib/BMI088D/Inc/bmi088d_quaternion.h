@@ -67,70 +67,11 @@ int32_t bmi088d_euler_to_quat(const bmi088d_euler_t *euler,
                               bmi088d_quat_t *quat);
 
 /**
- * @brief Rotate vector by quaternion
- * @param[in] quat Rotation quaternion
- * @param[in] vec Input vector
- * @param[out] result Rotated vector
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_quat_rotate_vector(const bmi088d_quat_t *quat,
-                                   const bmi088d_vec3_t *vec,
-                                   bmi088d_vec3_t *result);
-
-/**
- * @brief Get quaternion from axis-angle representation
- * @param[in] axis Rotation axis (normalized)
- * @param[in] angle Rotation angle in radians
- * @param[out] quat Output quaternion
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_quat_from_axis_angle(const bmi088d_vec3_t *axis, float angle,
-                                     bmi088d_quat_t *quat);
-
-/**
- * @brief Get quaternion from gyroscope integration
- * @param[in] gyro Gyroscope data in rad/s
- * @param[in] dt Time step in seconds
- * @param[in,out] quat Current quaternion (updated in-place)
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_quat_from_gyro(const bmi088d_vec3_t *gyro, float dt,
-                               bmi088d_quat_t *quat);
-
-/**
- * @brief Calculate quaternion difference
- * @param[in] q1 First quaternion
- * @param[in] q2 Second quaternion
- * @param[out] diff Difference quaternion
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_quat_difference(const bmi088d_quat_t *q1,
-                                const bmi088d_quat_t *q2, bmi088d_quat_t *diff);
-
-/**
- * @brief Spherical linear interpolation between two quaternions
- * @param[in] q1 Start quaternion
- * @param[in] q2 End quaternion
- * @param[in] t Interpolation factor [0, 1]
- * @param[out] result Interpolated quaternion
- * @return BMI088D_SUCCESS on success
- */
-int32_t bmi088d_quat_slerp(const bmi088d_quat_t *q1, const bmi088d_quat_t *q2,
-                           float t, bmi088d_quat_t *result);
-
-/**
  * @brief Get quaternion magnitude
  * @param[in] quat Input quaternion
  * @return Quaternion magnitude
  */
 float bmi088d_quat_magnitude(const bmi088d_quat_t *quat);
-
-/**
- * @brief Check if quaternion is valid (finite and normalized)
- * @param[in] quat Input quaternion
- * @return TRUE if valid, FALSE otherwise
- */
-uint8_t bmi088d_quat_is_valid(const bmi088d_quat_t *quat);
 
 #ifdef __cplusplus
 }

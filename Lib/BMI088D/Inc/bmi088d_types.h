@@ -75,9 +75,6 @@ typedef struct {
 
 /* Sensor configuration */
 typedef struct {
-  float accel_sensitivity;              /* Accelerometer sensitivity */
-  float gyro_sensitivity;               /* Gyroscope sensitivity */
-  uint8_t calibrate_on_init;            /* Auto-calibrate on initialization */
   uint8_t use_temperature_compensation; /* Enable temperature compensation */
 } bmi088d_config_t;
 

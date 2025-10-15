@@ -11,7 +11,6 @@
 #include "bmi088d_utils.h"
 #include <math.h>
 #include <stddef.h>
-#include <stdlib.h> // For malloc and free
 #include <string.h>
 
 /* Internal improvement functions ported from source-project */
@@ -29,7 +28,7 @@ int32_t bmi088d_pid_init(bmi088d_pid_t *pid, float max_output,
                          float integral_limit, float deadband, float kp,
                          float ki, float kd, float coef_a, float coef_b,
                          float output_lpf_rc, float derivative_lpf_rc,
-                         uint16_t ols_order, uint8_t improvements) {
+                         uint8_t improvements) {
   if (!pid) {
     return BMI088D_ERROR_INVALID_PARAM;
   }
@@ -50,13 +49,6 @@ int32_t bmi088d_pid_init(bmi088d_pid_t *pid, float max_output,
   pid->output_lpf_rc = output_lpf_rc;
   pid->derivative_lpf_rc = derivative_lpf_rc;
 
-  pid->ols_order = ols_order;
-  if (ols_order > 0) {
-    if (bmi088d_ols_init(&pid->ols, ols_order) != 0) {
-      return BMI088D_ERROR_MEMORY;
-    }
-  }
-
   pid->improvements = improvements;
   pid->error_handler.error_count = 0;
   pid->error_handler.error_type = BMI088D_PID_ERROR_NONE;
@@ -65,9 +57,8 @@ int32_t bmi088d_pid_init(bmi088d_pid_t *pid, float max_output,
 }
 
 void bmi088d_pid_deinit(bmi088d_pid_t *pid) {
-  if (pid && pid->ols_order > 0) {
-    bmi088d_ols_deinit(&pid->ols);
-  }
+  /* No OLS to deinitialize */
+  (void)pid;
 }
 
 float bmi088d_pid_calculate(bmi088d_pid_t *pid, float measure, float ref,
@@ -93,21 +84,9 @@ float bmi088d_pid_calculate(bmi088d_pid_t *pid, float measure, float ref,
     float ki_term = pid->ki;
     float kd_term = pid->kd;
 
-    if (pid->fuzzy_rule) {
-      bmi088d_fuzzy_rule_implement(pid->fuzzy_rule, measure, ref, dt);
-      kp_term += pid->fuzzy_rule->kp_fuzzy;
-      ki_term += pid->fuzzy_rule->ki_fuzzy;
-      kd_term += pid->fuzzy_rule->kd_fuzzy;
-    }
-
     pid->p_out = kp_term * pid->error;
     pid->i_term = ki_term * pid->error * dt;
-
-    if (pid->ols_order >= 2) {
-      pid->d_out = kd_term * bmi088d_ols_derivative(&pid->ols, dt, pid->error);
-    } else {
-      pid->d_out = kd_term * (pid->error - pid->last_error) / dt;
-    }
+    pid->d_out = kd_term * (pid->error - pid->last_error) / dt;
 
     if (pid->user_func2) {
       pid->user_func2(pid);
@@ -150,11 +129,7 @@ float bmi088d_pid_calculate(bmi088d_pid_t *pid, float measure, float ref,
 }
 
 static void pid_trapezoid_integral(bmi088d_pid_t *pid, float dt) {
-  float ki_term = pid->ki;
-  if (pid->fuzzy_rule) {
-    ki_term += pid->fuzzy_rule->ki_fuzzy;
-  }
-  pid->i_term = ki_term * ((pid->error + pid->last_error) / 2.0f) * dt;
+  pid->i_term = pid->ki * ((pid->error + pid->last_error) / 2.0f) * dt;
 }
 
 static void pid_changing_integration_rate(bmi088d_pid_t *pid) {
@@ -192,15 +167,7 @@ static void pid_integral_limit(bmi088d_pid_t *pid) {
 }
 
 static void pid_derivative_on_measurement(bmi088d_pid_t *pid, float dt) {
-  float kd_term = pid->kd;
-  if (pid->fuzzy_rule) {
-    kd_term += pid->fuzzy_rule->kd_fuzzy;
-  }
-  if (pid->ols_order >= 2) {
-    pid->d_out = kd_term * bmi088d_ols_derivative(&pid->ols, dt, -pid->measure);
-  } else {
-    pid->d_out = kd_term * (pid->last_measure - pid->measure) / dt;
-  }
+  pid->d_out = pid->kd * (pid->last_measure - pid->measure) / dt;
 }
 
 static void pid_derivative_filter(bmi088d_pid_t *pid, float dt) {

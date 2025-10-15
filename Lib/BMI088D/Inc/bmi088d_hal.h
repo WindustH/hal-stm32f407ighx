@@ -9,7 +9,7 @@
 #ifndef BMI088D_HAL_H
 #define BMI088D_HAL_H
 
-#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal.h" // IWYU pragma: keep
 #include <stdint.h>
 
 #ifdef __cplusplus
