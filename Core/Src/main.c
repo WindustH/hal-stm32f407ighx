@@ -30,7 +30,10 @@
 
 #include "BSP/can_fifo0.h"
 #include "BSP/cron.h"
+#include "BSP/dwt.h"
+#include "BSP/gpio_exti.h"
 #include "BSP/uart.h"
+#include "Drivers/BMI880/driver.h"
 #include "Drivers/MOT_DMJ4310/driver.h"
 #include "Drivers/MOT_M3508/driver.h"
 #include "Drivers/RC_DR16/driver.h"
@@ -67,7 +70,7 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void start_peripherals() {
+static void start_hal_peripherals() {
   if (HAL_TIM_Base_Start(&htim3) != HAL_OK) {
     Error_Handler();
   }
@@ -156,9 +159,15 @@ int main(void) {
   // 配置 RC DR16
   setup_rc_dr16(&huart3);
   bsp_uart_rx_cb_add(rc_update_ctrl_msg_dr16);
+  // 配置 BMI088
+  setup_bmi088(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
+               TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
+  bsp_gpio_exti_cb_add(bmi088_update_pose);
+  bsp_cron_job_add(bmi088_temp_ctrl);
 
   // 外设启动
-  start_peripherals();
+  start_hal_peripherals();
+  DWT_Init(SYSCLK_MHZ);
 
   /* USER CODE END 2 */
 

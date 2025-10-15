@@ -503,13 +503,13 @@ const q7_t * pSrc,
  *
  *
  * @param[in]    *in           Array of input values.
- * @param[in]    *weights      Weights
+ * @param[in]    *weigths      Weights
  * @param[in]    blockSize     Number of samples in the input array.
  * @return Weighted average
  *
  */
 float32_t arm_weighted_average_f32(const float32_t *in
-  , const float32_t *weights
+  , const float32_t *weigths
   , uint32_t blockSize);
 
 

@@ -104,9 +104,6 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                      (DMJ4310_KD_RANGE_MAX - DMJ4310_KD_RANGE_MIN) * 4095.0f);
 
   // 饱和到有效的位范围
-  p_des_raw = (p_des_raw > 32767)    ? 32767
-              : (p_des_raw < -32768) ? -32768
-                                     : p_des_raw;
   v_des_raw = (v_des_raw > 2047)    ? 2047
               : (v_des_raw < -2048) ? -2048
                                     : v_des_raw;

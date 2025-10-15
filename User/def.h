@@ -15,6 +15,7 @@
 #define GPIO_EXTI_CB_LIST_SIZE 32
 // 系统时钟频率(Hz)
 #define SYSCLK 168000000U
+#define SYSCLK_MHZ 168U
 // APB1总线时钟频率(Hz)
 #define APB1_CLK 42000000U
 // APB2总线时钟频率(Hz)

@@ -606,19 +606,6 @@ void arm_mat_init_q15(
         uint16_t nRows,
         uint16_t nColumns,
         q15_t * pData);
-  
-  /**
-   * @brief  Q7 matrix initialization.
-   * @param[in,out] S         points to an instance of the floating-point matrix structure.
-   * @param[in]     nRows     number of rows in the matrix.
-   * @param[in]     nColumns  number of columns in the matrix.
-   * @param[in]     pData     points to the matrix data array.
-   */
-void arm_mat_init_q7(
-        arm_matrix_instance_q7 * S,
-        uint16_t nRows,
-        uint16_t nColumns,
-        q7_t * pData);
 
   /**
    * @brief  Floating-point matrix initialization.
@@ -861,8 +848,6 @@ float64_t arm_householder_f64(
     uint32_t    blockSize,
     float64_t * pOut
     );
-
-
 
 #ifdef   __cplusplus
 }

@@ -18,6 +18,7 @@ set(USER_DIR ${CMAKE_SOURCE_DIR}/User)
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/Lib)
 set(DRIVER_DIR ${CMAKE_SOURCE_DIR}/Drivers)
 set(CMSIS_DIR ${DRIVER_DIR}/CMSIS)
+set(CMSISCORE ${DRIVER_DIR}/CMSIS)
 set(HAL_DIR ${DRIVER_DIR}/STM32F4xx_HAL_Driver)
 set(STARTUP_DIR ${CMAKE_SOURCE_DIR}/startup)
 
@@ -33,7 +34,9 @@ set(ASM_SOURCES
 set(PKG_BMI088D_DIR ${LIB_DIR}/BMI088D)
 file(GLOB_RECURSE PKG_BMI088D_SOURCES ${PKG_BMI088D_DIR}/Src/*.c)
 
-set(PKG_CMSIS_DAP_DIR ${LIB_DIR}/CMSIS-DAP)
+set(CMSISDSP ${LIB_DIR}/CMSIS-DAP)
+add_subdirectory(${CMSISDSP}/Source bin_dsp)
+target_link_libraries(${TARGET} CMSISDSP)
 
 target_sources(${TARGET}
     PRIVATE
@@ -50,9 +53,9 @@ target_include_directories(${TARGET}
     ${USER_DIR}
     ${PKG_BMI088D_DIR}/Inc
     ${CORE_DIR}/Inc
+    ${CMSISDSP}/Include
     ${CMSIS_DIR}/Include
     ${CMSIS_DIR}/Device/ST/STM32F4xx/Include
-    ${PKG_CMSIS_DAP_DIR}/Include
     ${HAL_DIR}/Inc
 )
 
