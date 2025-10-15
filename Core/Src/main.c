@@ -104,6 +104,8 @@ static void start_hal_peripherals() {
   if (HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }
+
+  DWT_Init(SYSCLK_MHZ);
 }
 
 /* USER CODE END 0 */
@@ -167,7 +169,8 @@ int main(void) {
 
   // 外设启动
   start_hal_peripherals();
-  DWT_Init(SYSCLK_MHZ);
+  // 启动陀螺仪
+  start_bmi088();
 
   /* USER CODE END 2 */
 

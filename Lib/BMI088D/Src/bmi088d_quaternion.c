@@ -7,8 +7,10 @@
  */
 
 #include "bmi088d_quaternion.h"
-#include "bmi088d_utils.h"
 #include <math.h>
+
+/* Use CMSIS DSP for quaternion operations */
+#include "dsp/quaternion_math_functions.h"
 
 int32_t bmi088d_quat_identity(bmi088d_quat_t *quat) {
   if (!quat) {
@@ -28,17 +30,15 @@ int32_t bmi088d_quat_normalize(bmi088d_quat_t *quat) {
     return BMI088D_ERROR_INVALID_PARAM;
   }
 
-  float norm = bmi088d_quat_magnitude(quat);
+  float input_quat[4] = {quat->w, quat->x, quat->y, quat->z};
+  float normalized_quat[4];
 
-  if (norm < 1e-12f) {
-    return BMI088D_ERROR_INVALID_PARAM;
-  }
+  arm_quaternion_normalize_f32(input_quat, normalized_quat, 1);
 
-  float inv_norm = 1.0f / norm;
-  quat->w *= inv_norm;
-  quat->x *= inv_norm;
-  quat->y *= inv_norm;
-  quat->z *= inv_norm;
+  quat->w = normalized_quat[0];
+  quat->x = normalized_quat[1];
+  quat->y = normalized_quat[2];
+  quat->z = normalized_quat[3];
 
   return BMI088D_SUCCESS;
 }
@@ -50,10 +50,16 @@ int32_t bmi088d_quat_multiply(const bmi088d_quat_t *q1,
     return BMI088D_ERROR_INVALID_PARAM;
   }
 
-  result->w = q1->w * q2->w - q1->x * q2->x - q1->y * q2->y - q1->z * q2->z;
-  result->x = q1->w * q2->x + q1->x * q2->w + q1->y * q2->z - q1->z * q2->y;
-  result->y = q1->w * q2->y - q1->x * q2->z + q1->y * q2->w + q1->z * q2->x;
-  result->z = q1->w * q2->z + q1->x * q2->y - q1->y * q2->x + q1->z * q2->w;
+  float qa[4] = {q1->w, q1->x, q1->y, q1->z};
+  float qb[4] = {q2->w, q2->x, q2->y, q2->z};
+  float qr[4];
+
+  arm_quaternion_product_single_f32(qa, qb, qr);
+
+  result->w = qr[0];
+  result->x = qr[1];
+  result->y = qr[2];
+  result->z = qr[3];
 
   return BMI088D_SUCCESS;
 }
@@ -64,10 +70,15 @@ int32_t bmi088d_quat_conjugate(const bmi088d_quat_t *quat,
     return BMI088D_ERROR_INVALID_PARAM;
   }
 
-  conjugate->w = quat->w;
-  conjugate->x = -quat->x;
-  conjugate->y = -quat->y;
-  conjugate->z = -quat->z;
+  float input_quat[4] = {quat->w, quat->x, quat->y, quat->z};
+  float conjugate_quat[4];
+
+  arm_quaternion_conjugate_f32(input_quat, conjugate_quat, 1);
+
+  conjugate->w = conjugate_quat[0];
+  conjugate->x = conjugate_quat[1];
+  conjugate->y = conjugate_quat[2];
+  conjugate->z = conjugate_quat[3];
 
   return BMI088D_SUCCESS;
 }
@@ -137,6 +148,10 @@ float bmi088d_quat_magnitude(const bmi088d_quat_t *quat) {
     return 0.0f;
   }
 
-  return bmi088d_sqrt(quat->w * quat->w + quat->x * quat->x +
-                      quat->y * quat->y + quat->z * quat->z);
+  float input_quat[4] = {quat->w, quat->x, quat->y, quat->z};
+  float norm;
+
+  arm_quaternion_norm_f32(input_quat, &norm, 1);
+
+  return norm;
 }

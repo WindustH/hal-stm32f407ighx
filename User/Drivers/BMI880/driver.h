@@ -10,5 +10,6 @@ void setup_bmi088(SPI_HandleTypeDef *hspi, GPIO_TypeDef *accel_cs_port,
                   u16 accel_it_pin);
 void bmi088_update_pose(u16 pin);
 void bmi088_temp_ctrl();
+void start_bmi088();
 bmi088d_imu_data_t *bmi088_get_pose();
 #endif /* __USER_DRIVERS_BMI880_DRIVER__ */

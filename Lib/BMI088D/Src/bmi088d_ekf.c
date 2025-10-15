@@ -332,11 +332,12 @@ static void ekf_predict(float dt __attribute__((unused))) {
   arm_mat_init_f32(&x_minus_mat, STATE_SIZE, 1, x_minus);
   arm_mat_mult_f32(&F_mat, &x_mat, &x_minus_mat);
 
-  // Normalize quaternion part of x_minus
-  float q_norm = invSqrt(x_minus[0] * x_minus[0] + x_minus[1] * x_minus[1] +
-                         x_minus[2] * x_minus[2] + x_minus[3] * x_minus[3]);
+  // Normalize quaternion part of x_minus using ARM CMSIS-DAP
+  float quat_input[4] = {x_minus[0], x_minus[1], x_minus[2], x_minus[3]};
+  float quat_normalized[4];
+  arm_quaternion_normalize_f32(quat_input, quat_normalized, 1);
   for (int i = 0; i < 4; i++)
-    x_minus[i] *= q_norm;
+    x_minus[i] = quat_normalized[i];
 
   // P_minus = F * P * F^T + Q
   arm_matrix_instance_f32 P_mat, FT_mat, temp1, temp2, Q_mat, P_minus_mat;
@@ -375,6 +376,8 @@ static void ekf_update(void) {
   arm_mat_init_f32(&x_mat, STATE_SIZE, 1, x);
 
   // h = H(x_minus) -> predicted measurement
+  // This represents the predicted gravity vector from quaternion
+  // h = [2*(q1*q3 - q0*q2), 2*(q0*q1 + q2*q3), q0^2 - q1^2 - q2^2 + q3^2]
   float h[3];
   h[0] = 2 * (x_minus[1] * x_minus[3] - x_minus[0] * x_minus[2]);
   h[1] = 2 * (x_minus[0] * x_minus[1] + x_minus[2] * x_minus[3]);
@@ -478,7 +481,9 @@ static void ekf_apply_chi_square_test(void) {
   arm_mat_init_f32(&S_mat, MEAS_SIZE, MEAS_SIZE, S);
   arm_mat_init_f32(&S_inv_mat, MEAS_SIZE, MEAS_SIZE, temp_mat1);
 
-  // h = H(x_minus)
+  // h = H(x_minus) -> predicted measurement
+  // This represents the predicted gravity vector from quaternion
+  // h = [2*(q1*q3 - q0*q2), 2*(q0*q1 + q2*q3), q0^2 - q1^2 - q2^2 + q3^2]
   float h[3];
   h[0] = 2 * (x_minus[1] * x_minus[3] - x_minus[0] * x_minus[2]);
   h[1] = 2 * (x_minus[0] * x_minus[1] + x_minus[2] * x_minus[3]);

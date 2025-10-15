@@ -24,8 +24,8 @@
 #define TIM3_PRESCALER 419
 // TIM3周期值
 #define TIM3_PERIOD 99
-// volatile关键字简写
-#define vlt volatile
+// 遥控器控制帧发送间隔
+#define RC_FRAME_INTERVAL_MS 7
 
 #ifndef NULL
 // 圆周率π的浮点数表示

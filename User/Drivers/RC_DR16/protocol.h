@@ -2,9 +2,10 @@
 #define __USER_DRIVERS_RC_DR16_PROTOCOL__
 
 #include "type.h"
+
 /* ----------------------- 遥控器通道范围 ------------------------------- */
 #define RC_CH_VALUE_MIN ((u16)364)     // 通道值最小值
-#define RC_CH_VALUE_OFFSET ((u16)1024) // 通道值偏移量
+#define RC_CH_VALUE_OFFSET ((u16)1024) // 通道值偏移量（中位）
 #define RC_CH_VALUE_MAX ((u16)1684)    // 通道值最大值
 
 /* ----------------------- 开关状态 ---------------------------------- */
@@ -37,8 +38,8 @@ typedef struct {
     i16 x;      // 鼠标X轴
     i16 y;      // 鼠标Y轴
     i16 z;      // 鼠标Z轴(滚轮)
-    u8 press_l; // 左键按下状态
-    u8 press_r; // 右键按下状态
+    u8 press_l; // 左键按下状态 (0/1)
+    u8 press_r; // 右键按下状态 (0/1)
   } mouse;
 
   struct {
@@ -47,9 +48,9 @@ typedef struct {
 } rcCtrl_dr16;
 
 /**
- * @brief 将原始18字节SBUS-like数据解析为结构化的遥控器控制数据
- * @param raw_data 指向18字节缓冲区的指针(不能为空)
- * @param out      指向输出结构体的指针(不能为空)
+ * @brief 将原始18字节数据解析为结构化的遥控器控制数据
+ * @param raw_data 指向18字节缓冲区的指针（不能为空）
+ * @param out      指向输出结构体的指针（不能为空）
  */
 void rc_ctrl_msg_parse_dr16(const volatile u8 *raw_data,
                             volatile rcCtrl_dr16 *out);
