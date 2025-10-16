@@ -20,7 +20,7 @@ static const pwPidArg default_pid_arg = {.R = DMJ4310_PIDX_BIG_R,
                                          .kdr = DMJ4310_PIDX_KDR,
                                          .ol = DMJ4310_PIDX_OL};
 
-void dmj4310_setup_pidx(volatile f32 *fb) {
+void dmj4310_pidx_setup(volatile f32 *fb) {
   feedback = fb;
   pid_arg = default_pid_arg;
 }
@@ -40,10 +40,10 @@ void dmj4310_pidx_set_target(f32 tgt) {
   pid_stat.target = tgt;
 }
 
-void dmj4310_start_pidx() {
+void dmj4310_pidx_start() {
   dwt_cnt = DWT->CYCCNT;
   memset((void *)&pid_stat, 0, sizeof(pid_stat));
   started = true;
 }
 
-void dmj4310_stop_pidx() { started = false; }
+void dmj4310_pidx_stop() { started = false; }

@@ -40,10 +40,10 @@ void dmj4310_pidv_set_target(f32 tgt) {
   pid_stat.target = tgt;
 }
 
-void dmj4310_start_pidv() {
+void dmj4310_pidv_start() {
   dwt_cnt = DWT->CYCCNT;
   memset((void *)&pid_stat, 0, sizeof(pid_stat));
   started = true;
 }
 
-void dmj4310_stop_pidv() { started = false; }
+void dmj4310_pidv_stop() { started = false; }

@@ -25,9 +25,11 @@ static struct {
 static bmi088d_pid_t temp_ctrl_pid = {0};
 
 int32_t bmi088d_init(const bmi088d_hw_config_t *config) {
+
   if (bmi088d_state.initialized) {
     return BMI088D_SUCCESS;
   }
+
 
   /* Initialize hardware driver and sensors */
   if (bmi088d_sensor_init(config) != BMI088D_SENSOR_OK) {
@@ -41,6 +43,7 @@ int32_t bmi088d_init(const bmi088d_hw_config_t *config) {
   memset(&bmi088d_state.imu_data, 0, sizeof(bmi088d_state.imu_data));
   bmi088d_state.imu_data.accel_scale = 1.0f;
   bmi088d_state.imu_data.g_norm = 9.81f;
+
 
   /* Initialize submodules */
   bmi088d_calib_init(NULL);
@@ -64,6 +67,7 @@ int32_t bmi088d_init(const bmi088d_hw_config_t *config) {
                    0);                      /* improvements */
 
   bmi088d_state.initialized = 1;
+
   return BMI088D_SUCCESS;
 }
 
@@ -97,10 +101,12 @@ int32_t bmi088d_update(bmi088d_imu_data_t *imu_data, float dt) {
   return BMI088D_SUCCESS;
 }
 
+
 int32_t bmi088d_temp_control(float current_temp, float dt) {
   if (!bmi088d_state.initialized) {
     return BMI088D_ERROR_INVALID_PARAM;
   }
+
 
   /* Use the advanced PID controller with explicit time step and default target
    * temperature */

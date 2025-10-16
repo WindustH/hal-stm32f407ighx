@@ -70,6 +70,7 @@ void m3508_set_current(u8 mot_id, f32 cur) {
 
 void m3508_send_ctrl_msg() {
   if (!M3508_PROTECT_ON) {
+
     motCtrlCanMsg_M3508 can_msg;
     u32 unused_mailbox;
     mot_ctrl_pack_msg_m3508(mot_ctrl, &can_msg);
@@ -79,6 +80,7 @@ void m3508_send_ctrl_msg() {
                              &unused_mailbox) != HAL_OK) {
       return;
     }
+
 
     // 发送电机5-8的控制消息
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_5_8, can_msg.data_5_8,

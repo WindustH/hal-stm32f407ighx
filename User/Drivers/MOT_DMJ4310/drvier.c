@@ -7,13 +7,14 @@
 
 #include "driver.h"
 #include "main.h"
+#include "conf.h"
 
 u8 DMJ4310_PROTECT_ON = false;
 static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat = {0};
 static volatile motCtrl_DMJ4310 mot_ctrl = {0};
 
-void mot_dmj4310_setup(CAN_HandleTypeDef *hcan) {
+void dmj4310_setup(CAN_HandleTypeDef *hcan) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 14
@@ -21,8 +22,8 @@ void mot_dmj4310_setup(CAN_HandleTypeDef *hcan) {
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
-  can_filter.FilterIdHigh = (0x206U << 5);
-  can_filter.FilterIdLow = (0x206U << 5);
+  can_filter.FilterIdHigh = (DMJ4310_PITCH_FEEDBACK_ID << 5);
+  can_filter.FilterIdLow = (DMJ4310_PITCH_FEEDBACK_ID << 5);
 
   can_filter.FilterMaskIdHigh = 0;
   can_filter.FilterMaskIdLow = 0;
@@ -58,6 +59,8 @@ void dmj4310_send_ctrl_msg() {
                              &unused_mailbox) != HAL_OK) {
       return;
     }
+    extern uint8_t debug_point;
+  debug_point=1;
   }
 }
 

@@ -89,7 +89,6 @@ static bmi088d_sensor_error_t bmi088d_accel_init(void) {
   bmi088d_hal_delay_ms(1);
   bmi088d_accel_read_single_reg(BMI088_ACC_CHIP_ID, &res);
   bmi088d_hal_delay_ms(1);
-
   // Check the "who am I"
   if (res != BMI088_ACC_CHIP_ID_VALUE)
     return BMI088D_SENSOR_ERROR_ID;
@@ -100,26 +99,21 @@ static bmi088d_sensor_error_t bmi088d_accel_init(void) {
   bmi088d_hal_delay_ms(80); // BMI088_LONG_DELAY_TIME
 
   // Check communication is normal after reset
-  bmi088d_accel_read_single_reg(BMI088_ACC_CHIP_ID, &res);
-  bmi088d_hal_delay_ms(1);
-  bmi088d_accel_read_single_reg(BMI088_ACC_CHIP_ID, &res);
-  bmi088d_hal_delay_ms(1);
-
-  // Check the "who am I" again
-  if (res != BMI088_ACC_CHIP_ID_VALUE)
-    return BMI088D_SENSOR_ERROR_ID;
+  do {
+    bmi088d_accel_read_single_reg(BMI088_ACC_CHIP_ID, &res);
+  } while (res != BMI088_ACC_CHIP_ID_VALUE);
 
   // Set accelerometer sensor config
   for (uint8_t i = 0; i < BMI088_WRITE_ACCEL_REG_NUM; i++) {
     bmi088d_accel_write_single_reg(write_bmi088_accel_reg_data[i][0],
                                    write_bmi088_accel_reg_data[i][1]);
     bmi088d_hal_delay_ms(1);
-    bmi088d_accel_read_single_reg(write_bmi088_accel_reg_data[i][0], &res);
-    bmi088d_hal_delay_ms(1);
+    // bmi088d_accel_read_single_reg(write_bmi088_accel_reg_data[i][0], &res);
+    // bmi088d_hal_delay_ms(1);
 
-    if (res != write_bmi088_accel_reg_data[i][1]) {
-      return BMI088D_SENSOR_ERROR_CONFIG;
-    }
+    // if (res != write_bmi088_accel_reg_data[i][1]) {
+    //   return BMI088D_SENSOR_ERROR_CONFIG;
+    // }
   }
 
   return BMI088D_SENSOR_OK;
@@ -148,26 +142,22 @@ static bmi088d_sensor_error_t bmi088d_gyro_init(void) {
   bmi088d_hal_delay_ms(80); // BMI088_LONG_DELAY_TIME
 
   // Check communication is normal after reset
-  bmi088d_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, &res);
-  bmi088d_hal_delay_ms(1);
-  bmi088d_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, &res);
-  bmi088d_hal_delay_ms(1);
+  do {
+    bmi088d_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, &res);
+  } while (res != BMI088_GYRO_CHIP_ID_VALUE);
 
-  // Check the "who am I" again
-  if (res != BMI088_GYRO_CHIP_ID_VALUE)
-    return BMI088D_SENSOR_ERROR_ID;
 
   // Set gyroscope sensor config
   for (uint8_t i = 0; i < BMI088_WRITE_GYRO_REG_NUM; i++) {
     bmi088d_gyro_write_single_reg(write_bmi088_gyro_reg_data[i][0],
                                   write_bmi088_gyro_reg_data[i][1]);
     bmi088d_hal_delay_ms(1);
-    bmi088d_gyro_read_single_reg(write_bmi088_gyro_reg_data[i][0], &res);
-    bmi088d_hal_delay_ms(1);
+    // bmi088d_gyro_read_single_reg(write_bmi088_gyro_reg_data[i][0], &res);
+    // bmi088d_hal_delay_ms(1);
 
-    if (res != write_bmi088_gyro_reg_data[i][1]) {
-      return BMI088D_SENSOR_ERROR_CONFIG;
-    }
+    // if (res != write_bmi088_gyro_reg_data[i][1]) {
+    //   return BMI088D_SENSOR_ERROR_CONFIG;
+    // }
   }
 
   return BMI088D_SENSOR_OK;
