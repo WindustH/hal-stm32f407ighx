@@ -17,7 +17,7 @@ extern u8 DMJ4310_PROTECT_ON;
  * @brief 配置与启用DMJ4310电机的CAN通信
  * @param hcan CAN对象指针
  */
-void dmj4310_setup(CAN_HandleTypeDef *hcan);
+void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master);
 
 /**
  * @brief 发送控制消息到DMJ4310电机

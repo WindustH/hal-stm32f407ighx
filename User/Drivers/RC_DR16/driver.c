@@ -23,9 +23,9 @@ void rc_dr16_setup(UART_HandleTypeDef *huart) {
 
 void rc_dr16_update_ctrl_msg(UART_HandleTypeDef *huart, u16 size) {
   (void)size; // 避免未使用参数警告
-
   // 检查是否为配置的UART实例
   if (huart->Instance == huartx->Instance) {
+
     // 解析接收到的遥控器控制消息
     rc_ctrl_msg_parse_dr16(uart_rx_buffer, &rc_ctrl);
 

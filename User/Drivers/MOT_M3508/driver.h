@@ -17,7 +17,7 @@ extern u8 M3508_PROTECT_ON;
  * @brief 配置与启用M3508电机的CAN通信
  * @param hcan CAN对象指针
  */
-void m3508_setup(CAN_HandleTypeDef *hcan);
+void m3508_setup(CAN_HandleTypeDef *hcan, u8 master);
 
 /**
  * @brief 发送控制消息到M3508电机

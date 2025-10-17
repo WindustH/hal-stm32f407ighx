@@ -34,10 +34,9 @@ void mot_m3508_set_scaling(f32 pos_scale, f32 vel_scale, f32 cur_scale) {
 
 void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
                              motCtrlCanMsg_M3508 *can_msg) {
-  *can_msg = (motCtrlCanMsg_M3508){
-      .header_1_4 = tx_header_1_4,
-      .header_5_8 = tx_header_5_8,
-  };
+  can_msg->header_1_4 = tx_header_1_4;
+  can_msg->header_5_8 = tx_header_5_8;
+
   for (u8 i = 0; i < 4; i++) {
     can_msg->data_1_4[i * 2] = (ctrl[i].I >> 8) & 0xFF;
     can_msg->data_1_4[i * 2 + 1] = ctrl[i].I & 0xFF;
@@ -66,17 +65,17 @@ void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
 
   // ---- 多圈位置跟踪 ----
   static u16 prev_raw_pos[8] = {0};
-  static i32 sign[8] = {0};
+  i32 sign = 0;
 
   i16 delta_raw = raw_pos - prev_raw_pos[motor_id];
 
   // 处理编码器环绕
   if (delta_raw > M3508_PI)
-    sign[motor_id] = -1;
+    sign = -1;
   else if (delta_raw < -M3508_PI)
-    sign[motor_id] = 1;
+    sign = 1;
 
-  f32 delta = (delta_raw + sign[motor_id] * M3508_PI * 2.0f) * s_pos_scale;
+  f32 delta = (delta_raw + sign * M3508_PI * 2.0f) * s_pos_scale;
 
   prev_raw_pos[motor_id] = raw_pos;
 

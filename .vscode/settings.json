@@ -19,7 +19,7 @@
     "[c]": {
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
     },
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "VsCodeTaskButtons.tasks": [
         {
             "label": "$(pass-filled) Build (Release)",
@@ -43,5 +43,5 @@
         "--all-scopes-completion",
         "--log=error"
     ],
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
 }

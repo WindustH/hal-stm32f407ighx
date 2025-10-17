@@ -27,6 +27,8 @@
 // 遥控器控制帧发送间隔
 #define RC_FRAME_INTERVAL_MS 7
 
+#define IS_MASTER_CAN 1
+#define IS_SLAVE_CAN 0
 #ifndef NULL
 // 圆周率π的浮点数表示
 #define PI 3.14159265359f

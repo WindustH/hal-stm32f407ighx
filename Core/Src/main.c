@@ -18,10 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "Tasks/PID_DMJ4310/pidv.h"
-#include "Tasks/PID_DMJ4310/pidx.h"
-#include "Tasks/PID_M3508/pidv.h"
-#include "Tasks/PID_M3508/pidx.h"
 #include "can.h"
 #include "dma.h"
 #include "gpio.h"
@@ -41,6 +37,10 @@
 #include "Drivers/MOT_DMJ4310/driver.h"
 #include "Drivers/MOT_M3508/driver.h"
 #include "Drivers/RC_DR16/driver.h"
+#include "Tasks/PID_DMJ4310/pidv.h"
+#include "Tasks/PID_DMJ4310/pidx.h"
+#include "Tasks/PID_M3508/pidv.h"
+#include "Tasks/PID_M3508/pidx.h"
 
 /* USER CODE END Includes */
 
@@ -108,7 +108,6 @@ static void start_hal_peripherals() {
   DWT_Init(SYSCLK_MHZ);
 }
 
-
 /* USER CODE END 0 */
 
 /**
@@ -151,44 +150,33 @@ int main(void) {
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
-
   // 配置 DMJ4310
-  // dmj4310_setup(&hcan1);
-  // bsp_can_fifo0_cb_add(dmj4310_update_stat);
-  // bsp_cron_job_add(dmj4310_send_ctrl_msg);
+  dmj4310_setup(&hcan1, IS_MASTER_CAN);
+  bsp_can_fifo0_cb_add(dmj4310_update_stat);
+  bsp_cron_job_add(dmj4310_send_ctrl_msg);
 
-  // dmj4310_set_torque(100.0f);
+  dmj4310_set_torque(0.2f);
   // 配置 M3508
-  // m3508_setup(&hcan1);
+  m3508_setup(&hcan2, IS_SLAVE_CAN);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
+  // m3508_set_current(0, 200.0f);
 
-  m3508_set_current(0, 0.0f);
-  m3508_set_current(1, 0.0f);
-  m3508_set_current(2, 0.0f);
-  m3508_set_current(3, 0.0f);
-  m3508_set_current(4, 0.0f);
-  m3508_set_current(5, 0.0f);
-  m3508_set_current(6, 0.0f);
-  m3508_set_current(7, 0.0f);
   // 配置 RC DR16
   rc_dr16_setup(&huart3);
   bsp_uart_rx_cb_add(rc_dr16_update_ctrl_msg);
 
   // 配置 BMI088
-  bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
-               TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
+  // bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
+  //              TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
 
-
-  bsp_gpio_exti_cb_add(bmi088_update_pose);
-  bsp_cron_job_add(bmi088_temp_ctrl);
+  // bsp_gpio_exti_cb_add(bmi088_update_pose);
+  // bsp_cron_job_add(bmi088_temp_ctrl);
   // 外设启动
   start_hal_peripherals();
 
   // 启动陀螺仪
-  bmi088_start();
-
-
+  // bmi088_start();
 
   // dmj4310_set_torque(5000.0f);
 

@@ -5,25 +5,30 @@
  * 实现DMJ4310电机的CAN通信配置、控制命令发送和状态更新功能
  */
 
+#include "conf.h"
 #include "driver.h"
 #include "main.h"
-#include "conf.h"
 
 u8 DMJ4310_PROTECT_ON = false;
+static u8 mot_enabled = false;
 static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat = {0};
 static volatile motCtrl_DMJ4310 mot_ctrl = {0};
 
-void dmj4310_setup(CAN_HandleTypeDef *hcan) {
+void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 14
-  can_filter.FilterBank = 14;
+  if (master) {
+    can_filter.FilterBank = 0;
+    can_filter.SlaveStartFilterBank = 14;
+  } else
+    can_filter.FilterBank = 14;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
-  can_filter.FilterIdHigh = (DMJ4310_PITCH_FEEDBACK_ID << 5);
-  can_filter.FilterIdLow = (DMJ4310_PITCH_FEEDBACK_ID << 5);
+  can_filter.FilterIdHigh = (DMJ4310_MASTER_ID << 5);
+  can_filter.FilterIdLow = (DMJ4310_MASTER_ID << 5);
 
   can_filter.FilterMaskIdHigh = 0;
   can_filter.FilterMaskIdLow = 0;
@@ -50,17 +55,27 @@ void dmj4310_set_torque(f32 trq) {
 }
 
 void dmj4310_send_ctrl_msg() {
+
   if (!DMJ4310_PROTECT_ON) {
     motCtrlCanMsg_DMJ4310 can_msg;
     u32 unused_mailbox;
+    u8 block[8];
+
+    can_msg.data = block;
+    if (!mot_enabled) {
+      mot_enable_msg_dmj4310(&can_msg);
+      if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
+                               &unused_mailbox) != HAL_OK) {
+        return;
+      }
+    }
+
     mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);
 
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                              &unused_mailbox) != HAL_OK) {
       return;
     }
-    extern uint8_t debug_point;
-  debug_point=1;
   }
 }
 
