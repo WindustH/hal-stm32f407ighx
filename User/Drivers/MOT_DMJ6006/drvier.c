@@ -5,6 +5,7 @@
  * 实现DMJ6006电机的CAN通信配置、控制命令发送和状态更新功能
  */
 
+#include "BSP/can_tx_queue.h"
 #include "driver.h"
 #include "main.h"
 
@@ -61,16 +62,12 @@ void dmj6006_send_ctrl_msg() {
 
   if (!dmj6006_protect_on) {
     motCtrlCanMsg_DMJ6006 can_msg;
-    u32 unused_mailbox;
     u8 block[8];
 
     can_msg.data = block;
     if (!mot_enabled) {
       dmj6006_enable_msg(&can_msg);
-      while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
-        ;
-      if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
-                               &unused_mailbox) != HAL_OK) {
+      if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
         return;
       }
     }
@@ -78,8 +75,7 @@ void dmj6006_send_ctrl_msg() {
     dmj6006_ctrl_pack_mit(&mot_ctrl, &can_msg);
     while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
       ;
-    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
-                             &unused_mailbox) != HAL_OK) {
+    if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
       return;
     }
   }

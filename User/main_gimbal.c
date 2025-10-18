@@ -1,5 +1,6 @@
 #include "main_gimbal.h"
 #include "BSP/can_fifo0.h"
+#include "BSP/can_tx_queue.h"
 #include "BSP/cron.h"
 #include "BSP/dwt.h"
 #include "BSP/gpio_exti.h"
@@ -27,13 +28,13 @@ void main_gimbal() {
   dmj4310_setup(&hcan1, IS_MASTER_CAN, 0x002U, 0x003U, 0);
   bsp_can_fifo0_cb_add(dmj4310_update_stat);
   bsp_cron_job_add(dmj4310_send_ctrl_msg);
-  dmj4310_set_torque(0.5f);
+  dmj4310_set_torque(0.0f);
 
   // 配置 DMJ6006
   dmj6006_setup(&hcan1, IS_MASTER_CAN, 0x001U, 0x000U, 1);
   bsp_can_fifo0_cb_add(dmj6006_update_stat);
   bsp_cron_job_add(dmj6006_send_ctrl_msg);
-  dmj6006_set_torque(0.5f);
+  dmj6006_set_torque(0.0f);
 
   // 配置 M3508
   m3508_setup(&hcan2, IS_SLAVE_CAN, 14);
@@ -52,10 +53,28 @@ void main_gimbal() {
   bsp_cron_job_add(bmi088_temp_ctrl);
   // 外设启动
   start_hal_peripherals();
+  can_tx_manager_init(&hcan1);
 
-  gimbal_protect_start();
+  // gimbal_protect_start();
   // 启动陀螺仪
   bmi088_start();
+
+  volatile f32 *m3508_pidv_feedback[8] = {NULL};
+  volatile f32 *m3508_pidx_feedback[8] = {NULL};
+
+  for (u8 i = 0; i < 8; i++) {
+    m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
+    m3508_pidx_feedback[i] = &m3508_get_stat(i)->x;
+  }
+
+  m3508_pidv_setup(m3508_pidv_feedback);
+  m3508_pidx_setup(m3508_pidx_feedback);
+  bsp_cron_job_add(m3508_pidv_update);
+  bsp_cron_job_add(m3508_pidx_update);
+  m3508_pidv_start();
+  m3508_pidx_start();
+  m3508_pidv_set_target(0, 0.0f);
+  m3508_pidx_set_target(0, 0.0f);
 
   // volatile f32 *dmj4310_pidv_feedback =
   //     &dmj4310_get_stat()->v;

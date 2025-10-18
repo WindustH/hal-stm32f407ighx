@@ -7,7 +7,7 @@
 #define M3508_PIDV_KPR 20.0f
 #define M3508_PIDV_KIR 0.0f
 #define M3508_PIDV_KDR 0.0f
-#define M3508_PIDV_R 380.0f
+#define M3508_PIDV_R 400.0f
 #define M3508_PIDV_BIG_R 1600.0f
 #define M3508_PIDV_OL 16384.0f
 

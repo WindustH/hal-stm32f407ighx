@@ -26,6 +26,8 @@ void m3508_pidv_setup(volatile f32 **fb) {
 }
 
 void m3508_pidv_update() {
+  extern uint8_t debug_point;
+  debug_point++;
   if (!m3508_pidv_started)
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);

@@ -1,5 +1,6 @@
 #include "driver.h"
 
+#include "BSP/can_tx_queue.h"
 #include "Tasks/protect_chassis.h"
 #include "main.h"
 
@@ -64,15 +65,11 @@ void board_com_send_msg(volatile rcCtrl_dr16 *rc_ctrl) {
   bcd.s2 = rc_ctrl->rc.s2;
 
   boardComCanMsg can_msg;
-  u32 unused_mailbox;
   u8 block[8];
   can_msg.data = block;
 
   board_com_pack_msg(&can_msg, &bcd);
-  while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
-    ;
-  if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
-                           &unused_mailbox) != HAL_OK) {
+  if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
     return;
   }
 }

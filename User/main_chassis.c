@@ -1,4 +1,5 @@
 #include "BSP/can_fifo0.h"
+#include "BSP/can_tx_queue.h"
 #include "BSP/cron.h"
 #include "BSP/dwt.h"
 #include "BSP/gpio_exti.h"
@@ -28,11 +29,15 @@ void main_chassis() {
   m3508_setup(&hcan1, IS_MASTER_CAN, 0);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
+  m3508_set_current(0, 200.0f);
+  m3508_set_current(1, 200.0f);
+  m3508_set_current(2, 200.0f);
+  m3508_set_current(3, 200.0f);
 
-  board_com_rx_setup(&hcan2, IS_SLAVE_CAN, 0x007U, 18);
+  // board_com_rx_setup(&hcan2, IS_SLAVE_CAN, 0x007U, 18);
   // 外设启动
   start_hal_peripherals();
-
+  can_tx_manager_init(&hcan1);
   volatile f32 *m3508_pidv_feedback[8] = {NULL};
   volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
@@ -52,5 +57,5 @@ void main_chassis() {
   m3508_pidx_set_target(2, 0.0f);
   m3508_pidx_set_target(3, 0.0f);
 
-  chassis_protect_start();
+  // chassis_protect_start();
 }

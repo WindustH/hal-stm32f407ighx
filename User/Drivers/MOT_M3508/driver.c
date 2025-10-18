@@ -6,8 +6,8 @@
  */
 
 #include "driver.h"
+#include "BSP/can_tx_queue.h"
 #include "main.h"
-
 volatile u8 m3508_protect_on = false;
 static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
@@ -77,20 +77,15 @@ void m3508_send_ctrl_msg() {
     u8 block2[8];
     can_msg.data_1_4 = block1;
     can_msg.data_5_8 = block2;
-    u32 unused_mailbox;
     m3508_ctrl_pack_msg(mot_ctrl, &can_msg);
-    while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
-      ;
     // 发送电机1-4的控制消息
-    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_1_4, can_msg.data_1_4,
-                             &unused_mailbox) != HAL_OK) {
+    if (can_send_message(hcanx, &can_msg.header_1_4, can_msg.data_1_4) !=
+        HAL_OK) {
       return;
     }
-    while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
-      ;
     // 发送电机5-8的控制消息
-    if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_5_8, can_msg.data_5_8,
-                             &unused_mailbox) != HAL_OK) {
+    if (can_send_message(hcanx, &can_msg.header_5_8, can_msg.data_5_8) !=
+        HAL_OK) {
       return;
     }
   }

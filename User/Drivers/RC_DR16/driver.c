@@ -64,10 +64,8 @@ void USART3_IRQHandler(void) {
         memcpy(&temp_buf[first_part], uart_rx_buffer, 18 - first_part);
       }
 
-      extern u8 debug_point;
-      debug_point++;
       rc_ctrl_msg_parse_dr16(temp_buf, &rc_ctrl);
-      // board_com_send_msg(&rc_ctrl);
+      board_com_send_msg(&rc_ctrl);
       gimbal_protect_refresh_idle_time();
 
       // 更新 last_dma_pos：只前进 18 字节（假设每包固定 18 字节）
