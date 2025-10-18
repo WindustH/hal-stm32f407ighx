@@ -1,23 +1,22 @@
-/**
- * @file driver.c
- * @brief DR16遥控器驱动实现文件
- *
- * 实现DR16遥控器的UART通信配置和控制消息解析功能
- */
-
 #include "driver.h"
-#include "Drivers/BOARD_CAN_COM/driver.h"
-#include "Tasks/protect_gimbal.h"
 #include "main.h"
 #include "usart.h"
 #include <string.h>
+
+#ifdef BOARD_GIMBAL
+#include "Drivers/BOARD_CAN_COM/driver.h"
+#include "Tasks/protect_gimbal.h"
+#endif
 
 static u8 uart_rx_buffer[DMA_BUFFER_SIZE];               ///< UART接收缓冲区
 static volatile rcCtrl_dr16 rc_ctrl;                     ///< 遥控器控制信息
 static volatile uint32_t last_dma_pos = DMA_BUFFER_SIZE; // 上次读取位置
 static inline void do_when_received_rc() {
+
+#ifdef BOARD_GIMBAL
   board_com_send_msg(&rc_ctrl);
   gimbal_protect_refresh_idle_time();
+#endif
 }
 
 void rc_dr16_setup(void) {

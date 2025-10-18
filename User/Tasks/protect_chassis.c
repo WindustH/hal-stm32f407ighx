@@ -1,7 +1,8 @@
+#include "protect_chassis.h"
 #include "BSP/dwt.h"
 #include "Drivers/MOT_M3508/protect.h"
-#include "protect_gimbal.h"
 #include "type.h"
+
 
 static u32 dwt_cnt = 0;
 static f32 idle_time = 0.0f;

@@ -1,12 +1,13 @@
 #include "main_chassis.h"
+#ifdef BOARD_CHASSIS
 #include "BSP/all.h"     // IWYU pragma: keep
 #include "Drivers/all.h" // IWYU pragma: keep
 #include "Tasks/all.h"   // IWYU pragma: keep
 #include "handle.h"
 #include "main.h"
 
-extern volatile f32 *m3508_pidv_feedback[8];
-extern volatile f32 *m3508_pidx_feedback[8];
+volatile f32 *m3508_pidv_feedback[8] = {NULL};
+volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
 void main_chassis() {
   // 配置 M3508
@@ -38,3 +39,4 @@ void main_chassis() {
   bsp_cron_job_add(chassis_protect_update_idle_time);
   chassis_protect_start();
 }
+#endif

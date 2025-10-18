@@ -28,14 +28,13 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "BSP/can_tx_queue.h"
-#include "BSP/dwt.h"
-#include "Tasks/protect_chassis.h"
-#include "Tasks/protect_gimbal.h"
-#include "main_chassis.h"
-#include "main_gimbal.h"
+#include "BSP/all.h"     // IWYU pragma: keep
+#include "Drivers/all.h" // IWYU pragma: keep
+#include "Tasks/all.h"   // IWYU pragma: keep
+#include "handle.h"
+#include "main_chassis.h" // IWYU pragma: keep
+#include "main_gimbal.h"  // IWYU pragma: keep
 #include "type.h"
-
 
 /* USER CODE END Includes */
 
@@ -68,9 +67,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t debug_point = 0;
-volatile f32 *m3508_pidv_feedback[8] = {NULL};
-volatile f32 *m3508_pidx_feedback[8] = {NULL};
+u32 debug_point = 0;
+u32 error_indicator = 0;
 /* USER CODE END 0 */
 
 /**

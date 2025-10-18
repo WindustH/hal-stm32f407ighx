@@ -1,12 +1,15 @@
 #include "main_gimbal.h"
+
+#ifdef BOARD_GIMBAL
 #include "BSP/all.h"     // IWYU pragma: keep
 #include "Drivers/all.h" // IWYU pragma: keep
 #include "Tasks/all.h"   // IWYU pragma: keep
 #include "handle.h"
 #include "main.h"
 
-extern volatile f32 *m3508_pidv_feedback[8];
-extern volatile f32 *m3508_pidx_feedback[8];
+volatile f32 *m3508_pidv_feedback[8] = {NULL};
+volatile f32 *m3508_pidx_feedback[8] = {NULL};
+
 volatile f32 *dmj6006_pidv_feedback;
 
 void main_gimbal() {
@@ -62,3 +65,4 @@ void main_gimbal() {
   dmj6006_pidv_setup(dmj6006_pidv_feedback);
   dmj6006_pidv_start();
 }
+#endif
