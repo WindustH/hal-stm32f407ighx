@@ -15,6 +15,10 @@
 static u8 uart_rx_buffer[DMA_BUFFER_SIZE];               ///< UART接收缓冲区
 static volatile rcCtrl_dr16 rc_ctrl;                     ///< 遥控器控制信息
 static volatile uint32_t last_dma_pos = DMA_BUFFER_SIZE; // 上次读取位置
+static inline void do_when_received_rc() {
+  board_com_send_msg(&rc_ctrl);
+  gimbal_protect_refresh_idle_time();
+}
 
 void rc_dr16_setup(void) {
   // 启动循环 DMA 接收（关键：Circular Mode）
@@ -65,9 +69,7 @@ void USART3_IRQHandler(void) {
       }
 
       rc_ctrl_msg_parse_dr16(temp_buf, &rc_ctrl);
-      board_com_send_msg(&rc_ctrl);
-      gimbal_protect_refresh_idle_time();
-
+      do_when_received_rc();
       // 更新 last_dma_pos：只前进 18 字节（假设每包固定 18 字节）
       last_dma_pos = (last_dma_pos + new_data_len) % DMA_BUFFER_SIZE;
     } else {

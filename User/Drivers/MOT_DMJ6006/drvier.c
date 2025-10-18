@@ -83,7 +83,7 @@ void dmj6006_send_ctrl_msg() {
 
 void dmj6006_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                          u8 data[8]) {
-  if (hcanx == hcan) {
+  if (hcanx == hcan && header->StdId == dmj6006_master_id) {
     dmj6006_fb_parse(header, data, &mot_stat);
   }
 }

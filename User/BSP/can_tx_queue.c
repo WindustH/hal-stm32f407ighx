@@ -198,3 +198,55 @@ void CAN1_TX_IRQHandler(void) {
     tx_complete_count++;
   }
 }
+
+extern CAN_HandleTypeDef hcan2;
+
+void CAN2_TX_IRQHandler(void) {
+  uint32_t tsr = CAN2->TSR;
+
+  // 检查 Mailbox 0
+  if (tsr & CAN_TSR_RQCP0) {
+    CAN2->TSR = CAN_TSR_RQCP0; // 清除标志（写1清除）
+    tx_complete_count++;       // 调试用，可选
+
+    // 查找 hcan2 对应的队列
+    for (int i = 0; i < MAX_CAN_INSTANCES; i++) {
+      if (g_queues[i].in_use && g_queues[i].hcan == &hcan2) {
+        if (g_queues[i].pending > 0) {
+          g_queues[i].pending--;
+        }
+        // 尝试发送下一帧
+        while (g_queues[i].pending < 3 &&
+               g_queues[i].head != g_queues[i].tail) {
+          uint32_t mbox;
+          HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(
+              &hcan2, &g_queues[i].buffer[g_queues[i].tail].header,
+              g_queues[i].buffer[g_queues[i].tail].data, &mbox);
+          if (status == HAL_OK && (mbox <= CAN_TX_MAILBOX2)) {
+            g_queues[i].pending++;
+            g_queues[i].tail = (g_queues[i].tail + 1) % CAN_TX_QUEUE_SIZE;
+          } else {
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  // 检查 Mailbox 1
+  if (tsr & CAN_TSR_RQCP1) {
+    CAN2->TSR = CAN_TSR_RQCP1;
+    tx_complete_count++;
+    // 通常不需要重复处理，因为 HAL 会自动分配 mailbox，
+    // 且 pending 计数已在 mailbox 0 处理中统一维护。
+    // 如果你希望更精确地跟踪每个 mailbox，可在此补充逻辑，
+    // 但当前设计以“总 pending 数”为准，因此可省略。
+  }
+
+  // 检查 Mailbox 2
+  if (tsr & CAN_TSR_RQCP2) {
+    CAN2->TSR = CAN_TSR_RQCP2;
+    tx_complete_count++;
+  }
+}

@@ -28,12 +28,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "BSP/can_tx_queue.h"
 #include "BSP/dwt.h"
 #include "Tasks/protect_chassis.h"
 #include "Tasks/protect_gimbal.h"
 #include "main_chassis.h"
 #include "main_gimbal.h"
 #include "type.h"
+
 
 /* USER CODE END Includes */
 
@@ -204,7 +206,8 @@ void start_hal_peripherals() {
   if (HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }
-
+  can_tx_queue_init(&hcan1);
+  can_tx_queue_init(&hcan2);
   DWT_Init(SYSCLK_MHZ);
 }
 

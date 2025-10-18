@@ -36,7 +36,6 @@ void main_chassis() {
   bsp_can_fifo0_cb_add(board_com_update_rx_data);
   // 外设启动
   start_hal_peripherals();
-  can_tx_queue_init(&hcan1);
 
   for (u8 i = 0; i < 8; i++) {
     m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;

@@ -82,7 +82,7 @@ void dmj4310_send_ctrl_msg() {
 
 void dmj4310_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                          u8 data[8]) {
-  if (hcanx == hcan) {
+  if (hcanx == hcan && header->StdId == dmj4310_master_id) {
     dmj4310_fb_parse(header, data, &mot_stat);
   }
 }

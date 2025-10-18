@@ -99,7 +99,7 @@ void m3508_send_ctrl_msg() {
 
 void m3508_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                        u8 data[8]) {
-  if (hcan == hcanx) {
+  if (hcan == hcanx && header->StdId >= 0x201U && header->StdId <= 0x208U) {
     m3508_fb_parse(header, data, mot_stat);
   }
 }

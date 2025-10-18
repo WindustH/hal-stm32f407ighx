@@ -8,7 +8,9 @@
 volatile u32 board_com_can_id = 0x007U;
 static CAN_HandleTypeDef *hcanx;
 static boardComT bc_rx_data = {0};
-
+static inline void do_when_received_board_com() {
+  chassis_protect_refresh_idle_time();
+}
 void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
                         u32 filter_bank) {
 
@@ -42,7 +44,7 @@ void board_com_update_rx_data(CAN_HandleTypeDef *hcan,
                               CAN_RxHeaderTypeDef *header, u8 data[8]) {
   if (hcanx == hcan && header->StdId == board_com_can_id) {
     board_com_parse_msg(header, data, &bc_rx_data);
-    chassis_protect_refresh_idle_time();
+    do_when_received_board_com();
   }
 }
 
