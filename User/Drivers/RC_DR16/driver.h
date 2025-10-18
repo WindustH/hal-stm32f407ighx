@@ -10,18 +10,7 @@
 #include "protocol.h"
 #include "type.h" // IWYU pragma: keep
 
-/**
- * @brief 配置与启用DR16遥控器的UART通信
- * @param uartx UART对象指针
- */
-void rc_dr16_setup(UART_HandleTypeDef *uartx);
-
-/**
- * @brief 更新遥控器控制消息
- * @param huart UART对象指针
- * @param size 接收数据大小
- */
-void rc_dr16_update_ctrl_msg(UART_HandleTypeDef *huart, u16 size);
+void rc_dr16_setup();
 
 volatile rcCtrl_dr16 *rc_dr16_get_ctrl_sig();
 

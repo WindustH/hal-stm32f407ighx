@@ -2,8 +2,8 @@
 static inline f32 smooth_interpolation(f32 k) {
   return 20 * k * k * k * k - 15 * k * k * k * k * k;
 }
-f32 pw_pid_comput(volatile pidStat *const stat, volatile pwPidArg *const arg,
-                const f32 feedback) {
+f32 pw_pid_compute(volatile pidStat *const stat, volatile pwPidArg *const arg,
+                   const f32 feedback) {
   // Calculate error
   stat->p = stat->target - feedback;
 

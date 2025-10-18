@@ -9,7 +9,7 @@ static volatile f32 *feedback;
 static volatile pidStat pid_stat = {0};
 static volatile pwPidArg pid_arg = {0};
 static u32 dwt_cnt;
-static u8 started = false;
+static u8 volatile dmj4310_pidx_started = false;
 static const pwPidArg default_pid_arg = {.R = DMJ4310_PIDX_BIG_R,
                                          .r = DMJ4310_PIDX_R,
                                          .kp = DMJ4310_PIDX_KP,
@@ -26,7 +26,7 @@ void dmj4310_pidx_setup(volatile f32 *fb) {
 }
 
 void dmj4310_pidx_update() {
-  if (!started)
+  if (!dmj4310_pidx_started)
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   pid_stat.dt = dt;
@@ -35,7 +35,7 @@ void dmj4310_pidx_update() {
 }
 
 void dmj4310_pidx_set_target(f32 tgt) {
-  if (!started)
+  if (!dmj4310_pidx_started)
     return;
   pid_stat.target = tgt;
 }
@@ -43,7 +43,7 @@ void dmj4310_pidx_set_target(f32 tgt) {
 void dmj4310_pidx_start() {
   dwt_cnt = DWT->CYCCNT;
   memset((void *)&pid_stat, 0, sizeof(pid_stat));
-  started = true;
+  dmj4310_pidx_started = true;
 }
 
-void dmj4310_pidx_stop() { started = false; }
+void dmj4310_pidx_stop() { dmj4310_pidx_started = false; }

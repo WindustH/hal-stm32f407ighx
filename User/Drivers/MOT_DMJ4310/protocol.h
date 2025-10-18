@@ -1,6 +1,6 @@
 // protocol.h
-#ifndef __USER_DRIVER_MOTOR_DMJ4310_PROTOCOL__
-#define __USER_DRIVER_MOTOR_DMJ4310_PROTOCOL__
+#ifndef __USER_DRIVERS_MOT_DMJ4310_PROTOCOL__
+#define __USER_DRIVERS_MOT_DMJ4310_PROTOCOL__
 
 #include "type.h"
 
@@ -18,6 +18,10 @@
 #define DMJ4310_KP_RANGE_MAX 500.0f
 #define DMJ4310_KD_RANGE_MIN 0.0f
 #define DMJ4310_KD_RANGE_MAX 5.0f
+#define DMJ4310_V_RANGE_MIN 0.0f
+#define DMJ4310_V_RANGE_MAX 5.0f
+#define DMJ4310_MAX_TRQ 7.0f
+#define DMJ4310_MIN_TRQ -7.0f
 
 // 电机反馈数据结构体
 typedef struct {
@@ -59,4 +63,4 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
 
 void mot_enable_msg_dmj4310(motCtrlCanMsg_DMJ4310 *can_msg);
 
-#endif /* __USER_DRIVER_MOTOR_DMJ4310_PROTOCOL__ */
+#endif /* __USER_DRIVERS_MOT_DMJ4310_PROTOCOL__ */

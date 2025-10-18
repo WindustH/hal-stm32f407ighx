@@ -19,6 +19,8 @@ static const canTxH tx_header_5_8 = {
     .StdId = M3508_CONTROL_ID_5_8,
 };
 
+static u8 first_feedback[8] = {true};
+
 // 位置缩放因子
 static f32 s_pos_scale = M3508_X_SCALE;
 // 速度缩放因子
@@ -65,17 +67,19 @@ void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
 
   // ---- 多圈位置跟踪 ----
   static u16 prev_raw_pos[8] = {0};
-  i32 sign = 0;
-
-  i16 delta_raw = raw_pos - prev_raw_pos[motor_id];
-
-  // 处理编码器环绕
-  if (delta_raw > M3508_PI)
-    sign = -1;
-  else if (delta_raw < -M3508_PI)
-    sign = 1;
-
-  f32 delta = (delta_raw + sign * M3508_PI * 2.0f) * s_pos_scale;
+  f32 delta = 0.0f;
+  if (first_feedback[motor_id])
+    first_feedback[motor_id] = false;
+  else {
+    i32 sign = 0;
+    i16 delta_raw = raw_pos - prev_raw_pos[motor_id];
+    // 处理编码器环绕
+    if (delta_raw > M3508_PI)
+      sign = -1;
+    else if (delta_raw < -M3508_PI)
+      sign = 1;
+    delta = (delta_raw + sign * M3508_PI * 2.0f) * s_pos_scale;
+  }
 
   prev_raw_pos[motor_id] = raw_pos;
 

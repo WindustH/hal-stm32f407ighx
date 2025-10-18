@@ -107,4 +107,7 @@ typedef struct {
   f32 ol;
 } pwPidArg;
 
+f32 i32_to_f32(i32 x_i32, f32 x_min, f32 x_max, i32 bits);
+i32 f32_to_i32(f32 x, f32 x_min, f32 x_max, i32 bits);
+
 #endif /* __USER_TYPE__ */

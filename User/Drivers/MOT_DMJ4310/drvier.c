@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "main.h"
 
-u8 DMJ4310_PROTECT_ON = false;
+volatile u8 DMJ4310_PROTECT_ON = false;
 static u8 mot_enabled = false;
 static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat = {0};
@@ -82,7 +82,7 @@ void dmj4310_send_ctrl_msg() {
 void dmj4310_update_stat(CAN_HandleTypeDef *hcan) {
   if (hcanx == hcan) {
     canRxH header;
-    u8 *data = {0};
+    u8 data[8];
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
       return;
     }

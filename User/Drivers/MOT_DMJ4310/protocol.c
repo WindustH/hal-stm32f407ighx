@@ -3,6 +3,7 @@
 #include "conf.h"
 
 // 缩放因子（来自 conf.h）
+static u8 first_feedback = true;
 static f32 s_pos_scale = DMJ4310_X_SCALE;   // 弧度 / raw
 static f32 s_vel_scale = DMJ4310_V_SCALE;   // rad/s / raw
 static f32 s_trq_scale = DMJ4310_TOR_SCALE; // Nm / raw
@@ -48,14 +49,19 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
 
   // ---- 多圈位置处理 ----
   static i32 prev_raw_pos = 0;
-  i32 delta_raw = raw_pos - prev_raw_pos;
-  i8 sign = 0;
-  if (delta_raw > (i32)DMJ4310_PI)
-    sign = -1;
-  else if (delta_raw < -(i32)DMJ4310_PI)
-    sign = 1;
+  f32 delta = 0.0f;
+  if (first_feedback)
+    first_feedback = false;
+  else {
+    i32 delta_raw = raw_pos - prev_raw_pos;
+    i32 sign = 0;
+    if (delta_raw > (i32)DMJ4310_PI)
+      sign = -1;
+    else if (delta_raw < -(i32)DMJ4310_PI)
+      sign = 1;
 
-  f32 delta = (delta_raw + sign * DMJ4310_PI * 2.0f) * s_pos_scale;
+    delta = (delta_raw + sign * DMJ4310_PI * 2.0f) * s_pos_scale;
+  }
   prev_raw_pos = raw_pos;
 
   mot_stat_dmj4310->x += delta;
@@ -70,24 +76,17 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
 void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                                motCtrlCanMsg_DMJ4310 *can_msg) {
 
-  // 转换为原始整数
-  i16 p_des_raw = (i16)(ctrl_msg->x / s_pos_scale);
-  i16 v_des_raw = (i16)(ctrl_msg->v / s_vel_scale);
-  i16 t_ff_raw = (i16)(ctrl_msg->trq / s_trq_scale);
+  u16 p_des_raw =
+      (u16)f32_to_i32(ctrl_msg->x / s_pos_scale, -DMJ4310_PI, +DMJ4310_PI, 16);
+  u16 v_des_raw = (u16)f32_to_i32(ctrl_msg->v / s_vel_scale,
+                                  DMJ4310_V_RANGE_MIN, DMJ4310_V_RANGE_MAX, 12);
+  u16 t_ff_raw = (u16)f32_to_i32(ctrl_msg->trq / s_trq_scale, DMJ4310_MIN_TRQ,
+                                 DMJ4310_MAX_TRQ, 12);
 
-  // Kp/Kd 映射到 12 位 [0, 4095]
-  u16 kp_raw = (u16)((ctrl_msg->kp - DMJ4310_KP_RANGE_MIN) /
-                     (DMJ4310_KP_RANGE_MAX - DMJ4310_KP_RANGE_MIN) * 4095.0f);
-  u16 kd_raw = (u16)((ctrl_msg->kd - DMJ4310_KD_RANGE_MIN) /
-                     (DMJ4310_KD_RANGE_MAX - DMJ4310_KD_RANGE_MIN) * 4095.0f);
-
-  // 饱和处理
-  v_des_raw = (v_des_raw > 2047)    ? 2047
-              : (v_des_raw < -2048) ? -2048
-                                    : v_des_raw;
-  t_ff_raw = (t_ff_raw > 2047) ? 2047 : (t_ff_raw < -2048) ? -2048 : t_ff_raw;
-  kp_raw = (kp_raw > 4095) ? 4095 : kp_raw;
-  kd_raw = (kd_raw > 4095) ? 4095 : kd_raw;
+  u16 kp_raw = (u16)f32_to_i32(ctrl_msg->kp, DMJ4310_KP_RANGE_MIN,
+                               DMJ4310_KP_RANGE_MAX, 12);
+  u16 kd_raw = (u16)f32_to_i32(ctrl_msg->kd, DMJ4310_KD_RANGE_MIN,
+                               DMJ4310_KD_RANGE_MAX, 12);
 
   // 按照协议打包 8 字节数据（D[0] ~ D[7]）
   can_msg->data[0] = (u8)((p_des_raw >> 8) & 0xFF); // p[15:8]

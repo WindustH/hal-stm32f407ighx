@@ -7,9 +7,8 @@
 
 #include "driver.h"
 #include "main.h"
-#include <stdlib.h>
 
-u8 M3508_PROTECT_ON = false;
+volatile u8 M3508_PROTECT_ON = false;
 static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组

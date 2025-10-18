@@ -32,7 +32,6 @@
 #include "BSP/cron.h"
 #include "BSP/dwt.h"
 #include "BSP/gpio_exti.h"
-#include "BSP/uart.h"
 #include "Drivers/BMI880/driver.h"
 #include "Drivers/MOT_DMJ4310/driver.h"
 #include "Drivers/MOT_M3508/driver.h"
@@ -41,6 +40,7 @@
 #include "Tasks/PID_DMJ4310/pidx.h"
 #include "Tasks/PID_M3508/pidv.h"
 #include "Tasks/PID_M3508/pidx.h"
+#include "Tasks/protect.h"
 
 /* USER CODE END Includes */
 
@@ -150,51 +150,55 @@ int main(void) {
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
+  bsp_cron_job_add(protect_update_idle_time);
   // 配置 DMJ4310
   dmj4310_setup(&hcan1, IS_MASTER_CAN);
   bsp_can_fifo0_cb_add(dmj4310_update_stat);
   bsp_cron_job_add(dmj4310_send_ctrl_msg);
 
-  dmj4310_set_torque(0.2f);
+  dmj4310_set_torque(1.0f);
   // 配置 M3508
   m3508_setup(&hcan2, IS_SLAVE_CAN);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
-  // m3508_set_current(0, 200.0f);
+  m3508_set_current(0, 200.0f);
 
   // 配置 RC DR16
-  rc_dr16_setup(&huart3);
-  bsp_uart_rx_cb_add(rc_dr16_update_ctrl_msg);
+  rc_dr16_setup();
 
   // 配置 BMI088
-  // bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
-  //              TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
+  bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
+               TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
 
-  // bsp_gpio_exti_cb_add(bmi088_update_pose);
-  // bsp_cron_job_add(bmi088_temp_ctrl);
+  bsp_gpio_exti_cb_add(bmi088_update_pose);
+  bsp_cron_job_add(bmi088_temp_ctrl);
   // 外设启动
   start_hal_peripherals();
 
+  protect_start();
   // 启动陀螺仪
-  // bmi088_start();
+  bmi088_start();
 
-  // dmj4310_set_torque(5000.0f);
+  // volatile f32 *m3508_pidv_feedback[8] = {NULL};
+  // volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
-  // volatile f32 **m3508_pidv_feedback = {0};
-  // volatile f32 **m3508_pidx_feedback = {0};
   // for (u8 i = 0; i < 8; i++) {
-  //   m3508_pidv_feedback[i] = &m3508_get_stat(i)->x;
-  //   m3508_pidx_feedback[i] = &m3508_get_stat(i)->v;
+  //   m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
+  //   m3508_pidx_feedback[i] = &m3508_get_stat(i)->x;
   // }
+
   // m3508_pidv_setup(m3508_pidv_feedback);
   // m3508_pidx_setup(m3508_pidx_feedback);
+  // bsp_cron_job_add(m3508_pidv_update);
+  // bsp_cron_job_add(m3508_pidx_update);
   // m3508_pidv_start();
   // m3508_pidx_start();
+  // m3508_pidx_set_target(0, 1.0f);
 
-  // volatile f32 *dmj4310_pidv_feedback = {0};
-  // volatile f32 *dmj4310_pidx_feedback = {0};
-  // dmj4310_pidv_feedback = &dmj4310_get_stat()->x;
-  // dmj4310_pidx_feedback = &dmj4310_get_stat()->v;
+  // volatile f32 *dmj4310_pidv_feedback =
+  //     &dmj4310_get_stat()->v;
+  // volatile f32 *dmj4310_pidx_feedback =
+  //     &dmj4310_get_stat()->x;
   // dmj4310_pidv_setup(dmj4310_pidv_feedback);
   // dmj4310_pidx_setup(dmj4310_pidx_feedback);
   // dmj4310_pidv_start();
@@ -266,6 +270,7 @@ void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+
   while (1) {
   }
   /* USER CODE END Error_Handler_Debug */

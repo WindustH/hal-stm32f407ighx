@@ -11,7 +11,7 @@
 #include "protocol.h"
 #include "type.h"
 
-extern u8 M3508_PROTECT_ON;
+extern volatile u8 M3508_PROTECT_ON;
 
 /**
  * @brief 配置与启用M3508电机的CAN通信
