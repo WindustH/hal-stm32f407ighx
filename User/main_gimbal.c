@@ -1,29 +1,9 @@
 #include "main_gimbal.h"
-#include "BSP/can_fifo0.h"
-#include "BSP/can_tx_queue.h"
-#include "BSP/cron.h"
-#include "BSP/dwt.h"
-#include "BSP/gpio_exti.h"
-#include "Drivers/BMI880/driver.h"
-#include "Drivers/BOARD_CAN_COM/driver.h"
-#include "Drivers/MOT_DMJ4310/driver.h"
-#include "Drivers/MOT_DMJ6006/driver.h"
-#include "Drivers/MOT_M3508/driver.h"
-#include "Drivers/RC_DR16/driver.h"
-#include "Tasks/PID_DMJ4310/pidv.h"
-#include "Tasks/PID_DMJ4310/pidx.h"
-#include "Tasks/PID_DMJ6006/pidv.h"
-#include "Tasks/PID_DMJ6006/pidx.h"
-#include "Tasks/PID_M3508/pidv.h"
-#include "Tasks/PID_M3508/pidx.h"
-#include "Tasks/protect_gimbal.h"
-#include "can.h"
-#include "dma.h"
-#include "gpio.h"
+#include "BSP/all.h"     // IWYU pragma: keep
+#include "Drivers/all.h" // IWYU pragma: keep
+#include "Tasks/all.h"   // IWYU pragma: keep
+#include "handle.h"
 #include "main.h"
-#include "spi.h"
-#include "tim.h"
-#include "usart.h"
 
 extern volatile f32 *m3508_pidv_feedback[8];
 extern volatile f32 *m3508_pidx_feedback[8];
@@ -31,19 +11,19 @@ volatile f32 *dmj6006_pidv_feedback;
 
 void main_gimbal() {
   // 配置 DMJ4310
-  dmj4310_setup(&hcan1, IS_MASTER_CAN, 0x002U, 0x003U, 0);
+  dmj4310_setup(&hcan1, 0x002U, 0x003U, 0);
   bsp_can_fifo0_cb_add(dmj4310_update_stat);
   bsp_cron_job_add(dmj4310_send_ctrl_msg);
   dmj4310_set_torque(0.0f);
 
   // 配置 DMJ6006
-  dmj6006_setup(&hcan1, IS_MASTER_CAN, 0x001U, 0x000U, 1);
+  dmj6006_setup(&hcan1, 0x001U, 0x000U, 1);
   bsp_can_fifo0_cb_add(dmj6006_update_stat);
   bsp_cron_job_add(dmj6006_send_ctrl_msg);
   dmj6006_set_torque(0.0f);
 
   // 配置 M3508
-  m3508_setup(&hcan2, IS_SLAVE_CAN, 14);
+  m3508_setup(&hcan2, 14);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
 

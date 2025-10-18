@@ -11,14 +11,12 @@ static boardComT bc_rx_data = {0};
 static inline void do_when_received_board_com() {
   chassis_protect_refresh_idle_time();
 }
-void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
-                        u32 filter_bank) {
+void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank) {
 
   board_com_can_id = can_id;
 
   CAN_FilterTypeDef can_filter = {0};
-  if (master)
-    can_filter.SlaveStartFilterBank = 14;
+  can_filter.SlaveStartFilterBank = 14;
   can_filter.FilterBank = filter_bank;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;

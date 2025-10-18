@@ -4,8 +4,7 @@
 #include "protocol.h"
 #include "type.h"
 
-void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
-                        u32 filter_bank);
+void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank);
 void board_com_update_rx_data(CAN_HandleTypeDef *hcan,
                               CAN_RxHeaderTypeDef *header, u8 data[8]);
 

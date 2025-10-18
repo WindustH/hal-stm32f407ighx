@@ -19,14 +19,13 @@ static CAN_HandleTypeDef *hcanx;
 static volatile motStat_DMJ4310 mot_stat = {0};
 static volatile motCtrl_DMJ4310 mot_ctrl = {0};
 
-void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
-                   u32 master_id, u32 filter_bank) {
+void dmj4310_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 master_id,
+                   u32 filter_bank) {
   dmj4310_can_id = can_id;
   dmj4310_master_id = master_id;
 
   CAN_FilterTypeDef can_filter = {0};
-  if (master)
-    can_filter.SlaveStartFilterBank = 14;
+  can_filter.SlaveStartFilterBank = 14;
   can_filter.FilterBank = filter_bank;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;

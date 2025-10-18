@@ -1,6 +1,5 @@
 #include "protocol.h"
 #include <math.h>
-#include <string.h>
 
 // 全局变量：CAN 标准帧 ID
 extern u32 board_com_can_id;
