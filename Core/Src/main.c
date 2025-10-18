@@ -25,6 +25,7 @@
 #include "tim.h"
 #include "usart.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -123,7 +124,6 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-/* USER CODE END WHILE */
 #ifdef BOARD_GIMBAL
     gimbal_protect_update_idle_time();
 #endif
@@ -131,6 +131,8 @@ int main(void) {
 #ifdef BOARD_CHASSIS
     chassis_protect_start();
 #endif
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
