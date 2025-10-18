@@ -1,27 +1,24 @@
-#include "protect.h"
 #include "BSP/dwt.h"
-#include "Drivers/MOT_DMJ4310/protect.h"
 #include "Drivers/MOT_M3508/protect.h"
+#include "protect_gimbal.h"
 #include "type.h"
 
 static u32 dwt_cnt = 0;
 static f32 idle_time = 0.0f;
 static u8 protect_started = false;
-void protect_start() {
+void chassis_protect_start() {
   dwt_cnt = DWT->CYCCNT;
   protect_started = true;
 }
-void protect_update_idle_time() {
+void chassis_protect_update_idle_time() {
   if (!protect_started)
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   idle_time += dt * 1000.0f;
-  if (idle_time > 21.0f) {
+  if (idle_time > 14.0f) {
     protect_m3508();
-    protect_dmj4310();
   } else {
-    lift_protect_dmj4310();
     lift_protect_m3508();
   }
 }
-void protect_refresh_idle_time() { idle_time = 0.0f; }
+void chassis_protect_refresh_idle_time() { idle_time = 0.0f; }

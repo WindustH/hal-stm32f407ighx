@@ -5,9 +5,9 @@
 #include "type.h"
 
 // CAN ID - MIT模式命令帧
-extern volatile u16 dmj4310_can_id;
+extern volatile u32 dmj4310_can_id;
 // 反馈帧ID - 来自电机
-extern volatile u16 dmg4310_master_id;
+extern volatile u32 dmj4310_master_id;
 
 // DMJ4310 错误代码
 #define DMJ4310_ERROR_OVERVOLTAGE 0x8U
@@ -55,15 +55,15 @@ typedef struct {
 /**
  * @brief 解析DMJ4310电机的CAN反馈消息
  */
-void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
-                          volatile motStat_DMJ4310 *mot_stat_dmj4310);
+void dmj4310_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
+                      volatile motStat_DMJ4310 *mot_stat_dmj4310);
 
 /**
  * @brief 将MIT模式控制命令打包为CAN消息
  */
-void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
-                               motCtrlCanMsg_DMJ4310 *can_msg);
+void dmj4310_ctrl_pack_mit(const volatile motCtrl_DMJ4310 *ctrl_msg,
+                           motCtrlCanMsg_DMJ4310 *can_msg);
 
-void mot_enable_msg_dmj4310(motCtrlCanMsg_DMJ4310 *can_msg);
+void dmj4310_enable_msg(motCtrlCanMsg_DMJ4310 *can_msg);
 
 #endif /* __USER_DRIVERS_MOT_DMJ4310_PROTOCOL__ */

@@ -1,12 +1,12 @@
 #ifndef __USER_DEF__
 #define __USER_DEF__
 
+// #define BOARD_CHASSIS
+#define BOARD_GIMBAL
 // DMA缓冲区大小
 #define DMA_BUFFER_SIZE 256
 // 进程列表大小
 #define CRON_JOB_MAX_CNT 32
-// 最大支持的 UART 回调任务数
-#define UART_CB_LIST_SIZE 32
 // 最大支持的 CAN FIFO0 回调任务数
 #define CAN_FIFO0_CB_LIST_SIZE 32
 // 最大支持的 CAN FIFO1 回调任务数
@@ -23,7 +23,7 @@
 // TIM3预分频器值
 #define TIM3_PRESCALER 419
 // TIM3周期值
-#define TIM3_PERIOD 99
+#define TIM3_PERIOD 199
 // 遥控器控制帧发送间隔
 #define RC_FRAME_INTERVAL_MS 7
 

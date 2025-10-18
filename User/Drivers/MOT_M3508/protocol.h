@@ -1,5 +1,5 @@
-#ifndef __USER_DRIVER_MOTOR_M3508_PROTOCOL__
-#define __USER_DRIVER_MOTOR_M3508_PROTOCOL__
+#ifndef __USER_DRIVERS_MOT_M3508_PROTOCOL__
+#define __USER_DRIVERS_MOT_M3508_PROTOCOL__
 
 #include "type.h"
 
@@ -29,28 +29,20 @@ typedef struct {
 } motCtrlCanMsg_M3508;
 
 /**
- * @brief 配置M3508电机的缩放因子
- * @param pos_scale 位置缩放因子
- * @param vel_scale 速度缩放因子
- * @param cur_scale 电流缩放因子
- */
-void mot_m3508_set_scaling(f32 pos_scale, f32 vel_scale, f32 cur_scale);
-
-/**
  * @brief 解析M3508电机的CAN反馈消息
  * @param msg CAN接收头指针
  * @param data CAN数据指针
  * @param mot_stat 电机状态结构体指针
  */
-void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
-                        volatile motStat_M3508 *mot_stat);
+void m3508_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
+                    volatile motStat_M3508 *mot_stat);
 
 /**
  * @brief 将控制命令打包为M3508电机的CAN消息
  * @param ctrl 控制命令结构体指针
  * @param can_msg CAN消息结构体指针
  */
-void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
-                             motCtrlCanMsg_M3508 *can_msg);
+void m3508_ctrl_pack_msg(const volatile motCtrl_M3508 *ctrl,
+                         motCtrlCanMsg_M3508 *can_msg);
 
-#endif /* __USER_DRIVER_MOTOR_M3508_PROTOCOL__ */
+#endif /* __USER_DRIVERS_MOT_M3508_PROTOCOL__ */

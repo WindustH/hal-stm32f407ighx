@@ -5,9 +5,9 @@
 #include "type.h"
 
 // CAN ID - MIT模式命令帧
-extern volatile u16 dmj6006_can_id;
+extern volatile u32 dmj6006_can_id;
 // 反馈帧ID - 来自电机
-extern volatile u16 dmg6006_master_id;
+extern volatile u32 dmj6006_master_id;
 
 // DMJ6006 错误代码
 #define DMJ6006_ERROR_OVERVOLTAGE 0x8U
@@ -55,15 +55,15 @@ typedef struct {
 /**
  * @brief 解析DMJ6006电机的CAN反馈消息
  */
-void mot_fb_parse_dmj6006(const volatile canRxH *msg, const volatile u8 *data,
-                          volatile motStat_DMJ6006 *mot_stat_dmj6006);
+void dmj6006_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
+                      volatile motStat_DMJ6006 *mot_stat_dmj6006);
 
 /**
  * @brief 将MIT模式控制命令打包为CAN消息
  */
-void mot_ctrl_pack_mit_dmj6006(const volatile motCtrl_DMJ6006 *ctrl_msg,
-                               motCtrlCanMsg_DMJ6006 *can_msg);
+void dmj6006_ctrl_pack_mit(const volatile motCtrl_DMJ6006 *ctrl_msg,
+                           motCtrlCanMsg_DMJ6006 *can_msg);
 
-void mot_enable_msg_dmj6006(motCtrlCanMsg_DMJ6006 *can_msg);
+void dmj6006_enable_msg(motCtrlCanMsg_DMJ6006 *can_msg);
 
 #endif /* __USER_DRIVERS_MOT_DMJ6006_PROTOCOL__ */

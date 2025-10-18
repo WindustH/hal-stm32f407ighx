@@ -28,19 +28,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "BSP/can_fifo0.h"
-#include "BSP/cron.h"
 #include "BSP/dwt.h"
-#include "BSP/gpio_exti.h"
-#include "Drivers/BMI880/driver.h"
-#include "Drivers/MOT_DMJ4310/driver.h"
-#include "Drivers/MOT_M3508/driver.h"
-#include "Drivers/RC_DR16/driver.h"
-#include "Tasks/PID_DMJ4310/pidv.h"
-#include "Tasks/PID_DMJ4310/pidx.h"
-#include "Tasks/PID_M3508/pidv.h"
-#include "Tasks/PID_M3508/pidx.h"
-#include "Tasks/protect.h"
+#include "Tasks/protect_chassis.h"
+#include "Tasks/protect_gimbal.h"
+#include "main_chassis.h"
+#include "main_gimbal.h"
+#include "type.h"
 
 /* USER CODE END Includes */
 
@@ -74,39 +67,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t debug_point = 0;
-static void start_hal_peripherals() {
-
-  if (HAL_TIM_Base_Start_IT(&htim3) != HAL_OK) {
-    Error_Handler();
-  }
-  if (HAL_CAN_Start(&hcan1) != HAL_OK) {
-    Error_Handler();
-  }
-
-  if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) !=
-      HAL_OK) {
-    Error_Handler();
-  }
-
-  if (HAL_CAN_Start(&hcan2) != HAL_OK) {
-    Error_Handler();
-  }
-
-  if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING) !=
-      HAL_OK) {
-    Error_Handler();
-  }
-
-  if (HAL_TIM_Base_Start(&htim10) != HAL_OK) {
-    Error_Handler();
-  }
-
-  if (HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1) != HAL_OK) {
-    Error_Handler();
-  }
-
-  DWT_Init(SYSCLK_MHZ);
-}
 
 /* USER CODE END 0 */
 
@@ -150,67 +110,27 @@ int main(void) {
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
-  bsp_cron_job_add(protect_update_idle_time);
-  // 配置 DMJ4310
-  dmj4310_setup(&hcan1, IS_MASTER_CAN, 0x003U, 0x002U);
-  bsp_can_fifo0_cb_add(dmj4310_update_stat);
-  bsp_cron_job_add(dmj4310_send_ctrl_msg);
+#ifdef BOARD_GIMBAL
+  main_gimbal();
+#endif
 
-  dmj4310_set_torque(1.0f);
-  // 配置 M3508
-  m3508_setup(&hcan2, IS_SLAVE_CAN);
-  bsp_can_fifo0_cb_add(m3508_update_stat);
-  bsp_cron_job_add(m3508_send_ctrl_msg);
-  m3508_set_current(0, 200.0f);
-
-  // 配置 RC DR16
-  rc_dr16_setup();
-
-  // 配置 BMI088
-  bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
-               TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
-
-  bsp_gpio_exti_cb_add(bmi088_update_pose);
-  bsp_cron_job_add(bmi088_temp_ctrl);
-  // 外设启动
-  start_hal_peripherals();
-
-  protect_start();
-  // 启动陀螺仪
-  bmi088_start();
-
-  // volatile f32 *m3508_pidv_feedback[8] = {NULL};
-  // volatile f32 *m3508_pidx_feedback[8] = {NULL};
-
-  // for (u8 i = 0; i < 8; i++) {
-  //   m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
-  //   m3508_pidx_feedback[i] = &m3508_get_stat(i)->x;
-  // }
-
-  // m3508_pidv_setup(m3508_pidv_feedback);
-  // m3508_pidx_setup(m3508_pidx_feedback);
-  // bsp_cron_job_add(m3508_pidv_update);
-  // bsp_cron_job_add(m3508_pidx_update);
-  // m3508_pidv_start();
-  // m3508_pidx_start();
-  // m3508_pidx_set_target(0, 1.0f);
-
-  // volatile f32 *dmj4310_pidv_feedback =
-  //     &dmj4310_get_stat()->v;
-  // volatile f32 *dmj4310_pidx_feedback =
-  //     &dmj4310_get_stat()->x;
-  // dmj4310_pidv_setup(dmj4310_pidv_feedback);
-  // dmj4310_pidx_setup(dmj4310_pidx_feedback);
-  // dmj4310_pidv_start();
-  // dmj4310_pidx_start();
+#ifdef BOARD_CHASSIS
+  main_chassis();
+#endif
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    /* USER CODE END WHILE */
+/* USER CODE END WHILE */
+#ifdef BOARD_GIMBAL
+    gimbal_protect_update_idle_time();
+#endif
 
+#ifdef BOARD_CHASSIS
+    chassis_protect_start();
+#endif
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -259,6 +179,39 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
+void start_hal_peripherals() {
+
+  if (HAL_TIM_Base_Start_IT(&htim3) != HAL_OK) {
+    Error_Handler();
+  }
+  if (HAL_CAN_Start(&hcan1) != HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) !=
+      HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_CAN_Start(&hcan2) != HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING) !=
+      HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_TIM_Base_Start(&htim10) != HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1) != HAL_OK) {
+    Error_Handler();
+  }
+
+  DWT_Init(SYSCLK_MHZ);
+}
 
 /* USER CODE END 4 */
 

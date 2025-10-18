@@ -28,14 +28,8 @@ static f32 s_vel_scale = M3508_V_SCALE;
 // 电流缩放因子
 static f32 s_cur_scale = M3508_I_SCALE;
 
-void mot_m3508_set_scaling(f32 pos_scale, f32 vel_scale, f32 cur_scale) {
-  s_pos_scale = pos_scale;
-  s_vel_scale = vel_scale;
-  s_cur_scale = cur_scale;
-}
-
-void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
-                             motCtrlCanMsg_M3508 *can_msg) {
+void m3508_ctrl_pack_msg(const volatile motCtrl_M3508 *ctrl,
+                         motCtrlCanMsg_M3508 *can_msg) {
   can_msg->header_1_4 = tx_header_1_4;
   can_msg->header_5_8 = tx_header_5_8;
 
@@ -49,8 +43,8 @@ void mot_ctrl_pack_msg_m3508(const volatile motCtrl_M3508 *ctrl,
   }
 }
 
-void mot_fb_parse_m3508(const volatile canRxH *msg, const volatile u8 *data,
-                        volatile motStat_M3508 *mot_stat) {
+void m3508_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
+                    volatile motStat_M3508 *mot_stat) {
   u32 std_id = msg->StdId;
 
   // M3508反馈ID范围: 0x201到0x208

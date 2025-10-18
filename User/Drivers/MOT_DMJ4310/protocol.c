@@ -8,8 +8,8 @@ static f32 s_pos_scale = DMJ4310_X_SCALE;   // 弧度 / raw
 static f32 s_vel_scale = DMJ4310_V_SCALE;   // rad/s / raw
 static f32 s_trq_scale = DMJ4310_TOR_SCALE; // Nm / raw
 
-extern volatile u16 dmj4310_master_id;
-extern volatile u16 dmj4310_can_id;
+extern volatile u32 dmj4310_master_id;
+extern volatile u32 dmj4310_can_id;
 
 void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
   s_pos_scale = pos_scale;
@@ -17,8 +17,8 @@ void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
   s_trq_scale = trq_scale;
 }
 
-void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
-                          volatile motStat_DMJ4310 *mot_stat_dmj4310) {
+void dmj4310_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
+                      volatile motStat_DMJ4310 *mot_stat_dmj4310) {
   if (msg->StdId != dmj4310_master_id) {
     return;
   }
@@ -71,8 +71,8 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
   mot_stat_dmj4310->motor_id = parsed_id;
 }
 
-void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
-                               motCtrlCanMsg_DMJ4310 *can_msg) {
+void dmj4310_ctrl_pack_mit(const volatile motCtrl_DMJ4310 *ctrl_msg,
+                           motCtrlCanMsg_DMJ4310 *can_msg) {
 
   u16 p_des_raw =
       (u16)f32_to_i32(ctrl_msg->x / s_pos_scale, -DMJ4310_PI, +DMJ4310_PI, 16);
@@ -105,7 +105,7 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
   can_msg->header.TransmitGlobalTime = DISABLE;
 }
 
-void mot_enable_msg_dmj4310(motCtrlCanMsg_DMJ4310 *can_msg) {
+void dmj4310_enable_msg(motCtrlCanMsg_DMJ4310 *can_msg) {
   can_msg->header.StdId = dmj4310_can_id;
   can_msg->header.IDE = CAN_ID_STD;
   can_msg->header.RTR = CAN_RTR_DATA;

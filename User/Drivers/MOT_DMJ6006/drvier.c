@@ -9,9 +9,9 @@
 #include "main.h"
 
 // CAN ID - MIT模式命令帧
-volatile u16 dmj6006_can_id = 0x002U;
+volatile u32 dmj6006_can_id = 0x002U;
 // 反馈帧ID - 来自电机
-volatile u16 dmj6006_master_id = 0x003U;
+volatile u32 dmj6006_master_id = 0x003U;
 volatile u8 dmj6006_protect_on = false;
 static u8 mot_enabled = false;
 static CAN_HandleTypeDef *hcanx;
@@ -19,17 +19,14 @@ static volatile motStat_DMJ6006 mot_stat = {0};
 static volatile motCtrl_DMJ6006 mot_ctrl = {0};
 
 void dmj6006_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
-                   u16 master_id) {
+                   u16 master_id, u32 filter_bank) {
   dmj6006_can_id = can_id;
   dmj6006_master_id = master_id;
 
   CAN_FilterTypeDef can_filter = {0};
-  // 过滤器组 14
-  if (master) {
-    can_filter.FilterBank = 0;
+  if (master)
     can_filter.SlaveStartFilterBank = 14;
-  } else
-    can_filter.FilterBank = 14;
+  can_filter.FilterBank = filter_bank;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
@@ -69,15 +66,18 @@ void dmj6006_send_ctrl_msg() {
 
     can_msg.data = block;
     if (!mot_enabled) {
-      mot_enable_msg_dmj6006(&can_msg);
+      dmj6006_enable_msg(&can_msg);
+      while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
+        ;
       if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                                &unused_mailbox) != HAL_OK) {
         return;
       }
     }
 
-    mot_ctrl_pack_mit_dmj6006(&mot_ctrl, &can_msg);
-
+    dmj6006_ctrl_pack_mit(&mot_ctrl, &can_msg);
+    while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
+      ;
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                              &unused_mailbox) != HAL_OK) {
       return;
@@ -92,7 +92,7 @@ void dmj6006_update_stat(CAN_HandleTypeDef *hcan) {
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
       return;
     }
-    mot_fb_parse_dmj6006(&header, data, &mot_stat);
+    dmj6006_fb_parse(&header, data, &mot_stat);
   }
 }
 

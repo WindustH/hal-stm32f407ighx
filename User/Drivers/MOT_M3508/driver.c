@@ -13,15 +13,13 @@ static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组
 
-void m3508_setup(CAN_HandleTypeDef *hcan, u8 master) {
+void m3508_setup(CAN_HandleTypeDef *hcan, u8 master, u32 filter_bank) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 0 - 配置电机ID 0x201-0x202
-  if (master) {
-    can_filter.FilterBank = 0;
+  if (master)
     can_filter.SlaveStartFilterBank = 14;
-  } else
-    can_filter.FilterBank = 14;
+  can_filter.FilterBank = filter_bank;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
   can_filter.FilterIdHigh = (0x201U << 5);
@@ -36,10 +34,7 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master) {
   }
 
   // 过滤器组 1 - 配置电机ID 0x203-0x204
-  if (master)
-    can_filter.FilterBank = 1;
-  else
-    can_filter.FilterBank = 15;
+  can_filter.FilterBank = filter_bank + 1;
   can_filter.FilterIdHigh = (0x203U << 5);
   can_filter.FilterIdLow = (0x204U << 5);
 
@@ -48,10 +43,7 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master) {
   }
 
   // 过滤器组 2 - 配置电机ID 0x205-0x206
-  if (master)
-    can_filter.FilterBank = 2;
-  else
-    can_filter.FilterBank = 16;
+  can_filter.FilterBank = filter_bank + 2;
   can_filter.FilterIdHigh = (0x205U << 5);
   can_filter.FilterIdLow = (0x206U << 5);
 
@@ -60,10 +52,7 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master) {
   }
 
   // 过滤器组 3 - 配置电机ID 0x207-0x208
-  if (master)
-    can_filter.FilterBank = 3;
-  else
-    can_filter.FilterBank = 17;
+  can_filter.FilterBank = filter_bank + 3;
   can_filter.FilterIdHigh = (0x207U << 5);
   can_filter.FilterIdLow = (0x208U << 5);
 
@@ -89,13 +78,16 @@ void m3508_send_ctrl_msg() {
     can_msg.data_1_4 = block1;
     can_msg.data_5_8 = block2;
     u32 unused_mailbox;
-    mot_ctrl_pack_msg_m3508(mot_ctrl, &can_msg);
-
+    m3508_ctrl_pack_msg(mot_ctrl, &can_msg);
+    while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
+      ;
     // 发送电机1-4的控制消息
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_1_4, can_msg.data_1_4,
                              &unused_mailbox) != HAL_OK) {
       return;
     }
+    while (HAL_CAN_GetTxMailboxesFreeLevel(hcanx) == 0)
+      ;
     // 发送电机5-8的控制消息
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header_5_8, can_msg.data_5_8,
                              &unused_mailbox) != HAL_OK) {
@@ -111,7 +103,7 @@ void m3508_update_stat(CAN_HandleTypeDef *hcan) {
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
       return;
     }
-    mot_fb_parse_m3508(&header, data, mot_stat);
+    m3508_fb_parse(&header, data, mot_stat);
   }
 }
 
