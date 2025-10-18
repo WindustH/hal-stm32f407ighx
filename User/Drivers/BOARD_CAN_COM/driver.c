@@ -21,11 +21,11 @@ void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
-  can_filter.FilterIdHigh = (board_com_can_id << 5);
-  can_filter.FilterIdLow = 0;
+  can_filter.FilterIdHigh = (board_com_can_id << 5) & 0xFFFF;
+  can_filter.FilterIdLow = (board_com_can_id << 21) & 0xFFFF;
 
-  can_filter.FilterMaskIdHigh = (board_com_can_id << 5);
-  can_filter.FilterMaskIdLow = 0;
+  can_filter.FilterMaskIdHigh = (board_com_can_id << 5) & 0xFFFF;
+  can_filter.FilterMaskIdLow = (board_com_can_id << 21) & 0xFFFF;
 
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
   can_filter.FilterActivation = ENABLE;

@@ -32,6 +32,10 @@
         {
             "label": "$(cloud-download) Flash",
             "task": "flash",
+        },
+        {
+            "label": "$(trash) Clean",
+            "task": "clean",
         }
     ],
     "clangd.arguments": [

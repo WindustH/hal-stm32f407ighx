@@ -70,7 +70,7 @@ static void try_send_from_queue(can_tx_queue_instance_t *q) {
 // 公共 API
 // ========================
 
-HAL_StatusTypeDef can_tx_manager_init(CAN_HandleTypeDef *hcan) {
+HAL_StatusTypeDef can_tx_queue_init(CAN_HandleTypeDef *hcan) {
   if (!hcan)
     return HAL_ERROR;
 
@@ -197,6 +197,4 @@ void CAN1_TX_IRQHandler(void) {
     CAN1->TSR = CAN_TSR_RQCP2;
     tx_complete_count++;
   }
-
-  // 注意：不需要调用 HAL_CAN_IRQHandler()
 }

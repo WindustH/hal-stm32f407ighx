@@ -59,7 +59,7 @@ void main_gimbal() {
   bsp_cron_job_add(bmi088_temp_ctrl);
   // 外设启动
   start_hal_peripherals();
-  can_tx_manager_init(&hcan1);
+  can_tx_queue_init(&hcan1);
 
   bsp_cron_job_add(gimbal_protect_update_idle_time);
   gimbal_protect_start();

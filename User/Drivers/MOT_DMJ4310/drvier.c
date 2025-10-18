@@ -31,11 +31,12 @@ void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
-  can_filter.FilterIdHigh = (dmj4310_master_id << 5);
-  can_filter.FilterIdLow = 0;
+  can_filter.FilterIdHigh = (dmj4310_master_id << 5) & 0xFFFF;
+  can_filter.FilterIdLow = (dmj4310_master_id << 21) & 0xFFFF;
+  ;
 
-  can_filter.FilterMaskIdHigh = 0;
-  can_filter.FilterMaskIdLow = 0;
+  can_filter.FilterMaskIdHigh = (dmj4310_master_id << 5) & 0xFFFF;
+  can_filter.FilterMaskIdLow = (dmj4310_master_id << 21) & 0xFFFF;
 
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
   can_filter.FilterActivation = ENABLE;
