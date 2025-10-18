@@ -4,6 +4,11 @@
 
 #include "type.h"
 
+// CAN ID - MIT模式命令帧
+extern volatile u16 dmj4310_can_id;
+// 反馈帧ID - 来自电机
+extern volatile u16 dmg4310_master_id;
+
 // DMJ4310 错误代码
 #define DMJ4310_ERROR_OVERVOLTAGE 0x8U
 #define DMJ4310_ERROR_UNDERVOLTAGE 0x9U
@@ -20,8 +25,6 @@
 #define DMJ4310_KD_RANGE_MAX 5.0f
 #define DMJ4310_V_RANGE_MIN 0.0f
 #define DMJ4310_V_RANGE_MAX 5.0f
-#define DMJ4310_MAX_TRQ 7.0f
-#define DMJ4310_MIN_TRQ -7.0f
 
 // 电机反馈数据结构体
 typedef struct {

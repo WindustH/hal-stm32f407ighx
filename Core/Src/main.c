@@ -152,7 +152,7 @@ int main(void) {
 
   bsp_cron_job_add(protect_update_idle_time);
   // 配置 DMJ4310
-  dmj4310_setup(&hcan1, IS_MASTER_CAN);
+  dmj4310_setup(&hcan1, IS_MASTER_CAN, 0x003U, 0x002U);
   bsp_can_fifo0_cb_add(dmj4310_update_stat);
   bsp_cron_job_add(dmj4310_send_ctrl_msg);
 

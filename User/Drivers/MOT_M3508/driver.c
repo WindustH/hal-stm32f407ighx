@@ -8,7 +8,7 @@
 #include "driver.h"
 #include "main.h"
 
-volatile u8 M3508_PROTECT_ON = false;
+volatile u8 m3508_protect_on = false;
 static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组
@@ -76,12 +76,12 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master) {
 }
 
 void m3508_set_current(u8 mot_id, f32 cur) {
-  if (!M3508_PROTECT_ON)
+  if (!m3508_protect_on)
     mot_ctrl[mot_id].I = (i16)cur;
 }
 
 void m3508_send_ctrl_msg() {
-  if (!M3508_PROTECT_ON) {
+  if (!m3508_protect_on) {
 
     motCtrlCanMsg_M3508 can_msg;
     u8 block1[8];

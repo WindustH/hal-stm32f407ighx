@@ -1,27 +1,27 @@
 /**
  * @file drvier.c
- * @brief DMJ4310电机驱动实现文件
+ * @brief DMJ6006电机驱动实现文件
  *
- * 实现DMJ4310电机的CAN通信配置、控制命令发送和状态更新功能
+ * 实现DMJ6006电机的CAN通信配置、控制命令发送和状态更新功能
  */
 
 #include "driver.h"
 #include "main.h"
 
 // CAN ID - MIT模式命令帧
-volatile u16 dmj4310_can_id = 0x002U;
+volatile u16 dmj6006_can_id = 0x002U;
 // 反馈帧ID - 来自电机
-volatile u16 dmj4310_master_id = 0x003U;
-volatile u8 dmj4310_protect_on = false;
+volatile u16 dmj6006_master_id = 0x003U;
+volatile u8 dmj6006_protect_on = false;
 static u8 mot_enabled = false;
 static CAN_HandleTypeDef *hcanx;
-static volatile motStat_DMJ4310 mot_stat = {0};
-static volatile motCtrl_DMJ4310 mot_ctrl = {0};
+static volatile motStat_DMJ6006 mot_stat = {0};
+static volatile motCtrl_DMJ6006 mot_ctrl = {0};
 
-void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
+void dmj6006_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
                    u16 master_id) {
-  dmj4310_can_id = can_id;
-  dmj4310_master_id = master_id;
+  dmj6006_can_id = can_id;
+  dmj6006_master_id = master_id;
 
   CAN_FilterTypeDef can_filter = {0};
   // 过滤器组 14
@@ -33,8 +33,8 @@ void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
-  can_filter.FilterIdHigh = (dmj4310_master_id << 5);
-  can_filter.FilterIdLow = (dmj4310_master_id << 5);
+  can_filter.FilterIdHigh = (dmj6006_master_id << 5);
+  can_filter.FilterIdLow = (dmj6006_master_id << 5);
 
   can_filter.FilterMaskIdHigh = 0;
   can_filter.FilterMaskIdLow = 0;
@@ -50,8 +50,8 @@ void dmj4310_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
   hcanx = hcan;
 }
 
-void dmj4310_set_torque(f32 trq) {
-  if (!dmj4310_protect_on) {
+void dmj6006_set_torque(f32 trq) {
+  if (!dmj6006_protect_on) {
     mot_ctrl.trq = trq;
     mot_ctrl.kd = 0.0f;
     mot_ctrl.kp = 0.0f;
@@ -60,23 +60,23 @@ void dmj4310_set_torque(f32 trq) {
   }
 }
 
-void dmj4310_send_ctrl_msg() {
+void dmj6006_send_ctrl_msg() {
 
-  if (!dmj4310_protect_on) {
-    motCtrlCanMsg_DMJ4310 can_msg;
+  if (!dmj6006_protect_on) {
+    motCtrlCanMsg_DMJ6006 can_msg;
     u32 unused_mailbox;
     u8 block[8];
 
     can_msg.data = block;
     if (!mot_enabled) {
-      mot_enable_msg_dmj4310(&can_msg);
+      mot_enable_msg_dmj6006(&can_msg);
       if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                                &unused_mailbox) != HAL_OK) {
         return;
       }
     }
 
-    mot_ctrl_pack_mit_dmj4310(&mot_ctrl, &can_msg);
+    mot_ctrl_pack_mit_dmj6006(&mot_ctrl, &can_msg);
 
     if (HAL_CAN_AddTxMessage(hcanx, &can_msg.header, can_msg.data,
                              &unused_mailbox) != HAL_OK) {
@@ -85,17 +85,17 @@ void dmj4310_send_ctrl_msg() {
   }
 }
 
-void dmj4310_update_stat(CAN_HandleTypeDef *hcan) {
+void dmj6006_update_stat(CAN_HandleTypeDef *hcan) {
   if (hcanx == hcan) {
     canRxH header;
     u8 data[8];
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
       return;
     }
-    mot_fb_parse_dmj4310(&header, data, &mot_stat);
+    mot_fb_parse_dmj6006(&header, data, &mot_stat);
   }
 }
 
-volatile motStat_DMJ4310 *dmj4310_get_stat() { return &mot_stat; }
+volatile motStat_DMJ6006 *dmj6006_get_stat() { return &mot_stat; }
 
-void dmj4310_reset_pos() { mot_stat.x = 0.0f; }
+void dmj6006_reset_pos() { mot_stat.x = 0.0f; }

@@ -4,22 +4,22 @@
 
 // 缩放因子（来自 conf.h）
 static u8 first_feedback = true;
-static f32 s_pos_scale = DMJ4310_X_SCALE;   // 弧度 / raw
-static f32 s_vel_scale = DMJ4310_V_SCALE;   // rad/s / raw
-static f32 s_trq_scale = DMJ4310_TOR_SCALE; // Nm / raw
+static f32 s_pos_scale = DMJ6006_X_SCALE;   // 弧度 / raw
+static f32 s_vel_scale = DMJ6006_V_SCALE;   // rad/s / raw
+static f32 s_trq_scale = DMJ6006_TOR_SCALE; // Nm / raw
 
-extern volatile u16 dmj4310_master_id;
-extern volatile u16 dmj4310_can_id;
+extern volatile u16 dmj6006_master_id;
+extern volatile u16 dmj6006_can_id;
 
-void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
+void mot_dmj6006_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
   s_pos_scale = pos_scale;
   s_vel_scale = vel_scale;
   s_trq_scale = trq_scale;
 }
 
-void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
-                          volatile motStat_DMJ4310 *mot_stat_dmj4310) {
-  if (msg->StdId != dmj4310_master_id) {
+void mot_fb_parse_dmj6006(const volatile canRxH *msg, const volatile u8 *data,
+                          volatile motStat_DMJ6006 *mot_stat_dmj6006) {
+  if (msg->StdId != dmj6006_master_id) {
     return;
   }
 
@@ -53,38 +53,38 @@ void mot_fb_parse_dmj4310(const volatile canRxH *msg, const volatile u8 *data,
   else {
     i32 delta_raw = raw_pos - prev_raw_pos;
     i32 sign = 0;
-    if (delta_raw > (i32)DMJ4310_PI)
+    if (delta_raw > (i32)DMJ6006_PI)
       sign = -1;
-    else if (delta_raw < -(i32)DMJ4310_PI)
+    else if (delta_raw < -(i32)DMJ6006_PI)
       sign = 1;
 
-    delta = (delta_raw + sign * DMJ4310_PI * 2.0f) * s_pos_scale;
+    delta = (delta_raw + sign * DMJ6006_PI * 2.0f) * s_pos_scale;
   }
   prev_raw_pos = raw_pos;
 
-  mot_stat_dmj4310->x += delta;
-  mot_stat_dmj4310->v = raw_vel * s_vel_scale;
-  mot_stat_dmj4310->trq = raw_trq * s_trq_scale;
-  mot_stat_dmj4310->error_code = error_code;
-  mot_stat_dmj4310->T_mos = temp_mos;
-  mot_stat_dmj4310->T_mot = temp_rotor;
-  mot_stat_dmj4310->motor_id = parsed_id;
+  mot_stat_dmj6006->x += delta;
+  mot_stat_dmj6006->v = raw_vel * s_vel_scale;
+  mot_stat_dmj6006->trq = raw_trq * s_trq_scale;
+  mot_stat_dmj6006->error_code = error_code;
+  mot_stat_dmj6006->T_mos = temp_mos;
+  mot_stat_dmj6006->T_mot = temp_rotor;
+  mot_stat_dmj6006->motor_id = parsed_id;
 }
 
-void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
-                               motCtrlCanMsg_DMJ4310 *can_msg) {
+void mot_ctrl_pack_mit_dmj6006(const volatile motCtrl_DMJ6006 *ctrl_msg,
+                               motCtrlCanMsg_DMJ6006 *can_msg) {
 
   u16 p_des_raw =
-      (u16)f32_to_i32(ctrl_msg->x / s_pos_scale, -DMJ4310_PI, +DMJ4310_PI, 16);
+      (u16)f32_to_i32(ctrl_msg->x / s_pos_scale, -DMJ6006_PI, +DMJ6006_PI, 16);
   u16 v_des_raw = (u16)f32_to_i32(ctrl_msg->v / s_vel_scale,
-                                  DMJ4310_V_RANGE_MIN, DMJ4310_V_RANGE_MAX, 12);
-  u16 t_ff_raw = (u16)f32_to_i32(ctrl_msg->trq / s_trq_scale, DMJ4310_MIN_TRQ,
-                                 DMJ4310_MAX_TRQ, 12);
+                                  DMJ6006_V_RANGE_MIN, DMJ6006_V_RANGE_MAX, 12);
+  u16 t_ff_raw = (u16)f32_to_i32(ctrl_msg->trq / s_trq_scale, DMJ6006_MIN_TRQ,
+                                 DMJ6006_MAX_TRQ, 12);
 
-  u16 kp_raw = (u16)f32_to_i32(ctrl_msg->kp, DMJ4310_KP_RANGE_MIN,
-                               DMJ4310_KP_RANGE_MAX, 12);
-  u16 kd_raw = (u16)f32_to_i32(ctrl_msg->kd, DMJ4310_KD_RANGE_MIN,
-                               DMJ4310_KD_RANGE_MAX, 12);
+  u16 kp_raw = (u16)f32_to_i32(ctrl_msg->kp, DMJ6006_KP_RANGE_MIN,
+                               DMJ6006_KP_RANGE_MAX, 12);
+  u16 kd_raw = (u16)f32_to_i32(ctrl_msg->kd, DMJ6006_KD_RANGE_MIN,
+                               DMJ6006_KD_RANGE_MAX, 12);
 
   // 按照协议打包 8 字节数据（D[0] ~ D[7]）
   can_msg->data[0] = (u8)((p_des_raw >> 8) & 0xFF); // p[15:8]
@@ -98,15 +98,15 @@ void mot_ctrl_pack_mit_dmj4310(const volatile motCtrl_DMJ4310 *ctrl_msg,
                           ((t_ff_raw >> 8) & 0x0F)); // Kd[3:0] | t_ff[11:8]
   can_msg->data[7] = (u8)(t_ff_raw & 0xFF);          // t_ff[7:0]
 
-  can_msg->header.StdId = dmj4310_can_id;
+  can_msg->header.StdId = dmj6006_can_id;
   can_msg->header.IDE = CAN_ID_STD;
   can_msg->header.RTR = CAN_RTR_DATA;
   can_msg->header.DLC = 8U;
   can_msg->header.TransmitGlobalTime = DISABLE;
 }
 
-void mot_enable_msg_dmj4310(motCtrlCanMsg_DMJ4310 *can_msg) {
-  can_msg->header.StdId = dmj4310_can_id;
+void mot_enable_msg_dmj6006(motCtrlCanMsg_DMJ6006 *can_msg) {
+  can_msg->header.StdId = dmj6006_can_id;
   can_msg->header.IDE = CAN_ID_STD;
   can_msg->header.RTR = CAN_RTR_DATA;
   can_msg->header.DLC = 8U;
