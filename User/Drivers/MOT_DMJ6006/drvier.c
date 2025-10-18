@@ -32,7 +32,7 @@ void dmj6006_setup(CAN_HandleTypeDef *hcan, u8 master, u16 can_id,
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
   can_filter.FilterIdHigh = (dmj6006_master_id << 5);
-  can_filter.FilterIdLow = (dmj6006_master_id << 5);
+  can_filter.FilterIdLow = 0;
 
   can_filter.FilterMaskIdHigh = 0;
   can_filter.FilterMaskIdLow = 0;
@@ -81,14 +81,10 @@ void dmj6006_send_ctrl_msg() {
   }
 }
 
-void dmj6006_update_stat(CAN_HandleTypeDef *hcan) {
+void dmj6006_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                         u8 data[8]) {
   if (hcanx == hcan) {
-    canRxH header;
-    u8 data[8];
-    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
-      return;
-    }
-    dmj6006_fb_parse(&header, data, &mot_stat);
+    dmj6006_fb_parse(header, data, &mot_stat);
   }
 }
 

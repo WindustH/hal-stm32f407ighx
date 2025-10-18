@@ -31,7 +31,8 @@ void m3508_send_ctrl_msg();
  */
 void m3508_set_current(u8 mot_id, f32 cur);
 
-void m3508_update_stat(CAN_HandleTypeDef *hcan);
+void m3508_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                       u8 data[8]);
 
 void m3508_reset_pos();
 

@@ -41,12 +41,14 @@ typedef struct {
 // 定义 CAN FIFO0 消息挂起回调函数类型
 // 参数说明：
 //   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan);
+typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                           u8 data[8]);
 
 // 定义 CAN FIFO1 消息挂起回调函数类型
 // 参数说明：
 //   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo1Cb)(CAN_HandleTypeDef *hcan);
+typedef void (*canFifo1Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                           u8 data[8]);
 
 // CAN FIFO0 回调函数列表结构
 typedef struct {

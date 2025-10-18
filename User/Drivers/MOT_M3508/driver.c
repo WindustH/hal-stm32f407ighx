@@ -22,9 +22,9 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master, u32 filter_bank) {
   can_filter.FilterBank = filter_bank;
   can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
-  can_filter.FilterIdHigh = (0x201U << 5);
-  can_filter.FilterIdLow = (0x202U << 5);
-  can_filter.FilterMaskIdHigh = 0;
+  can_filter.FilterIdHigh = (0x201U << 5) & 0xFFFF;
+  can_filter.FilterIdLow = 0;
+  can_filter.FilterMaskIdHigh = (0x202U << 5) & 0xFFFF;
   can_filter.FilterMaskIdLow = 0;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   can_filter.FilterActivation = ENABLE;
@@ -35,8 +35,10 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master, u32 filter_bank) {
 
   // 过滤器组 1 - 配置电机ID 0x203-0x204
   can_filter.FilterBank = filter_bank + 1;
-  can_filter.FilterIdHigh = (0x203U << 5);
-  can_filter.FilterIdLow = (0x204U << 5);
+  can_filter.FilterIdHigh = (0x203U << 5) & 0xFFFF;
+  can_filter.FilterIdLow = 0;
+  can_filter.FilterMaskIdHigh = (0x204U << 5) & 0xFFFF;
+  can_filter.FilterMaskIdLow = 0;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {
     Error_Handler();
@@ -44,8 +46,10 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master, u32 filter_bank) {
 
   // 过滤器组 2 - 配置电机ID 0x205-0x206
   can_filter.FilterBank = filter_bank + 2;
-  can_filter.FilterIdHigh = (0x205U << 5);
-  can_filter.FilterIdLow = (0x206U << 5);
+  can_filter.FilterIdHigh = (0x205U << 5) & 0xFFFF;
+  can_filter.FilterIdLow = 0;
+  can_filter.FilterMaskIdHigh = (0x206U << 5) & 0xFFFF;
+  can_filter.FilterMaskIdLow = 0;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {
     Error_Handler();
@@ -53,8 +57,10 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u8 master, u32 filter_bank) {
 
   // 过滤器组 3 - 配置电机ID 0x207-0x208
   can_filter.FilterBank = filter_bank + 3;
-  can_filter.FilterIdHigh = (0x207U << 5);
-  can_filter.FilterIdLow = (0x208U << 5);
+  can_filter.FilterIdHigh = (0x207U << 5) & 0xFFFF;
+  can_filter.FilterIdLow = 0;
+  can_filter.FilterMaskIdHigh = (0x208U << 5) & 0xFFFF;
+  can_filter.FilterMaskIdLow = 0;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {
     Error_Handler();
@@ -91,14 +97,10 @@ void m3508_send_ctrl_msg() {
   }
 }
 
-void m3508_update_stat(CAN_HandleTypeDef *hcan) {
+void m3508_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                       u8 data[8]) {
   if (hcan == hcanx) {
-    canRxH header;
-    u8 data[8];
-    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
-      return;
-    }
-    m3508_fb_parse(&header, data, mot_stat);
+    m3508_fb_parse(header, data, mot_stat);
   }
 }
 

@@ -23,23 +23,20 @@
 #include "tim.h"
 #include "usart.h"
 
+extern volatile f32 *m3508_pidv_feedback[8];
+extern volatile f32 *m3508_pidx_feedback[8];
+
 void main_chassis() {
-  bsp_can_fifo0_cb_add(board_com_update_rx_data);
   // 配置 M3508
   m3508_setup(&hcan1, IS_MASTER_CAN, 0);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
-  m3508_set_current(0, 200.0f);
-  m3508_set_current(1, 200.0f);
-  m3508_set_current(2, 200.0f);
-  m3508_set_current(3, 200.0f);
 
-  // board_com_rx_setup(&hcan2, IS_SLAVE_CAN, 0x007U, 18);
+  board_com_rx_setup(&hcan2, IS_SLAVE_CAN, 0x007U, 14);
+  bsp_can_fifo0_cb_add(board_com_update_rx_data);
   // 外设启动
   start_hal_peripherals();
   can_tx_manager_init(&hcan1);
-  volatile f32 *m3508_pidv_feedback[8] = {NULL};
-  volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
   for (u8 i = 0; i < 8; i++) {
     m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
@@ -57,5 +54,6 @@ void main_chassis() {
   m3508_pidx_set_target(2, 0.0f);
   m3508_pidx_set_target(3, 0.0f);
 
-  // chassis_protect_start();
+  bsp_cron_job_add(chassis_protect_update_idle_time);
+  chassis_protect_start();
 }

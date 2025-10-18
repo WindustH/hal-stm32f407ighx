@@ -17,7 +17,7 @@ void gimbal_protect_update_idle_time() {
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   idle_time += dt * 1000.0f;
-  if (idle_time > 14.0f) {
+  if (idle_time > 21.0f) {
     protect_m3508();
     protect_dmj4310();
     protect_dmj6006();

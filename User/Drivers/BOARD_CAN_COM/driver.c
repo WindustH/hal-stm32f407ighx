@@ -5,7 +5,7 @@
 #include "main.h"
 
 // CAN ID - MIT模式命令帧
-volatile u32 board_com_can_id = 0x002U;
+volatile u32 board_com_can_id = 0x007U;
 static CAN_HandleTypeDef *hcanx;
 static boardComT bc_rx_data = {0};
 
@@ -22,9 +22,9 @@ void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
 
   can_filter.FilterIdHigh = (board_com_can_id << 5);
-  can_filter.FilterIdLow = (board_com_can_id << 5);
+  can_filter.FilterIdLow = 0;
 
-  can_filter.FilterMaskIdHigh = 0;
+  can_filter.FilterMaskIdHigh = (board_com_can_id << 5);
   can_filter.FilterMaskIdLow = 0;
 
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
@@ -38,15 +38,10 @@ void board_com_rx_setup(CAN_HandleTypeDef *hcan, u8 master, u32 can_id,
   hcanx = hcan;
 }
 
-void board_com_update_rx_data(CAN_HandleTypeDef *hcan) {
-  if (hcanx == hcan) {
-
-    canRxH header;
-    u8 data[8];
-    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
-      return;
-    }
-    board_com_parse_msg(&header, data, &bc_rx_data);
+void board_com_update_rx_data(CAN_HandleTypeDef *hcan,
+                              CAN_RxHeaderTypeDef *header, u8 data[8]) {
+  if (hcanx == hcan && header->StdId == board_com_can_id) {
+    board_com_parse_msg(header, data, &bc_rx_data);
     chassis_protect_refresh_idle_time();
   }
 }
@@ -69,6 +64,8 @@ void board_com_send_msg(volatile rcCtrl_dr16 *rc_ctrl) {
   can_msg.data = block;
 
   board_com_pack_msg(&can_msg, &bcd);
+  extern uint8_t debug_point;
+  debug_point = can_msg.header.StdId;
   if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
     return;
   }

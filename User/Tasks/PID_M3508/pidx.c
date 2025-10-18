@@ -6,8 +6,8 @@
 #include <string.h>
 
 static volatile f32 **feedback;
-static volatile pidStat pid_stat[8] = {0};
-static volatile pwPidArg pid_arg = {0};
+static volatile pidStat m3508_pidx_stat[8] = {0};
+static volatile pwPidArg m3508_pidx_arg = {0};
 static u32 dwt_cnt;
 static volatile u8 m3508_pidx_started = false;
 static const pwPidArg default_pid_arg = {.R = M3508_PIDX_BIG_R,
@@ -22,7 +22,7 @@ static const pwPidArg default_pid_arg = {.R = M3508_PIDX_BIG_R,
 
 void m3508_pidx_setup(volatile f32 **fb) {
   feedback = fb;
-  pid_arg = default_pid_arg;
+  m3508_pidx_arg = default_pid_arg;
 }
 
 void m3508_pidx_update() {
@@ -30,8 +30,9 @@ void m3508_pidx_update() {
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   for (u8 i = 0; i < 8; i++) {
-    pid_stat[i].dt = dt;
-    f32 output = pw_pid_compute(&pid_stat[i], &pid_arg, *feedback[i]);
+    m3508_pidx_stat[i].dt = dt;
+    f32 output =
+        pw_pid_compute(&m3508_pidx_stat[i], &m3508_pidx_arg, *feedback[i]);
     m3508_pidv_set_target(i, output);
   }
 }
@@ -39,12 +40,12 @@ void m3508_pidx_update() {
 void m3508_pidx_set_target(u8 id, f32 tgt) {
   if (!m3508_pidx_started)
     return;
-  pid_stat[id].target = tgt;
+  m3508_pidx_stat[id].target = tgt;
 }
 
 void m3508_pidx_start() {
   dwt_cnt = DWT->CYCCNT;
-  memset((void *)&pid_stat, 0, sizeof(pid_stat));
+  memset((void *)&m3508_pidx_stat, 0, sizeof(m3508_pidx_stat));
   m3508_pidx_started = true;
 }
 

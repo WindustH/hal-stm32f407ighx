@@ -68,7 +68,8 @@ void board_com_pack_msg(boardComCanMsg *msg, const boardComT *data) {
 
 void board_com_parse_msg(const canRxH *rxHeader, const u8 data[8],
                          boardComT *out) {
-  (void)rxHeader;
+  if (rxHeader->StdId != board_com_can_id)
+    return;
   const u8 *d = data;
 
   // f0: d[0] + d[1]

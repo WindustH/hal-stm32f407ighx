@@ -14,10 +14,10 @@
 #define M3508_PIDX_KP 3000.0f
 #define M3508_PIDX_KI 0.0f
 #define M3508_PIDX_KD 0.0f
-#define M3508_PIDX_KPR 450.0f
+#define M3508_PIDX_KPR 150.0f
 #define M3508_PIDX_KIR 0.0f
 #define M3508_PIDX_KDR 0.0f
-#define M3508_PIDX_R 4.712389f      // 1.5 * PI
-#define M3508_PIDX_BIG_R 18.849556f // 6 * PI
+#define M3508_PIDX_R 15.0f     // 1.5 * PI
+#define M3508_PIDX_BIG_R 60.0f // 6 * PI
 #define M3508_PIDX_OL 4800.0f
 #endif /* __USER_TASKS_PID_M3508_CONF__ */

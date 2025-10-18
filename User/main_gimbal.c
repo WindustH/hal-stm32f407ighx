@@ -12,6 +12,8 @@
 #include "Drivers/RC_DR16/driver.h"
 #include "Tasks/PID_DMJ4310/pidv.h"
 #include "Tasks/PID_DMJ4310/pidx.h"
+#include "Tasks/PID_DMJ6006/pidv.h"
+#include "Tasks/PID_DMJ6006/pidx.h"
 #include "Tasks/PID_M3508/pidv.h"
 #include "Tasks/PID_M3508/pidx.h"
 #include "Tasks/protect_gimbal.h"
@@ -22,6 +24,10 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+
+extern volatile f32 *m3508_pidv_feedback[8];
+extern volatile f32 *m3508_pidx_feedback[8];
+volatile f32 *dmj6006_pidv_feedback;
 
 void main_gimbal() {
   // 配置 DMJ4310
@@ -55,12 +61,10 @@ void main_gimbal() {
   start_hal_peripherals();
   can_tx_manager_init(&hcan1);
 
-  // gimbal_protect_start();
+  bsp_cron_job_add(gimbal_protect_update_idle_time);
+  gimbal_protect_start();
   // 启动陀螺仪
   bmi088_start();
-
-  volatile f32 *m3508_pidv_feedback[8] = {NULL};
-  volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
   for (u8 i = 0; i < 8; i++) {
     m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
@@ -73,15 +77,9 @@ void main_gimbal() {
   bsp_cron_job_add(m3508_pidx_update);
   m3508_pidv_start();
   m3508_pidx_start();
-  m3508_pidv_set_target(0, 0.0f);
   m3508_pidx_set_target(0, 0.0f);
 
-  // volatile f32 *dmj4310_pidv_feedback =
-  //     &dmj4310_get_stat()->v;
-  // volatile f32 *dmj4310_pidx_feedback =
-  //     &dmj4310_get_stat()->x;
-  // dmj4310_pidv_setup(dmj4310_pidv_feedback);
-  // dmj4310_pidx_setup(dmj4310_pidx_feedback);
-  // dmj4310_pidv_start();
-  // dmj4310_pidx_start();
+  volatile f32 *dmj6006_pidv_feedback = &dmj6006_get_stat()->v;
+  dmj6006_pidv_setup(dmj6006_pidv_feedback);
+  dmj6006_pidv_start();
 }

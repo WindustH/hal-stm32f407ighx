@@ -67,7 +67,8 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t debug_point = 0;
-
+volatile f32 *m3508_pidv_feedback[8] = {NULL};
+volatile f32 *m3508_pidx_feedback[8] = {NULL};
 /* USER CODE END 0 */
 
 /**
@@ -123,13 +124,6 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-#ifdef BOARD_GIMBAL
-    gimbal_protect_update_idle_time();
-#endif
-
-#ifdef BOARD_CHASSIS
-    chassis_protect_start();
-#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

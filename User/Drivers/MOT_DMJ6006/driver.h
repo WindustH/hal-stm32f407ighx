@@ -30,7 +30,8 @@ void dmj6006_send_ctrl_msg();
  * @param trq 扭矩值
  */
 void dmj6006_set_torque(f32 trq);
-void dmj6006_update_stat(CAN_HandleTypeDef *hcan);
+void dmj6006_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                         u8 data[8]);
 void dmj6006_reset_pos();
 volatile motStat_DMJ6006 *dmj6006_get_stat();
 #endif /* __USER_DRIVERS_MOT_DMJ6006_DRIVER__ */

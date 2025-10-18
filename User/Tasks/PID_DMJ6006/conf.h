@@ -9,7 +9,7 @@
 #define DMJ6006_PIDV_KDR 0.0f
 #define DMJ6006_PIDV_R 0.0f
 #define DMJ6006_PIDV_BIG_R 0.0f
-#define DMJ6006_PIDV_OL 10.0f
+#define DMJ6006_PIDV_OL 12.0f
 
 #define DMJ6006_PIDX_KP 0.0f
 #define DMJ6006_PIDX_KI 0.0f
@@ -19,5 +19,5 @@
 #define DMJ6006_PIDX_KDR 0.0f
 #define DMJ6006_PIDX_R 0.0f
 #define DMJ6006_PIDX_BIG_R 0.0f
-#define DMJ6006_PIDX_OL 10.0f
+#define DMJ6006_PIDX_OL 12.0f
 #endif /* __USER_TASKS_PID_DMJ6006_CONF__ */

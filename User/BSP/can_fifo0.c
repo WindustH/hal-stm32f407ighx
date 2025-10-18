@@ -12,7 +12,6 @@
 // 静态全局回调列表
 static volatile canFifo0CbList can_fifo0_msg_pending_cb_list = {0};
 
-
 u8 bsp_can_fifo0_cb_add(canFifo0Cb callback) {
   if (callback == NULL) {
     return CAN_FIFO0_CB_LIST_SIZE;
@@ -32,7 +31,6 @@ u8 bsp_can_fifo0_cb_add(canFifo0Cb callback) {
   return CAN_FIFO0_CB_LIST_SIZE; // 满了
 }
 
-
 void bsp_can_fifo0_cb_remove(u8 idx) {
   if (idx >= CAN_FIFO0_CB_LIST_SIZE) {
     return;
@@ -47,12 +45,18 @@ void bsp_can_fifo0_cb_remove(u8 idx) {
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   // 遍历所有已注册的回调并调用
+  canRxH header;
+  u8 data[8];
+  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header, data) != HAL_OK) {
+    return;
+  }
+
   u32 state_snapshot =
       can_fifo0_msg_pending_cb_list.state; // 读一次避免多次访问 volatile
   for (u8 i = 0; i < CAN_FIFO0_CB_LIST_SIZE; i++) {
     if ((state_snapshot & (1U << i)) &&
         can_fifo0_msg_pending_cb_list.callbacks[i] != NULL) {
-      can_fifo0_msg_pending_cb_list.callbacks[i](hcan);
+      can_fifo0_msg_pending_cb_list.callbacks[i](hcan, &header, data);
     }
   }
 }
