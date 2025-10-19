@@ -31,10 +31,13 @@ void main_gimbal() {
   bsp_cron_job_add(m3508_send_ctrl_msg);
 
   // 配置 RC DR16 和 板间通讯发送
-  board_gimbal_tx_setup(&hcan1, 0x007U);
+  bc_gim_tx_setup(&hcan1, 0x007U);
   rc_dr16_setup();
-  dr16_cb_add(board_gimbal_send_msg);            // 接收到遥控器信号转发给底盘
+  dr16_cb_add(bc_gim_send_msg);                  // 接收到遥控器信号转发给底盘
   dr16_cb_add(gimbal_protect_refresh_idle_time); // 接收到信号清零信号空闲时间
+  // 配置板间通讯接收
+  bc_gim_rx_setup(&hcan1, 0x008U, 2, CAN_FILTER_FIFO0);
+  bsp_can_fifo0_cb_add(bc_gim_update_data_from_cha);
   // 配置 BMI088
   bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
                TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);

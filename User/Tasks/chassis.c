@@ -5,7 +5,7 @@
 #include "Utils/motion.h"
 #include "arm_math.h" // IWYU pragma: keep
 void chassis_update_wheel_speed() {
-  bComGimDat *bcgd = board_com_get_gimbal_data();
+  bComGimDat *bcgd = bc_cha_get_gim_data();
   f32 a, b, c, d;
   solve_motion(bcgd->ch0, bcgd->ch1, 0.0f, &a, &b, &c, &d);
   //   f32 l;
