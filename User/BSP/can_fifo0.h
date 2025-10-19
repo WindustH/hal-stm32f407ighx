@@ -7,21 +7,17 @@
 
 #ifndef __BSP_CAN_FIFO0__
 #define __BSP_CAN_FIFO0__
-
 #include "type.h"
+#define CAN_FIFO0_CB_LIST_SIZE 32
 
-/**
- * @brief 注册一个 CAN FIFO0 消息挂起回调函数
- * @param callback 要注册的回调函数指针（不可为 NULL）
- * @return 成功返回索引（0 ~ CAN_FIFO0_CB_LIST_SIZE-1），失败返回
- * CAN_FIFO0_CB_LIST_SIZE
- */
+typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                           u8 data[8]);
+typedef struct {
+  volatile u32 state;
+  canFifo0Cb callbacks[CAN_FIFO0_CB_LIST_SIZE];
+} canFifo0CbList;
+
 u8 bsp_can_fifo0_cb_add(canFifo0Cb callback);
-
-/**
- * @brief 注销一个已注册的 CAN FIFO0 回调函数
- * @param idx 要注销的回调索引（由 add 返回）
- */
 void bsp_can_fifo0_cb_remove(u8 idx);
 
 #endif /* __BSP_CAN_FIFO0_IT__ */

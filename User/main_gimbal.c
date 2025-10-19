@@ -15,8 +15,8 @@ volatile f32 *dmj6006_pidv_feedback;
 void main_gimbal() {
   // 配置 DMJ4310
   dmj4310_setup(&hcan1, 0x002U, 0x003U, 0, CAN_FILTER_FIFO0);
-  bsp_can_fifo0_cb_add(dmj4310_update_stat);
-  bsp_cron_job_add(dmj4310_send_ctrl_msg);
+  bsp_can_fifo0_cb_add(dmj4310_update_stat); // 从 CAN FIFO 中断接收更新
+  bsp_cron_job_add(dmj4310_send_ctrl_msg);   // 定期发送控制信号
   dmj4310_set_torque(0.0f);
 
   // 配置 DMJ6006
@@ -30,28 +30,31 @@ void main_gimbal() {
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
 
-  // 配置 RC DR16
-  board_com_tx_setup(&hcan1, 0x007U);
+  // 配置 RC DR16 和 板间通讯发送
+  board_gimbal_tx_setup(&hcan1, 0x007U);
   rc_dr16_setup();
-
+  dr16_cb_add(board_gimbal_send_msg);            // 接收到遥控器信号转发给底盘
+  dr16_cb_add(gimbal_protect_refresh_idle_time); // 接收到信号清零信号空闲时间
   // 配置 BMI088
   bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
                TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
 
-  bsp_gpio_exti_cb_add(bmi088_update_pose);
-  bsp_cron_job_add(bmi088_temp_ctrl);
+  bsp_gpio_exti_cb_add(
+      bmi088_update_pose); // 接收到 BMI088 数据准备完成中断后更新姿态
+  bsp_cron_job_add(bmi088_temp_ctrl); // 定期陀螺仪温控
+
   // 外设启动
   start_hal_peripherals();
 
-  bsp_cron_job_add(gimbal_protect_update_idle_time);
-  gimbal_protect_start();
+  bsp_cron_job_add(gimbal_protect_update_idle_time); // 定期更新信号空闲时间
+  gimbal_protect_start();                            // 启用云台保护
   // 启动陀螺仪
   bmi088_start();
 
   for (u8 i = 0; i < 8; i++) {
     m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
     m3508_pidx_feedback[i] = &m3508_get_stat(i)->x;
-  }
+  } // 设置 PID 反馈源
 
   m3508_pidv_setup(m3508_pidv_feedback);
   m3508_pidx_setup(m3508_pidx_feedback);

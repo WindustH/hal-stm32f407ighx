@@ -14,7 +14,7 @@ typedef struct {
   u8 s2;
 } boardComT;
 
-void board_com_pack_msg(boardComCanMsg *msg, const boardComT *data);
-void board_com_parse_msg(const canRxH *rxHeader, const u8 data[8],
-                         boardComT *out);
+void board_com_pack_gimbal_msg(boardComCanMsg *msg, const boardComT *data);
+void board_com_parse_gimbal_msg(const canRxH *rxHeader, const u8 data[8],
+                                boardComT *out);
 #endif /* __USER_DRIVERS_BOARD_CAN_COM_PROTOCOL__ */

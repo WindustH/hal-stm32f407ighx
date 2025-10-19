@@ -13,7 +13,8 @@
         ".claude": true,
         "Drivers": true,
         ".mxproject": true,
-        "*.ioc": true
+        "*.ioc": true,
+        "switch_board.py": true
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "[c]": {

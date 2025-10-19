@@ -23,8 +23,7 @@ extern const u32 TICK_PER_SECOND;
 // 每 Tick 秒数(常量)
 extern const f32 SECOND_PER_TICK;
 
-// 函数指针类型定义
-typedef void (*cronJob)(void);
+
 
 // 缓冲区结构体定义
 typedef struct {
@@ -32,46 +31,7 @@ typedef struct {
   u16 len;                 // 数据长度
 } buf;
 
-// 进程列表结构体定义
-typedef struct {
-  cronJob procs[CRON_JOB_MAX_CNT]; // 进程函数指针数组
-  u32 state;                       // 进程状态位图
-} cronJobList;
 
-// 定义 CAN FIFO0 消息挂起回调函数类型
-// 参数说明：
-//   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
-                           u8 data[8]);
-
-// 定义 CAN FIFO1 消息挂起回调函数类型
-// 参数说明：
-//   hcan: 触发中断的 CAN 句柄
-typedef void (*canFifo1Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
-                           u8 data[8]);
-
-// CAN FIFO0 回调函数列表结构
-typedef struct {
-  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
-  canFifo0Cb callbacks[CAN_FIFO0_CB_LIST_SIZE];
-} canFifo0CbList;
-
-// CAN FIFO1 回调函数列表结构
-typedef struct {
-  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
-  canFifo1Cb callbacks[CAN_FIFO1_CB_LIST_SIZE];
-} canFifo1CbList;
-
-// 定义 GPIO EXTI 中断回调函数类型
-// 参数说明：
-//   GPIO_Pin: 触发中断的 GPIO 引脚
-typedef void (*gpioExtiCb)(uint16_t GPIO_Pin);
-
-// GPIO EXTI 回调函数列表结构
-typedef struct {
-  volatile u32 state; // 位图：bit i = 1 表示第 i 个槽位被占用
-  gpioExtiCb callbacks[GPIO_EXTI_CB_LIST_SIZE];
-} gpioExtiCbList;
 
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;

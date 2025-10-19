@@ -4,11 +4,14 @@ static CAN_HandleTypeDef *hcanx;
 
 #ifdef BOARD_GIMBAL
 #include "BSP/can_tx_queue.h"
-void board_com_tx_setup(CAN_HandleTypeDef *hcan, u32 can_id) {
+#include "Drivers/RC_DR16/driver.h"
+
+void board_gimbal_tx_setup(CAN_HandleTypeDef *hcan, u32 can_id) {
   board_com_can_id = can_id;
   hcanx = hcan;
 }
-void board_com_send_msg(volatile rcCtrl_dr16 *rc_ctrl) {
+void board_gimbal_send_msg() {
+  volatile rcCtrl_dr16 *rc_ctrl = rc_dr16_get_ctrl_sig();
   boardComT bcd;
   bcd.ch0 = rc_ctrl->rc.ch0;
   bcd.ch1 = rc_ctrl->rc.ch1;
@@ -21,7 +24,7 @@ void board_com_send_msg(volatile rcCtrl_dr16 *rc_ctrl) {
   u8 block[8];
   can_msg.data = block;
 
-  board_com_pack_msg(&can_msg, &bcd);
+  board_com_pack_gimbal_msg(&can_msg, &bcd);
   extern uint8_t debug_point;
   debug_point = can_msg.header.StdId;
   if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
@@ -31,17 +34,13 @@ void board_com_send_msg(volatile rcCtrl_dr16 *rc_ctrl) {
 #endif
 
 #ifdef BOARD_CHASSIS
-#include "Tasks/protect_chassis.h"
 #include "main.h"
-static boardComT bc_rx_data = {0};
-static inline void do_when_received_board_com() {
-  chassis_protect_refresh_idle_time();
-}
+static boardComT bc_gimbal_data = {0};
 
-boardComT *board_com_get_rx_data() { return &bc_rx_data; }
+boardComT *board_com_get_gimbal_data() { return &bc_gimbal_data; }
 
-void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank,
-                        u8 fifo) {
+void board_chassis_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id,
+                            u32 filter_bank, u8 fifo) {
 
   board_com_can_id = can_id;
 
@@ -68,11 +67,11 @@ void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank,
   hcanx = hcan;
 }
 
-void board_com_update_rx_data(CAN_HandleTypeDef *hcan,
-                              CAN_RxHeaderTypeDef *header, u8 data[8]) {
+void board_com_update_gimbal_data(CAN_HandleTypeDef *hcan,
+                                  CAN_RxHeaderTypeDef *header, u8 data[8]) {
   if (hcanx == hcan && header->StdId == board_com_can_id) {
-    board_com_parse_msg(header, data, &bc_rx_data);
-    do_when_received_board_com();
+    board_com_parse_gimbal_msg(header, data, &bc_gimbal_data);
+    bcc_cb_call();
   }
 }
 #endif
