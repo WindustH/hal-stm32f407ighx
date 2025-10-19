@@ -1,5 +1,4 @@
 #include "driver.h"
-
 volatile u32 board_com_can_id = 0x007U;
 static CAN_HandleTypeDef *hcanx;
 
@@ -41,7 +40,8 @@ static inline void do_when_received_board_com() {
 
 boardComT *board_com_get_rx_data() { return &bc_rx_data; }
 
-void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank) {
+void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank,
+                        u8 fifo) {
 
   board_com_can_id = can_id;
 
@@ -57,7 +57,7 @@ void board_com_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 filter_bank) {
   can_filter.FilterMaskIdHigh = (board_com_can_id << 5) & 0xFFFF;
   can_filter.FilterMaskIdLow = (board_com_can_id << 21) & 0xFFFF;
 
-  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
+  can_filter.FilterFIFOAssignment = fifo; // 分配到 FIFO0
   can_filter.FilterActivation = ENABLE;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {

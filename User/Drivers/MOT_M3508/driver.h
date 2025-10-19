@@ -17,7 +17,7 @@ extern volatile u8 m3508_protect_on;
  * @brief 配置与启用M3508电机的CAN通信
  * @param hcan CAN对象指针
  */
-void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank);
+void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank, u8 fifo);
 
 /**
  * @brief 发送控制消息到M3508电机

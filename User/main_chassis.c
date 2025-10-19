@@ -1,21 +1,22 @@
-#include "main_chassis.h"
 #ifdef BOARD_CHASSIS
+#include "main_chassis.h"
 #include "BSP/all.h"     // IWYU pragma: keep
 #include "Drivers/all.h" // IWYU pragma: keep
 #include "Tasks/all.h"   // IWYU pragma: keep
 #include "handle.h"
 #include "main.h"
+#include "type.h"
 
 volatile f32 *m3508_pidv_feedback[8] = {NULL};
 volatile f32 *m3508_pidx_feedback[8] = {NULL};
 
 void main_chassis() {
   // 配置 M3508
-  m3508_setup(&hcan1, 0);
+  m3508_setup(&hcan1, 0, CAN_FILTER_FIFO0);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
 
-  board_com_rx_setup(&hcan2, 0x007U, 14);
+  board_com_rx_setup(&hcan2, 0x007U, 14, CAN_FILTER_FIFO0);
   bsp_can_fifo0_cb_add(board_com_update_rx_data);
   // 外设启动
   start_hal_peripherals();

@@ -82,6 +82,7 @@ target_compile_definitions(${TARGET}
     STM32F40_41xxx
     ${MCU_DEVICE}
     USE_HAL_DRIVER
+BOARD_GIMBAL
 )
 
 target_link_options(${TARGET}

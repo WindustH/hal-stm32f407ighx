@@ -18,7 +18,7 @@ extern volatile u8 dmj4310_protect_on;
  * @param hcan CAN对象指针
  */
 void dmj4310_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 master_id,
-                   u32 filter_bank);
+                   u32 filter_bank, u8 fifo);
 
 /**
  * @brief 发送控制消息到DMJ4310电机

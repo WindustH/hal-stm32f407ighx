@@ -1,11 +1,11 @@
-#include "main_gimbal.h"
-
 #ifdef BOARD_GIMBAL
+#include "main_gimbal.h"
 #include "BSP/all.h"     // IWYU pragma: keep
 #include "Drivers/all.h" // IWYU pragma: keep
 #include "Tasks/all.h"   // IWYU pragma: keep
 #include "handle.h"
 #include "main.h"
+#include "type.h"
 
 volatile f32 *m3508_pidv_feedback[8] = {NULL};
 volatile f32 *m3508_pidx_feedback[8] = {NULL};
@@ -14,19 +14,19 @@ volatile f32 *dmj6006_pidv_feedback;
 
 void main_gimbal() {
   // 配置 DMJ4310
-  dmj4310_setup(&hcan1, 0x002U, 0x003U, 0);
+  dmj4310_setup(&hcan1, 0x002U, 0x003U, 0, CAN_FILTER_FIFO0);
   bsp_can_fifo0_cb_add(dmj4310_update_stat);
   bsp_cron_job_add(dmj4310_send_ctrl_msg);
   dmj4310_set_torque(0.0f);
 
   // 配置 DMJ6006
-  dmj6006_setup(&hcan1, 0x001U, 0x000U, 1);
-  bsp_can_fifo0_cb_add(dmj6006_update_stat);
+  dmj6006_setup(&hcan1, 0x001U, 0x000U, 1, CAN_FILTER_FIFO1);
+  bsp_can_fifo1_cb_add(dmj6006_update_stat);
   bsp_cron_job_add(dmj6006_send_ctrl_msg);
   dmj6006_set_torque(0.0f);
 
   // 配置 M3508
-  m3508_setup(&hcan2, 14);
+  m3508_setup(&hcan2, 14, CAN_FILTER_FIFO0);
   bsp_can_fifo0_cb_add(m3508_update_stat);
   bsp_cron_job_add(m3508_send_ctrl_msg);
 

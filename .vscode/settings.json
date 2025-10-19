@@ -36,6 +36,10 @@
         {
             "label": "$(trash) Clean",
             "task": "clean",
+        },
+        {
+            "label": "$(replace) Switch",
+            "task": "switch-board",
         }
     ],
     "clangd.arguments": [

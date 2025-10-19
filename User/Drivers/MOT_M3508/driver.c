@@ -13,7 +13,7 @@ static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
 static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
 static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组
 
-void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank) {
+void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank, u8 fifo) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
 
   // 过滤器组 0 - 配置电机ID 0x201-0x202
@@ -25,7 +25,7 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank) {
   can_filter.FilterIdLow = (0x201U << 21) & 0xFFFF;
   can_filter.FilterMaskIdHigh = (0x202U << 5) & 0xFFFF;
   can_filter.FilterMaskIdLow = (0x202U << 21) & 0xFFFF;
-  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  can_filter.FilterFIFOAssignment = fifo;
   can_filter.FilterActivation = ENABLE;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {

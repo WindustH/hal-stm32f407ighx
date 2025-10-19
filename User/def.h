@@ -1,12 +1,6 @@
 #ifndef __USER_DEF__
 #define __USER_DEF__
 
-// #define BOARD_CHASSIS
-
-#ifndef BOARD_CHASSIS
-#define BOARD_GIMBAL
-#endif
-
 // DMA缓冲区大小
 #define DMA_BUFFER_SIZE 256
 // 进程列表大小

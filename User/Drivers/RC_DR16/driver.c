@@ -12,7 +12,6 @@ static u8 uart_rx_buffer[DMA_BUFFER_SIZE];               ///< UART接收缓冲�
 static volatile rcCtrl_dr16 rc_ctrl;                     ///< 遥控器控制信息
 static volatile uint32_t last_dma_pos = DMA_BUFFER_SIZE; // 上次读取位置
 static inline void do_when_received_rc() {
-
 #ifdef BOARD_GIMBAL
   board_com_send_msg(&rc_ctrl);
   gimbal_protect_refresh_idle_time();

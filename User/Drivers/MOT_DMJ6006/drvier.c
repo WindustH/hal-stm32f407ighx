@@ -20,7 +20,7 @@ static volatile motStat_DMJ6006 mot_stat = {0};
 static volatile motCtrl_DMJ6006 mot_ctrl = {0};
 
 void dmj6006_setup(CAN_HandleTypeDef *hcan, u16 can_id, u16 master_id,
-                   u32 filter_bank) {
+                   u32 filter_bank, u8 fifo) {
   dmj6006_can_id = can_id;
   dmj6006_master_id = master_id;
 
@@ -36,7 +36,7 @@ void dmj6006_setup(CAN_HandleTypeDef *hcan, u16 can_id, u16 master_id,
   can_filter.FilterMaskIdHigh = (dmj6006_master_id << 5) & 0xFFFF;
   can_filter.FilterMaskIdLow = (dmj6006_master_id << 21) & 0xFFFF;
 
-  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 分配到 FIFO0
+  can_filter.FilterFIFOAssignment = fifo; // 分配到 FIFO0
   can_filter.FilterActivation = ENABLE;
 
   if (HAL_CAN_ConfigFilter(hcan, &can_filter) != HAL_OK) {

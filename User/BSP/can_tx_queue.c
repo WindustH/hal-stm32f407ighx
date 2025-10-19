@@ -1,5 +1,6 @@
 #include "can_tx_queue.h"
 #include "main.h"
+#include <stdbool.h>
 #include <string.h>
 
 // 单个队列项
