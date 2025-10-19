@@ -12,9 +12,9 @@ typedef struct {
   f32 ch3;
   u8 s1;
   u8 s2;
-} boardComT;
+} bComGimDat;
 
-void board_com_pack_gimbal_msg(boardComCanMsg *msg, const boardComT *data);
+void board_com_pack_gimbal_msg(boardComCanMsg *msg, const bComGimDat *data);
 void board_com_parse_gimbal_msg(const canRxH *rxHeader, const u8 data[8],
-                                boardComT *out);
+                                bComGimDat *out);
 #endif /* __USER_DRIVERS_BOARD_CAN_COM_PROTOCOL__ */

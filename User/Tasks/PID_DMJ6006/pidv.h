@@ -12,5 +12,5 @@ void dmj6006_pidv_set_target(f32 tgt);
 void dmj6006_pidv_start();
 
 void dmj6006_pidv_stop();
-
+void dmj6006_reset_pidv_stat();
 #endif /* __USER_TASKS_PID_DMJ6006_PIDV__ */

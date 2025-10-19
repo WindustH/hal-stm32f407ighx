@@ -6,6 +6,7 @@ void protect_m3508() {
   for (u8 i = 0; i < 8; i++)
     m3508_set_current(i, 0);
   m3508_send_ctrl_msg();
+  m3508_reset_pos();
   m3508_protect_on = true;
 }
 

@@ -14,10 +14,10 @@ volatile u32 dmj6006_can_id = 0x002U;
 // 反馈帧ID - 来自电机
 volatile u32 dmj6006_master_id = 0x003U;
 volatile u8 dmj6006_protect_on = false;
-static u8 mot_enabled = false;
+static u8 dmj6006_enabled = false;
 static CAN_HandleTypeDef *hcanx;
-static volatile motStat_DMJ6006 mot_stat = {0};
-static volatile motCtrl_DMJ6006 mot_ctrl = {0};
+static volatile motStat_DMJ6006 dmj6006_mot_stat = {0};
+static volatile motCtrl_DMJ6006 dmj6006_mot_ctrl = {0};
 
 void dmj6006_setup(CAN_HandleTypeDef *hcan, u16 can_id, u16 master_id,
                    u32 filter_bank, u8 fifo) {
@@ -49,11 +49,11 @@ void dmj6006_setup(CAN_HandleTypeDef *hcan, u16 can_id, u16 master_id,
 
 void dmj6006_set_torque(f32 trq) {
   if (!dmj6006_protect_on) {
-    mot_ctrl.trq = trq;
-    mot_ctrl.kd = 0.0f;
-    mot_ctrl.kp = 0.0f;
-    mot_ctrl.v = 0.0f;
-    mot_ctrl.x = 0.0f;
+    dmj6006_mot_ctrl.trq = trq;
+    dmj6006_mot_ctrl.kd = 0.0f;
+    dmj6006_mot_ctrl.kp = 0.0f;
+    dmj6006_mot_ctrl.v = 0.0f;
+    dmj6006_mot_ctrl.x = 0.0f;
   }
 }
 
@@ -64,27 +64,38 @@ void dmj6006_send_ctrl_msg() {
     u8 block[8];
 
     can_msg.data = block;
-    if (!mot_enabled) {
+    if (!dmj6006_enabled) {
       dmj6006_enable_msg(&can_msg);
       if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
         return;
       }
     }
 
-    dmj6006_ctrl_pack_mit(&mot_ctrl, &can_msg);
+    dmj6006_ctrl_pack_mit(&dmj6006_mot_ctrl, &can_msg);
     if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
       return;
     }
   }
 }
 
-void dmj6006_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
-                         u8 data[8]) {
-  if (hcanx == hcan && header->StdId == dmj6006_master_id) {
-    dmj6006_fb_parse(header, data, &mot_stat);
+void dmj6006_disable() {
+  dmj6006_enabled = false;
+  motCtrlCanMsg_DMJ6006 can_msg;
+  u8 block[8];
+  can_msg.data = block;
+  dmj6006_disable_msg(&can_msg);
+  if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
+    return;
   }
 }
 
-volatile motStat_DMJ6006 *dmj6006_get_stat() { return &mot_stat; }
+void dmj6006_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
+                         u8 data[8]) {
+  if (hcanx == hcan && header->StdId == dmj6006_master_id) {
+    dmj6006_fb_parse(header, data, &dmj6006_mot_stat);
+  }
+}
 
-void dmj6006_reset_pos() { mot_stat.x = 0.0f; }
+volatile motStat_DMJ6006 *dmj6006_get_stat() { return &dmj6006_mot_stat; }
+
+void dmj6006_reset_pos() { dmj6006_mot_stat.x = 0.0f; }

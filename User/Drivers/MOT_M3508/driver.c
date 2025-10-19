@@ -9,9 +9,11 @@
 #include "BSP/can_tx_queue.h"
 #include "main.h"
 volatile u8 m3508_protect_on = false;
-static CAN_HandleTypeDef *hcanx;                 ///< CAN对象指针
-static volatile motStat_M3508 mot_stat[8] = {0}; ///< 8个电机的状态信息数组
-static volatile motCtrl_M3508 mot_ctrl[8] = {0}; ///< 8个电机的控制信息数组
+static CAN_HandleTypeDef *hcanx; ///< CAN对象指针
+static volatile motStat_M3508 m3508_mot_stat[8] = {
+    0}; ///< 8个电机的状态信息数组
+static volatile motCtrl_M3508 m3508_mot_ctrl[8] = {
+    0}; ///< 8个电机的控制信息数组
 
 void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank, u8 fifo) {
   CAN_FilterTypeDef can_filter = {0}; // 初始化为0更安全
@@ -71,7 +73,7 @@ void m3508_setup(CAN_HandleTypeDef *hcan, u32 filter_bank, u8 fifo) {
 
 void m3508_set_current(u8 mot_id, f32 cur) {
   if (!m3508_protect_on)
-    mot_ctrl[mot_id].I = (i16)cur;
+    m3508_mot_ctrl[mot_id].I = (i16)cur;
 }
 
 void m3508_send_ctrl_msg() {
@@ -82,7 +84,7 @@ void m3508_send_ctrl_msg() {
     u8 block2[8];
     can_msg.data_1_4 = block1;
     can_msg.data_5_8 = block2;
-    m3508_ctrl_pack_msg(mot_ctrl, &can_msg);
+    m3508_ctrl_pack_msg(m3508_mot_ctrl, &can_msg);
     // 发送电机1-4的控制消息
     if (can_send_message(hcanx, &can_msg.header_1_4, can_msg.data_1_4) !=
         HAL_OK) {
@@ -99,13 +101,13 @@ void m3508_send_ctrl_msg() {
 void m3508_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                        u8 data[8]) {
   if (hcan == hcanx && header->StdId >= 0x201U && header->StdId <= 0x208U) {
-    m3508_fb_parse(header, data, mot_stat);
+    m3508_fb_parse(header, data, m3508_mot_stat);
   }
 }
 
-volatile motStat_M3508 *m3508_get_stat(u8 id) { return &mot_stat[id]; }
+volatile motStat_M3508 *m3508_get_stat(u8 id) { return &m3508_mot_stat[id]; }
 
 void m3508_reset_pos() {
   for (u8 i = 0; i < 8; i++)
-    mot_stat[i].x = 0.0f;
+    m3508_mot_stat[i].x = 0.0f;
 }

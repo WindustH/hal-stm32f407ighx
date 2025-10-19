@@ -9,7 +9,7 @@ void board_chassis_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id,
                             u32 filter_bank, u8 fifo);
 void board_com_update_gimbal_data(CAN_HandleTypeDef *hcan,
                                   CAN_RxHeaderTypeDef *header, u8 data[8]);
-boardComT *board_com_get_rx_data();
+bComGimDat *board_com_get_gimbal_data();
 #endif
 #ifdef BOARD_GIMBAL
 void board_gimbal_tx_setup(CAN_HandleTypeDef *hcan, u32 can_id);

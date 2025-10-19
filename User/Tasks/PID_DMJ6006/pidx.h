@@ -11,5 +11,5 @@ void dmj6006_pidx_set_target(f32 tgt);
 void dmj6006_pidx_start();
 
 void dmj6006_pidx_stop();
-
+void dmj6006_reset_pidx_stat();
 #endif /* __USER_TASKS_PID_DMJ6006_PIDX__ */

@@ -14,10 +14,10 @@ volatile u32 dmj4310_can_id = 0x002U;
 // 反馈帧ID - 来自电机
 volatile u32 dmj4310_master_id = 0x003U;
 volatile u8 dmj4310_protect_on = false;
-static u8 mot_enabled = false;
+static u8 dmj4310_enabled = false;
 static CAN_HandleTypeDef *hcanx;
-static volatile motStat_DMJ4310 mot_stat = {0};
-static volatile motCtrl_DMJ4310 mot_ctrl = {0};
+static volatile motStat_DMJ4310 dmj4310_mot_stat = {0};
+static volatile motCtrl_DMJ4310 dmj4310_mot_ctrl = {0};
 
 void dmj4310_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 master_id,
                    u32 filter_bank, u8 fifo) {
@@ -50,29 +50,28 @@ void dmj4310_setup(CAN_HandleTypeDef *hcan, u32 can_id, u32 master_id,
 
 void dmj4310_set_torque(f32 trq) {
   if (!dmj4310_protect_on) {
-    mot_ctrl.trq = trq;
-    mot_ctrl.kd = 0.0f;
-    mot_ctrl.kp = 0.0f;
-    mot_ctrl.v = 0.0f;
-    mot_ctrl.x = 0.0f;
+    dmj4310_mot_ctrl.trq = trq;
+    dmj4310_mot_ctrl.kd = 0.0f;
+    dmj4310_mot_ctrl.kp = 0.0f;
+    dmj4310_mot_ctrl.v = 0.0f;
+    dmj4310_mot_ctrl.x = 0.0f;
   }
 }
 
 void dmj4310_send_ctrl_msg() {
-
   if (!dmj4310_protect_on) {
     motCtrlCanMsg_DMJ4310 can_msg;
     u8 block[8];
 
     can_msg.data = block;
-    if (!mot_enabled) {
+    if (!dmj4310_enabled) {
       dmj4310_enable_msg(&can_msg);
       if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
         return;
       }
     }
 
-    dmj4310_ctrl_pack_mit(&mot_ctrl, &can_msg);
+    dmj4310_ctrl_pack_mit(&dmj4310_mot_ctrl, &can_msg);
     if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
       return;
     }
@@ -82,10 +81,20 @@ void dmj4310_send_ctrl_msg() {
 void dmj4310_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                          u8 data[8]) {
   if (hcanx == hcan && header->StdId == dmj4310_master_id) {
-    dmj4310_fb_parse(header, data, &mot_stat);
+    dmj4310_fb_parse(header, data, &dmj4310_mot_stat);
+  }
+}
+void dmj4310_disable() {
+  dmj4310_enabled = false;
+  motCtrlCanMsg_DMJ4310 can_msg;
+  u8 block[8];
+  can_msg.data = block;
+  dmj4310_disable_msg(&can_msg);
+  if (can_send_message(hcanx, &can_msg.header, can_msg.data) != HAL_OK) {
+    return;
   }
 }
 
-volatile motStat_DMJ4310 *dmj4310_get_stat() { return &mot_stat; }
+volatile motStat_DMJ4310 *dmj4310_get_stat() { return &dmj4310_mot_stat; }
 
-void dmj4310_reset_pos() { mot_stat.x = 0.0f; }
+void dmj4310_reset_pos() { dmj4310_mot_stat.x = 0.0f; }

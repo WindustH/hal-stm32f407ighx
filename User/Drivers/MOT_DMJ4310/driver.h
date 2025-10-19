@@ -33,5 +33,6 @@ void dmj4310_set_torque(f32 trq);
 void dmj4310_update_stat(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                          u8 data[8]);
 void dmj4310_reset_pos();
+void dmj4310_disable();
 volatile motStat_DMJ4310 *dmj4310_get_stat();
 #endif /* __USER_DRIVERS_MOT_DMJ4310_DRIVER__ */

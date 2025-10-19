@@ -27,23 +27,21 @@ void dmj6006_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
   u8 parsed_id = id_and_error & 0x0F;
   u8 error_code = (id_and_error >> 4) & 0x0F;
 
-  // ---- 位置: 16位有符号整数 ----
-  u16 raw_pos_u16 = (u16)((data[1] << 8) | data[2]);
-  i16 raw_pos = (i16)raw_pos_u16;
+  // ---- 原始无符号数据提取 ----
+  u16 raw_pos = ((u16)data[1] << 8) | (u16)data[2];          // 16-bit
+  u16 raw_vel = ((u16)data[3] << 4) | ((u16)data[4] >> 4);   // 12-bit
+  u16 raw_trq = ((u16)(data[4] & 0x0F) << 8) | (u16)data[5]; // 12-bit
 
-  // ---- 速度: 12位有符号整数 ----
-  i16 raw_vel = (i16)((data[3] << 4) | ((data[4] >> 4) & 0x0F));
-  if (raw_vel & 0x0800)
-    raw_vel |= 0xF000;
-
-  // ---- 扭矩: 12位有符号整数 ----
-  i16 raw_trq = (i16)(((data[4] & 0x0F) << 8) | data[5]);
-  if (raw_trq & 0x0800)
-    raw_trq |= 0xF000;
-
-  // ---- 温度 ----
   u8 temp_mos = data[6];
   u8 temp_rotor = data[7];
+
+  // ---- 使用你的转换函数解析物理量 ----
+  // f32 position =
+  //     i32_to_f32((i32)raw_pos, -12.5f, 12.5f, 16); // P_MIN=-12.5, P_MAX=12.5
+  f32 velocity =
+      i32_to_f32((i32)raw_vel, -45.0f, 45.0f, 12); // V_MIN=-45.0, V_MAX=45.0
+  f32 torque =
+      i32_to_f32((i32)raw_trq, -18.0f, 18.0f, 12); // T_MIN=-18.0, T_MAX=18.0
 
   // ---- 多圈位置处理 ----
   static i32 prev_raw_pos = 0;
@@ -63,8 +61,8 @@ void dmj6006_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
   prev_raw_pos = raw_pos;
 
   mot_stat_dmj6006->x += delta;
-  mot_stat_dmj6006->v = raw_vel * s_vel_scale;
-  mot_stat_dmj6006->trq = raw_trq * s_trq_scale;
+  mot_stat_dmj6006->v = velocity * s_vel_scale;
+  mot_stat_dmj6006->trq = torque * s_trq_scale;
   mot_stat_dmj6006->error_code = error_code;
   mot_stat_dmj6006->T_mos = temp_mos;
   mot_stat_dmj6006->T_mot = temp_rotor;
@@ -120,4 +118,21 @@ void dmj6006_enable_msg(motCtrlCanMsg_DMJ6006 *can_msg) {
   can_msg->data[5] = 0xFF;
   can_msg->data[6] = 0xFF;
   can_msg->data[7] = 0xFC;
+}
+
+void dmj6006_disable_msg(motCtrlCanMsg_DMJ6006 *can_msg) {
+  can_msg->header.StdId = dmj6006_can_id;
+  can_msg->header.IDE = CAN_ID_STD;
+  can_msg->header.RTR = CAN_RTR_DATA;
+  can_msg->header.DLC = 8U;
+  can_msg->header.TransmitGlobalTime = DISABLE;
+
+  can_msg->data[0] = 0xFF;
+  can_msg->data[1] = 0xFF;
+  can_msg->data[2] = 0xFF;
+  can_msg->data[3] = 0xFF;
+  can_msg->data[4] = 0xFF;
+  can_msg->data[5] = 0xFF;
+  can_msg->data[6] = 0xFF;
+  can_msg->data[7] = 0xFD;
 }

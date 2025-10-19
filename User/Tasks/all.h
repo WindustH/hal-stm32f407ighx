@@ -9,9 +9,11 @@
 #include "Tasks/PID_DMJ4310/pidx.h" // IWYU pragma: keep
 #include "Tasks/PID_DMJ6006/pidv.h" // IWYU pragma: keep
 #include "Tasks/PID_DMJ6006/pidx.h" // IWYU pragma: keep
+#include "Tasks/gimbal.h"           // IWYU pragma: keep
 #include "Tasks/protect_gimbal.h"   // IWYU pragma: keep
 #endif
 #ifdef BOARD_CHASSIS
+#include "Tasks/chassis.h"         // IWYU pragma: keep
 #include "Tasks/protect_chassis.h" // IWYU pragma: keep
 #endif
 #endif /* __USER_TASKS_ALL__ */

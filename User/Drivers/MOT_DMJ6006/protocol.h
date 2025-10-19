@@ -65,5 +65,6 @@ void dmj6006_ctrl_pack_mit(const volatile motCtrl_DMJ6006 *ctrl_msg,
                            motCtrlCanMsg_DMJ6006 *can_msg);
 
 void dmj6006_enable_msg(motCtrlCanMsg_DMJ6006 *can_msg);
+void dmj6006_disable_msg(motCtrlCanMsg_DMJ6006 *can_msg);
 
 #endif /* __USER_DRIVERS_MOT_DMJ6006_PROTOCOL__ */

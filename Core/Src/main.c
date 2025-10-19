@@ -231,6 +231,8 @@ void Error_Handler(void) {
   __disable_irq();
 
   while (1) {
+    error_indicator++;
+    HAL_Delay(1);
   }
   /* USER CODE END Error_Handler_Debug */
 }

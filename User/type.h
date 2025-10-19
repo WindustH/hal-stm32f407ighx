@@ -23,39 +23,14 @@ extern const u32 TICK_PER_SECOND;
 // 每 Tick 秒数(常量)
 extern const f32 SECOND_PER_TICK;
 
-
-
 // 缓冲区结构体定义
 typedef struct {
   u8 dat[DMA_BUFFER_SIZE]; // 数据缓冲区
   u16 len;                 // 数据长度
 } buf;
 
-
-
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;
-
-typedef struct {
-  f32 dt;
-  f32 p;
-  f32 i;
-  f32 d;
-  f32 target;
-  f32 prev_error;
-} pidStat;
-
-typedef struct {
-  f32 r; // 使用第一套参数的控制域
-  f32 R; // 过渡控制域大小
-  f32 kpr;
-  f32 kir;
-  f32 kdr;
-  f32 kp;
-  f32 ki;
-  f32 kd;
-  f32 ol;
-} pwPidArg;
 
 f32 i32_to_f32(i32 x_i32, f32 x_min, f32 x_max, i32 bits);
 i32 f32_to_i32(f32 x, f32 x_min, f32 x_max, i32 bits);

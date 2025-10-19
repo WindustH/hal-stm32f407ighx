@@ -15,7 +15,7 @@ static inline i16 sign_extend_14_to_16(u16 val) {
   return (i16)val;
 }
 
-void board_com_pack_gimbal_msg(boardComCanMsg *msg, const boardComT *data) {
+void board_com_pack_gimbal_msg(boardComCanMsg *msg, const bComGimDat *data) {
   msg->header.StdId = board_com_can_id;
   msg->header.IDE = CAN_ID_STD;
   msg->header.RTR = CAN_RTR_DATA;
@@ -66,7 +66,7 @@ void board_com_pack_gimbal_msg(boardComCanMsg *msg, const boardComT *data) {
 }
 
 void board_com_parse_gimbal_msg(const canRxH *rxHeader, const u8 data[8],
-                                boardComT *out) {
+                                bComGimDat *out) {
   if (rxHeader->StdId != board_com_can_id)
     return;
   const u8 *d = data;

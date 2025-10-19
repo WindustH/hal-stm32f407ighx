@@ -12,11 +12,11 @@ void board_gimbal_tx_setup(CAN_HandleTypeDef *hcan, u32 can_id) {
 }
 void board_gimbal_send_msg() {
   volatile rcCtrl_dr16 *rc_ctrl = rc_dr16_get_ctrl_sig();
-  boardComT bcd;
+  bComGimDat bcd;
   bcd.ch0 = rc_ctrl->rc.ch0;
   bcd.ch1 = rc_ctrl->rc.ch1;
   bcd.ch2 = rc_ctrl->rc.ch2;
-  bcd.ch3 = rc_ctrl->rc.ch2;
+  bcd.ch3 = rc_ctrl->rc.ch3;
   bcd.s1 = rc_ctrl->rc.s1;
   bcd.s2 = rc_ctrl->rc.s2;
 
@@ -35,9 +35,9 @@ void board_gimbal_send_msg() {
 
 #ifdef BOARD_CHASSIS
 #include "main.h"
-static boardComT bc_gimbal_data = {0};
+static bComGimDat bc_gimbal_data = {0};
 
-boardComT *board_com_get_gimbal_data() { return &bc_gimbal_data; }
+bComGimDat *board_com_get_gimbal_data() { return &bc_gimbal_data; }
 
 void board_chassis_rx_setup(CAN_HandleTypeDef *hcan, u32 can_id,
                             u32 filter_bank, u8 fifo) {

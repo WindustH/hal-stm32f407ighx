@@ -47,3 +47,10 @@ void dmj4310_pidv_start() {
 }
 
 void dmj4310_pidv_stop() { dmj4310_pidv_started = false; }
+
+void dmj4310_reset_pidv_stat() {
+  dmj4310_pidv_stat.p = 0.0f;
+  dmj4310_pidv_stat.i = 0.0f;
+  dmj4310_pidv_stat.d = 0.0f;
+  dmj4310_pidv_stat.target = 0.0f;
+}

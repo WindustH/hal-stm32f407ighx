@@ -20,10 +20,15 @@ static const pwPidArg default_pid_arg = {.R = DMJ6006_PIDX_BIG_R,
                                          .kir = DMJ6006_PIDX_KIR,
                                          .kdr = DMJ6006_PIDX_KDR,
                                          .ol = DMJ6006_PIDX_OL};
-
+static volatile pwIGainExtArg dmj6006_pidx_ig_arg = {0};
+static const pwIGainExtArg default_pid_ig_arg = {.R = DMJ6006_PIDV_BIG_R,
+                                                 .r = DMJ6006_PIDX_R,
+                                                 .ig = DMJ6006_PIDX_IGAIN_K,
+                                                 .igr = DMJ6006_PIDX_IGAIN_KR};
 void dmj6006_pidx_setup(volatile f32 *fb) {
   feedback = fb;
   dmj6006_pidx_arg = default_pid_arg;
+  dmj6006_pidx_ig_arg = default_pid_ig_arg;
 }
 
 void dmj6006_pidx_update() {
@@ -31,7 +36,8 @@ void dmj6006_pidx_update() {
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   dmj6006_pidx_stat.dt = dt;
-  f32 output = pw_pid_compute(&dmj6006_pidx_stat, &dmj6006_pidx_arg, *feedback);
+  f32 output = pw_pid_with_pw_i_gain_compute(
+      &dmj6006_pidx_stat, &dmj6006_pidx_arg, &dmj6006_pidx_ig_arg, *feedback);
   dmj6006_pidv_set_target(output + feedforward_output);
 }
 
@@ -49,4 +55,11 @@ void dmj6006_pidx_start() {
 
 void dmj6006_pidx_stop() { dmj6006_pidx_started = false; }
 
-void dmj6006_set_feedforward(f32 ff_o) { feedforward_output = ff_o; }
+void dmj6006_set_pidx_feedforward(f32 ff_o) { feedforward_output = ff_o; }
+
+void dmj6006_reset_pidx_stat() {
+  dmj6006_pidx_stat.p = 0.0f;
+  dmj6006_pidx_stat.i = 0.0f;
+  dmj6006_pidx_stat.d = 0.0f;
+  dmj6006_pidx_stat.target = 0.0f;
+}

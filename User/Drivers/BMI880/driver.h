@@ -20,4 +20,5 @@ void bmi088_update_pose(u16 pin);
 void bmi088_temp_ctrl();
 void bmi088_start();
 volatile bmi088d_imu_data_t *bmi088_get_imu_data();
+volatile poseT *bmi088_get_pose();
 #endif /* __USER_DRIVERS_BMI880_DRIVER__ */

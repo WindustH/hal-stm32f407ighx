@@ -3,6 +3,10 @@
 #include "Drivers/MOT_DMJ4310/protect.h"
 #include "Drivers/MOT_DMJ6006/protect.h"
 #include "Drivers/MOT_M3508/protect.h"
+#include "Tasks/PID_DMJ4310/pidv.h"
+#include "Tasks/PID_DMJ4310/pidx.h"
+#include "Tasks/PID_DMJ6006/pidv.h"
+#include "Tasks/PID_DMJ6006/pidx.h"
 #include "type.h"
 
 static u32 dwt_cnt = 0;
@@ -21,6 +25,10 @@ void gimbal_protect_update_idle_time() {
     protect_m3508();
     protect_dmj4310();
     protect_dmj6006();
+    dmj6006_reset_pidv_stat();
+    dmj6006_reset_pidx_stat();
+    dmj4310_reset_pidv_stat();
+    dmj4310_reset_pidx_stat();
   } else {
     lift_protect_dmj4310();
     lift_protect_m3508();

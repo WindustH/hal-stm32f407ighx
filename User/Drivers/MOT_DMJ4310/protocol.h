@@ -65,5 +65,5 @@ void dmj4310_ctrl_pack_mit(const volatile motCtrl_DMJ4310 *ctrl_msg,
                            motCtrlCanMsg_DMJ4310 *can_msg);
 
 void dmj4310_enable_msg(motCtrlCanMsg_DMJ4310 *can_msg);
-
+void dmj4310_disable_msg(motCtrlCanMsg_DMJ4310 *can_msg);
 #endif /* __USER_DRIVERS_MOT_DMJ4310_PROTOCOL__ */

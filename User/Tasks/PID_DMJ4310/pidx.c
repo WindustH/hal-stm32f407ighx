@@ -47,3 +47,10 @@ void dmj4310_pidx_start() {
 }
 
 void dmj4310_pidx_stop() { dmj4310_pidx_started = false; }
+
+void dmj4310_reset_pidx_stat() {
+  dmj4310_pidx_stat.p = 0.0f;
+  dmj4310_pidx_stat.i = 0.0f;
+  dmj4310_pidx_stat.d = 0.0f;
+  dmj4310_pidx_stat.target = 0.0f;
+}
