@@ -3,6 +3,7 @@
 #include "Drivers/MOT_DMJ6006/driver.h"
 #include "Utils/piecewise_pid.h"
 #include "conf.h"
+#include "feedforward.h"
 #include <string.h>
 
 static volatile f32 *feedback;
@@ -40,7 +41,7 @@ void dmj6006_pidv_update() {
   // *feedback);
   f32 output = pw_pid_with_pw_i_gain_compute(
       &dmj6006_pidv_stat, &dmj6006_pidv_arg, &dmj6006_pidv_ig_arg, *feedback);
-  dmj6006_set_torque(output);
+  dmj6006_set_torque(output + dmj6006_pidv_ff_sum());
 }
 
 void dmj6006_pidv_set_target(f32 tgt) {

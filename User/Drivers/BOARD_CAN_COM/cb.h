@@ -3,7 +3,7 @@
 
 #include "type.h"
 
-#define BCC_CB_MAX_CNT 32
+#define BCC_CB_MAX_CNT 8
 typedef void (*cbT)(void);
 typedef struct {
   cbT procs[BCC_CB_MAX_CNT];

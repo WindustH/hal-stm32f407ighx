@@ -3,7 +3,7 @@
 
 #include "type.h"
 
-#define DR16_CB_MAX_CNT 32
+#define DR16_CB_MAX_CNT 8
 typedef void (*dr16Cb)(void);
 typedef struct {
   dr16Cb procs[DR16_CB_MAX_CNT];

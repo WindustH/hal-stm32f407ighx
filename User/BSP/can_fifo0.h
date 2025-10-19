@@ -8,7 +8,7 @@
 #ifndef __BSP_CAN_FIFO0__
 #define __BSP_CAN_FIFO0__
 #include "type.h"
-#define CAN_FIFO0_CB_LIST_SIZE 32
+#define CAN_FIFO0_CB_LIST_SIZE 16
 
 typedef void (*canFifo0Cb)(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *header,
                            u8 data[8]);

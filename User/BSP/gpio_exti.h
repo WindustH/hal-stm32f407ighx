@@ -9,7 +9,7 @@
 #define __BSP_GPIO_EXTI__
 
 #include "type.h"
-#define GPIO_EXTI_CB_LIST_SIZE 32
+#define GPIO_EXTI_CB_LIST_SIZE 8
 typedef void (*gpioExtiCb)(uint16_t GPIO_Pin);
 typedef struct {
   volatile u32 state;
