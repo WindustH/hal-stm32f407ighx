@@ -1,106 +1,75 @@
 #include "motion.h"
-#include "arm_math.h"
-#include <float.h>
+#include "arm_math.h" // IWYU pragma: keep
 
 void solve_motion(f32 Vx, f32 Vy, f32 omega, f32 *A, f32 *B, f32 *C, f32 *D) {
-  // Step 1: Compute the four critical points
-  f32 p[4] = {0.0, (Vx + omega) / 2.0, (Vx - Vy) / 2.0, (omega - Vy) / 2.0};
+  // Step 1: Pure rotation vector v1 = [ω, ω, ω, ω]
+  f32 v1[4] = {omega, omega, omega, omega};
 
-  // Step 2: Sort to find median
-  // Simple sorting for 4 elements
-  for (int i = 0; i < 3; i++) {
-    for (int j = i + 1; j < 4; j++) {
-      if (p[i] > p[j]) {
-        f32 temp = p[i];
-        p[i] = p[j];
-        p[j] = temp;
+  // Step 2: Pure translation vector v2 (for 45° omni wheels)
+  f32 v2[4] = {(Vx - Vy) * 0.5f, (Vx + Vy) * 0.5f, (-Vx + Vy) * 0.5f,
+               (-Vx - Vy) * 0.5f};
+
+  // Step 3: Compute ||v2|| (which equals sqrt(Vx^2 + Vy^2) ∈ [0,1])
+  f32 v2_norm_sq =
+      v2[0] * v2[0] + v2[1] * v2[1] + v2[2] * v2[2] + v2[3] * v2[3];
+
+  if (v2_norm_sq < MATH_EPSILON) {
+    // No translation: output clamped pure rotation
+    *A = clamp_f32(v1[0], -1.0f, 1.0f);
+    *B = clamp_f32(v1[1], -1.0f, 1.0f);
+    *C = clamp_f32(v1[2], -1.0f, 1.0f);
+    *D = clamp_f32(v1[3], -1.0f, 1.0f);
+    return;
+  }
+
+  f32 v2_norm;
+  arm_sqrt_f32(v2_norm_sq, &v2_norm); // v2_norm ∈ (0, 1]
+
+  // Step 4: Unit direction e = v2 / ||v2||
+  f32 inv_norm = 1.0f / v2_norm;
+  f32 e[4] = {v2[0] * inv_norm, v2[1] * inv_norm, v2[2] * inv_norm,
+              v2[3] * inv_norm};
+
+  // Step 5: Find smallest t >= 0 such that v1[i] + t * e[i] ∈ [-1, 1] for all i
+  f32 t_hit = 1e6f; // will be the minimal valid t
+
+  for (int i = 0; i < 4; i++) {
+    if (e[i] < MATH_EPSILON && e[i] > -MATH_EPSILON) {
+      // Ray parallel to axis i: check if current v1[i] is within limits
+      if (v1[i] < -1.0f || v1[i] > 1.0f) {
+        t_hit = 0.0f; // already out of bounds → no translation allowed
+        break;
       }
+      continue;
     }
+
+    // Compute t where p_i(t) = ±1
+    f32 t1 = (-1.0f - v1[i]) / e[i];
+    f32 t2 = (1.0f - v1[i]) / e[i];
+
+    // Consider only t >= 0
+    if (t1 >= 0.0f && t1 < t_hit)
+      t_hit = t1;
+    if (t2 >= 0.0f && t2 < t_hit)
+      t_hit = t2;
   }
 
-  // Median for even number of points: average of middle two
-  f32 a = (p[1] + p[2]) / 2.0;
+  // If no constraint found (e.g., v1 inside and e=0), t_hit remains large →
+  // clamp to 0
+  if (t_hit > 1e5f)
+    t_hit = 0.0f;
 
-  // Step 3: Compute b, c, d using the general solution
-  f32 b = (Vx + omega) / 2.0 - a;
-  f32 c = a - (Vx - Vy) / 2.0;
-  f32 d = (omega - Vy) / 2.0 - a;
+  // l = t_hit (since e is unit vector, distance = t)
+  f32 l = t_hit;
 
-  // Step 4: Compute m = max(|a|, |b|, |c|, |d|)
-  f32 m = fabs(a);
-  if (fabs(b) > m)
-    m = fabs(b);
-  if (fabs(c) > m)
-    m = fabs(c);
-  if (fabs(d) > m)
-    m = fabs(d);
+  // Step 6: Final output = v1 + e * l * ||v2||
+  f32 scale = l * v2_norm;
+  f32 out[4] = {v1[0] + e[0] * scale, v1[1] + e[1] * scale,
+                v1[2] + e[2] * scale, v1[3] + e[3] * scale};
 
-  // Step 5: Normalize
-  if (m == 0.0) {
-    *A = *B = *C = *D = 0.0;
-  } else {
-    *A = a / m;
-    *B = b / m;
-    *C = c / m;
-    *D = d / m;
-  }
-}
-
-void segment_length_in_square(f32 x0, f32 y0, f32 *res) {
-  // 处理零向量情况
-  if (x0 == 0.0 && y0 == 0.0) {
-    *res = 1.4142f;
-    return;
-  }
-
-  // 正方形边界：x = ±1, y = ±1
-  f32 t_min = -DBL_MAX;
-  f32 t_max = DBL_MAX;
-
-  // 与左右边（x = ±1）的交点参数 t
-  if (x0 != 0.0) {
-    f32 t1 = -1.0 / x0; // x = -1
-    f32 t2 = 1.0 / x0;  // x =  1
-    if (t1 > t2) {
-      f32 tmp = t1;
-      t1 = t2;
-      t2 = tmp;
-    }
-    if (t1 > t_min)
-      t_min = t1;
-    if (t2 < t_max)
-      t_max = t2;
-  } else {
-    // x0 == 0：直线垂直，必须满足 |0| <= 1（恒成立），不约束 t
-    // 但若 |0| > 1 则无交，但这里 0 <= 1，所以无影响
-  }
-
-  // 与上下边（y = ±1）的交点参数 t
-  if (y0 != 0.0) {
-    f32 t1 = -1.0 / y0; // y = -1
-    f32 t2 = 1.0 / y0;  // y =  1
-    if (t1 > t2) {
-      f32 tmp = t1;
-      t1 = t2;
-      t2 = tmp;
-    }
-    if (t1 > t_min)
-      t_min = t1;
-    if (t2 < t_max)
-      t_max = t2;
-  }
-
-  // 如果无交集
-  if (t_min > t_max) {
-    *res = 1.4142f;
-    return;
-  }
-
-  // 计算两个交点坐标
-  f32 x1 = x0 * t_min;
-  f32 y1 = y0 * t_min;
-  f32 x2 = x0 * t_max;
-  f32 y2 = y0 * t_max;
-
-  arm_sqrt_f32((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1), res);
+  // Final clamp to [-1, 1] (safety against numerical error)
+  *A = clamp_f32(out[0], -1.0f, 1.0f);
+  *B = clamp_f32(out[1], -1.0f, 1.0f);
+  *C = clamp_f32(out[2], -1.0f, 1.0f);
+  *D = clamp_f32(out[3], -1.0f, 1.0f);
 }

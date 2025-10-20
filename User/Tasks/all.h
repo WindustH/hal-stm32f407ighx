@@ -15,5 +15,7 @@
 #ifdef BOARD_CHASSIS
 #include "Tasks/chassis.h"         // IWYU pragma: keep
 #include "Tasks/protect_chassis.h" // IWYU pragma: keep
+#include "Tasks/PID_WHEEL/pidv.h" // IWYU pragma: keep
+#include "Tasks/PID_WHEEL/pidx.h" // IWYU pragma: keep
 #endif
 #endif /* __USER_TASKS_ALL__ */

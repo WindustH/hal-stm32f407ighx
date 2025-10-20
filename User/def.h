@@ -20,13 +20,16 @@
 
 #define IS_MASTER_CAN 1
 #define IS_SLAVE_CAN 0
-#ifndef NULL
-// 圆周率π的浮点数表示
+
+#ifndef PI
 #define PI 3.14159265359f
 #endif
 
+#ifndef MATH_EPSILON
+#define MATH_EPSILON 1e-6f
+#endif
+
 #ifndef NULL
-// 空指针定义
 #define NULL ((void *)0)
 #endif
 

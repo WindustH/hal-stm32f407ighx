@@ -1,0 +1,15 @@
+{
+  "file_scan_exclusions": [
+    ".cache",
+    ".git",
+    "build",
+    "startup",
+    ".mxproject",
+    "dev.py",
+    "switch_board.py",
+    ".cmake",
+    "CMakeLists.txt",
+    ".ld",
+    ".vscode"
+  ]
+}

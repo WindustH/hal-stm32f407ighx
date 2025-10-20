@@ -3,11 +3,13 @@
 #include "Drivers/MOT_DMJ4310/driver.h"
 #include "Utils/piecewise_pid.h"
 #include "conf.h"
+#include "feedforward.h"
 #include <string.h>
 
 static volatile f32 *feedback;
 static volatile pidStat dmj4310_pidv_stat = {0};
 static volatile pwPidArg dmj4310_pidv_arg = {0};
+static volatile pwIGainExtArg dmj4310_pidv_ig_arg = {0};
 static u32 dwt_cnt;
 static u8 dmj4310_pidv_started = false;
 static const pwPidArg default_pid_arg = {.R = DMJ4310_PIDV_BIG_R,
@@ -19,10 +21,15 @@ static const pwPidArg default_pid_arg = {.R = DMJ4310_PIDV_BIG_R,
                                          .kir = DMJ4310_PIDV_KIR,
                                          .kdr = DMJ4310_PIDV_KDR,
                                          .ol = DMJ4310_PIDV_OL};
+static const pwIGainExtArg default_pid_ig_arg = {.R = DMJ4310_PIDV_BIG_R,
+                                                 .r = DMJ4310_PIDV_R,
+                                                 .ig = DMJ4310_PIDV_IGAIN_K,
+                                                 .igr = DMJ4310_PIDV_IGAIN_KR};
 
 void dmj4310_pidv_setup(volatile f32 *fb) {
   feedback = fb;
   dmj4310_pidv_arg = default_pid_arg;
+  dmj4310_pidv_ig_arg = default_pid_ig_arg;
 }
 
 void dmj4310_pidv_update() {
@@ -30,8 +37,11 @@ void dmj4310_pidv_update() {
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   dmj4310_pidv_stat.dt = dt;
-  f32 output = pw_pid_compute(&dmj4310_pidv_stat, &dmj4310_pidv_arg, *feedback);
-  dmj4310_set_torque(output);
+  // f32 output = pw_pid_compute(&dmj4310_pidv_stat, &dmj4310_pidv_arg,
+  // *feedback);
+  f32 output = pw_pid_with_pw_i_gain_compute(
+      &dmj4310_pidv_stat, &dmj4310_pidv_arg, &dmj4310_pidv_ig_arg, *feedback);
+  dmj4310_set_torque(output + dmj4310_pidv_ff_sum());
 }
 
 void dmj4310_pidv_set_target(f32 tgt) {

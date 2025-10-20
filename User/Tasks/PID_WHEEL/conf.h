@@ -1,0 +1,34 @@
+#ifndef __USER_TASKS_PID_WHEEL_CONF__
+#define __USER_TASKS_PID_WHEEL_CONF__
+#ifdef BOARD_CHASSIS
+#define WHEEL_PIDV_KP 0.0f
+#define WHEEL_PIDV_KPR 0.0f
+#define WHEEL_PIDV_KI 0.0f
+#define WHEEL_PIDV_KIR 0.0f
+#define WHEEL_PIDV_KD 0.0f
+#define WHEEL_PIDV_KDR 0.0f
+#define WHEEL_PIDV_R 0.0f
+#define WHEEL_PIDV_BIG_R 0.0f
+#define WHEEL_PIDV_OL 0.0f
+
+#define WHEEL_PIDV_IGAIN_R 0.0f
+#define WHEEL_PIDV_IGAIN_BIG_R 0.0f
+#define WHEEL_PIDV_IGAIN_K 0.0f
+#define WHEEL_PIDV_IGAIN_KR 0.0f
+
+#define WHEEL_PIDX_KP 0.0f
+#define WHEEL_PIDX_KI 1.0f
+#define WHEEL_PIDX_KD 0.0f
+#define WHEEL_PIDX_KPR 0.0f
+#define WHEEL_PIDX_KIR 0.4f
+#define WHEEL_PIDX_KDR 0.0f
+#define WHEEL_PIDX_R 0.0f
+#define WHEEL_PIDX_BIG_R 0.0f
+#define WHEEL_PIDX_OL 0.0f
+
+#define WHEEL_PIDX_IGAIN_R 0.0f
+#define WHEEL_PIDX_IGAIN_BIG_R 0.0f
+#define WHEEL_PIDX_IGAIN_K 0.0f
+#define WHEEL_PIDX_IGAIN_KR 0.0f
+#endif
+#endif /* __USER_TASKS_PID_WHEEL_CONF__ */

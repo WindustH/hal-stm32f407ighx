@@ -11,12 +11,6 @@ static f32 s_trq_scale = DMJ4310_TOR_SCALE; // Nm / raw
 extern volatile u32 dmj4310_master_id;
 extern volatile u32 dmj4310_can_id;
 
-void mot_dmj4310_set_scaling(f32 pos_scale, f32 vel_scale, f32 trq_scale) {
-  s_pos_scale = pos_scale;
-  s_vel_scale = vel_scale;
-  s_trq_scale = trq_scale;
-}
-
 void dmj4310_fb_parse(const volatile canRxH *msg, const volatile u8 *data,
                       volatile motStat_DMJ4310 *mot_stat_dmj4310) {
   if (msg->StdId != dmj4310_master_id) {

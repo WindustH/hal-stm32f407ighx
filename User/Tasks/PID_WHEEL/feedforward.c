@@ -1,8 +1,9 @@
-#include "feedforward.h" // 对应你的头文件
+#ifdef BOARD_CHASSIS
+#include "feedforward.h"
 #include "type.h"
 
-volatile ffSrcList dmj6006_pidx_ff_src_list = {.state = 0};
-volatile ffSrcList dmj6006_pidv_ff_src_list = {.state = 0};
+volatile ffSrcList wheel_pidx_ff_src_list = {.state = 0};
+volatile ffSrcList wheel_pidv_ff_src_list = {.state = 0};
 
 // 通用添加函数
 static u8 ff_add(volatile ffSrcList *list, volatile f32 *ff_src, f32 coeff) {
@@ -55,22 +56,23 @@ static f32 ff_sum(volatile const ffSrcList *list) {
 
 // ===== 对外接口 =====
 
-u8 dmj6006_pidx_ff_add(volatile f32 *ff_src, f32 coeff) {
-  return ff_add(&dmj6006_pidx_ff_src_list, ff_src, coeff);
+u8 wheel_pidx_ff_add(volatile f32 *ff_src, f32 coeff) {
+  return ff_add(&wheel_pidx_ff_src_list, ff_src, coeff);
 }
 
-void dmj6006_pidx_ff_remove(u8 idx) {
-  ff_remove(&dmj6006_pidx_ff_src_list, idx);
+void wheel_pidx_ff_remove(u8 idx) {
+  ff_remove(&wheel_pidx_ff_src_list, idx);
 }
 
-f32 dmj6006_pidx_ff_sum(void) { return ff_sum(&dmj6006_pidx_ff_src_list); }
+f32 wheel_pidx_ff_sum(void) { return ff_sum(&wheel_pidx_ff_src_list); }
 
-u8 dmj6006_pidv_ff_add(volatile f32 *ff_src, f32 coeff) {
-  return ff_add(&dmj6006_pidv_ff_src_list, ff_src, coeff);
+u8 wheel_pidv_ff_add(volatile f32 *ff_src, f32 coeff) {
+  return ff_add(&wheel_pidv_ff_src_list, ff_src, coeff);
 }
 
-void dmj6006_pidv_ff_remove(u8 idx) {
-  ff_remove(&dmj6006_pidv_ff_src_list, idx);
+void wheel_pidv_ff_remove(u8 idx) {
+  ff_remove(&wheel_pidv_ff_src_list, idx);
 }
 
-f32 dmj6006_pidv_ff_sum(void) { return ff_sum(&dmj6006_pidv_ff_src_list); }
+f32 wheel_pidv_ff_sum(void) { return ff_sum(&wheel_pidv_ff_src_list); }
+#endif
