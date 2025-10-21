@@ -1,123 +1,102 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build-debug",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "build-debug"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "build-release",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "build-release"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "clean",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "clean"
-            ],
-            "group": "none",
-            "presentation": {
-                "echo": true,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "flash",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "flash"
-            ],
-            "group": "test",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "switch-board",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/switch_board.py",
-                "flash"
-            ],
-            "group": "test",
-            "presentation": {
-                "echo": true,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "rebuild",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "rebuild"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "size",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev.py",
-                "size"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-debug",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "build-debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build-release",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "build-release"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "clean"],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "flash",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "flash"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "switch-board",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/switch_board.py", "flash"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "rebuild",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "rebuild"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "size",
+      "type": "shell",
+      "command": "python",
+      "args": ["${workspaceFolder}/dev.py", "size"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
 }

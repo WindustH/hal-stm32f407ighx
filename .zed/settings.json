@@ -10,6 +10,12 @@
     ".cmake",
     "CMakeLists.txt",
     ".ld",
-    ".vscode"
-  ]
+    ".vscode",
+    ".clangd",
+    "Core",
+    "Drivers",
+    "Lib"
+  ],
+  "format_on_save": "on",
+  "tab_size": 2
 }

@@ -32,5 +32,4 @@
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
-
 #endif /* __USER_DEF__ */

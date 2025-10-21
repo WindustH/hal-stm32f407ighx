@@ -1,57 +1,57 @@
 {
-    "files.exclude": {
-        "build": true,
-        ".cache": true,
-        "*.svd": true,
-        "*.ld": true,
-        "*.cmake": true,
-        // ".clangd": true,
-        // ".gitignore": true,
-        "dev.py": true,
-        "startup": true,
-        "startup-mdkarm": true,
-        ".claude": true,
-        "Drivers": true,
-        ".mxproject": true,
-        "*.ioc": true,
-        "switch_board.py": true,
-        ".zed": true
+  "files.exclude": {
+    "build": true,
+    ".cache": true,
+    "*.svd": true,
+    "*.ld": true,
+    "*.cmake": true,
+    // ".clangd": true,
+    // ".gitignore": true,
+    "dev.py": true,
+    "startup": true,
+    "startup-mdkarm": true,
+    ".claude": true,
+    "Drivers": true,
+    ".mxproject": true,
+    "*.ioc": true,
+    "switch_board.py": true,
+    ".zed": true
+  },
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "[c]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+  },
+  "editor.formatOnSave": true,
+  "VsCodeTaskButtons.tasks": [
+    {
+      "label": "$(pass-filled) Build (Release)",
+      "task": "build-release"
     },
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-    "[c]": {
-        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    {
+      "label": "$(debug-console) Build (Debug)",
+      "task": "build-debug"
     },
-    "editor.formatOnSave": true,
-    "VsCodeTaskButtons.tasks": [
-        {
-            "label": "$(pass-filled) Build (Release)",
-            "task": "build-release",
-        },
-        {
-            "label": "$(debug-console) Build (Debug)",
-            "task": "build-debug",
-        },
-        {
-            "label": "$(cloud-download) Flash",
-            "task": "flash",
-        },
-        {
-            "label": "$(trash) Clean",
-            "task": "clean",
-        },
-        {
-            "label": "$(replace) Switch",
-            "task": "switch-board",
-        }
-    ],
-    "clangd.arguments": [
-        "--background-index",
-        "--compile-commands-dir=${workspaceFolder}/build",
-        "--query-driver=",
-        "--header-insertion=never",
-        "--clang-tidy",
-        "--all-scopes-completion",
-        "--log=error"
-    ],
-    "C_Cpp.errorSquiggles": "disabled",
+    {
+      "label": "$(cloud-download) Flash",
+      "task": "flash"
+    },
+    {
+      "label": "$(trash) Clean",
+      "task": "clean"
+    },
+    {
+      "label": "$(replace) Switch",
+      "task": "switch-board"
+    }
+  ],
+  "clangd.arguments": [
+    "--background-index",
+    "--compile-commands-dir=${workspaceFolder}/build",
+    "--query-driver=",
+    "--header-insertion=never",
+    "--clang-tidy",
+    "--all-scopes-completion",
+    "--log=error"
+  ],
+  "C_Cpp.errorSquiggles": "disabled"
 }

@@ -22,15 +22,13 @@ f32 clamp_f32(f32 value, f32 min_val, f32 max_val) {
   return value;
 }
 
-f32 abs_f32(f32 value){
-    return value < 0 ? -value : value;
-}
+f32 abs_f32(f32 value) { return value < 0 ? -value : value; }
 
 f32 i32_to_f32(i32 x_i32, f32 x_min, f32 x_max, i32 bits) {
-  x_i32 = clamp_i32(x_i32, x_min, x_max);
   f32 span = x_max - x_min;
   f32 offset = x_min;
-  return ((f32)x_i32) * span / ((f32)((1 << bits) - 1)) + offset;
+  return clamp_f32(((f32)x_i32) * span / ((f32)((1 << bits) - 1)) + offset,
+                   x_min, x_max);
 }
 
 i32 f32_to_i32(f32 x, f32 x_min, f32 x_max, i32 bits) {
@@ -39,3 +37,5 @@ i32 f32_to_i32(f32 x, f32 x_min, f32 x_max, i32 bits) {
   f32 offset = x_min;
   return (i32)((x - offset) * ((f32)((1 << bits) - 1)) / span);
 }
+
+const chaMode cha_mode_map[4] = {CHA_FREE, CHA_FREE, CHA_FREE, CHA_FOLLOW};

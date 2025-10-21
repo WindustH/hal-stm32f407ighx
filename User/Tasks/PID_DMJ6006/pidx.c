@@ -47,7 +47,11 @@ void dmj6006_pidx_set_target(f32 tgt) {
     return;
   dmj6006_pidx_stat.target = tgt;
 }
-
+void dmj6006_pidx_target_add(f32 d) {
+  if (!dmj6006_pidx_started)
+    return;
+  dmj6006_pidx_stat.target += d;
+}
 void dmj6006_pidx_start() {
   dwt_cnt = DWT->CYCCNT;
   memset((void *)&dmj6006_pidx_stat, 0, sizeof(dmj6006_pidx_stat));

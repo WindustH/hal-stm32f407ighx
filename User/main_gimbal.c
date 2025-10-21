@@ -36,8 +36,8 @@ void main_gimbal() {
   dr16_cb_add(bc_gim_send_msg);                  // 接收到遥控器信号转发给底盘
   dr16_cb_add(gimbal_protect_refresh_idle_time); // 接收到信号清零信号空闲时间
   // 配置板间通讯接收
-  bc_gim_rx_setup(&hcan1, 0x008U, 2, CAN_FILTER_FIFO0);
-  bsp_can_fifo0_cb_add(bc_gim_update_data_from_cha);
+  // bc_gim_rx_setup(&hcan1, 0x008U, 2, CAN_FILTER_FIFO0);
+  // bsp_can_fifo0_cb_add(bc_gim_update_data_from_cha);
   // 配置 BMI088
   bmi088_setup(&hspi1, GPIOA, GPIO_PIN_4, GPIOB, GPIO_PIN_0, &htim10,
                TIM_CHANNEL_1, GPIO_PIN_4, GPIO_PIN_5);
