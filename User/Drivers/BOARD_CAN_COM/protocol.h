@@ -11,8 +11,8 @@
 #define GIM_TO_CHA_CH3_RANGE_MIN -1.0f
 #define GIM_TO_CHA_CH3_RANGE_MAX 1.0f
 
-#define CHA_TO_GIM_CH0_RANGE_MIN -100000.0f
-#define CHA_TO_GIM_CH0_RANGE_MAX 100000.0f
+#define CHA_TO_GIM_CH0_RANGE_MIN -2.0f
+#define CHA_TO_GIM_CH0_RANGE_MAX 2.0f
 #define CHA_TO_GIM_CH1_RANGE_MIN -2.0f
 #define CHA_TO_GIM_CH1_RANGE_MAX 2.0f
 #define CHA_TO_GIM_CH2_RANGE_MIN -2.0f
@@ -27,9 +27,9 @@ typedef struct {
 
 // 云台 → 底盘
 typedef struct {
-  f32 ch0;
-  f32 ch1;
-  f32 ch2;
+  f32 ch0; // 遥控器 平移 1
+  f32 ch1; // 遥控器 平移 2
+  f32 ch2; // 遥控器 Yaw 控制
   f32 ch3;
   u8 s1;
   u8 s2;
@@ -37,7 +37,7 @@ typedef struct {
 
 // 底盘 → 云台（新增）
 typedef struct {
-  f32 ch0;
+  f32 ch0; // 底盘角速度
   f32 ch1;
   f32 ch2;
   f32 ch3;

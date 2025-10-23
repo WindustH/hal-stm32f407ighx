@@ -18,7 +18,7 @@ void main_chassis() {
   // 配置板间通讯接收
   bc_cha_rx_setup(&hcan2, 0x007U, 14, CAN_FILTER_FIFO0);
   bsp_can_fifo0_cb_add(bc_cha_update_data_from_gim); // 从 CAN FIFO 中断接收消息
-  bcc_cb_add(chassis_update_wheel_speed);        // 根据接收的数据更新轮子速度
+  bcc_cb_add(chassis_update);                    // 根据接收的数据更新轮子速度
   bcc_cb_add(chassis_protect_refresh_idle_time); // 接收到消息清零空闲时间
   // 配置板间通讯发送
   bc_cha_tx_setup(&hcan2, 0x008U);

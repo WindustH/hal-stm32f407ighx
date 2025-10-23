@@ -1,10 +1,9 @@
 #ifdef BOARD_CHASSIS
 #include "pidv.h"
 #include "BSP/dwt.h"
-#include "Utils/piecewise_pid.h"
 #include "Tasks/chassis.h"
+#include "Utils/piecewise_pid.h"
 #include "conf.h"
-#include "feedforward.h"
 #include <string.h>
 
 static volatile f32 *feedback;
@@ -40,9 +39,9 @@ void wheel_pidv_update() {
   wheel_pidv_stat.dt = dt;
   // f32 output = pw_pid_compute(&wheel_pidv_stat, &wheel_pidv_arg,
   // *feedback);
-  f32 output = pw_pid_with_pw_i_gain_compute(
-      &wheel_pidv_stat, &wheel_pidv_arg, &wheel_pidv_ig_arg, *feedback);
-  chassis_set_rot(output + wheel_pidv_ff_sum());
+  f32 output = pw_pid_with_pw_i_gain_compute(&wheel_pidv_stat, &wheel_pidv_arg,
+                                             &wheel_pidv_ig_arg, *feedback);
+  chassis_set_rot(output);
 }
 
 void wheel_pidv_set_target(f32 tgt) {

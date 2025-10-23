@@ -1,39 +1,50 @@
 #ifdef BOARD_GIMBAL
 #include "gimbal.h"
 #include "BSP/dwt.h"
+#include "Drivers/BOARD_CAN_COM/driver.h"
 #include "Drivers/RC_DR16/driver.h"
+#include "Tasks/PID_DMJ6006/feedforward.h"
 #include "Tasks/PID_DMJ6006/pidx.h"
 
+#define YAW_FF_COEFF 0.0f
 static u32 dwt_cnt;
-static volatile u8 gimbal_rc_started = false;
+static volatile u8 gimbal_started = false;
 static chaMode mode = CHA_NONE;
+static u8 cha_ff_src_id;
 
-#define YAW_SPEED 8.0f
-void gimbal_rc_setup() {}
-void gimbal_rc_update() {
-  if (!gimbal_rc_started)
+void gimbal_update() {
+  if (!gimbal_started)
     return;
   volatile rcCtrl_dr16 *ctrl = rc_dr16_get_ctrl_sig();
-
+  // 模式切换
   chaMode new_mode = cha_mode_map[ctrl->rc.s1];
-  gimbal_rc_mode_switch(mode, new_mode);
+  gimbal_switch_mode(mode, new_mode);
   mode = new_mode;
 
   f32 rc_yaw = ctrl->rc.ch2;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   dmj6006_pidx_target_add(dt * YAW_SPEED * rc_yaw);
 }
-void gimbal_rc_start() {
+void gimbal_start() {
   dwt_cnt = DWT->CYCCNT;
-  gimbal_rc_started = true;
+  gimbal_started = true;
 }
-void gimbal_rc_mode_switch(chaMode pre_mode, chaMode new_mode) {
+void gimbal_switch_mode(chaMode pre_mode, chaMode new_mode) {
   if (pre_mode == new_mode)
     return;
-  if (pre_mode == CHA_NONE) {
 
-  } else if (pre_mode == CHA_FREE) {
-  } else if (pre_mode == CHA_FOLLOW) {
+  if (pre_mode == CHA_NONE) {
+    // 将摇杆值加入前馈
+    dmj6006_pidx_ff_add(&rc_dr16_get_ctrl_sig()->rc.ch2, YAW_SPEED);
+  } else if (pre_mode == CHA_ROT) {
+    // 移除底盘陀螺仪速度前馈
+    dmj6006_pidx_ff_remove(cha_ff_src_id);
+  }
+
+  if (new_mode == CHA_ROT) {
+    // 添加底盘陀螺仪速度前馈
+    cha_ff_src_id =
+        dmj6006_pidx_ff_add(&bc_gim_get_cha_data()->ch0, -YAW_FF_COEFF);
   }
 }
 #endif

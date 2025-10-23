@@ -13,7 +13,7 @@
     ".vscode",
     ".clangd",
     "Core",
-    "Drivers",
+    // "Drivers",
     "Lib"
   ],
   "format_on_save": "on",

@@ -32,7 +32,7 @@ typedef struct {
 typedef CAN_RxHeaderTypeDef canRxH;
 typedef CAN_TxHeaderTypeDef canTxH;
 
-typedef enum { CHA_FOLLOW, CHA_FREE, CHA_NONE } chaMode;
+typedef enum { CHA_FOLLOW, CHA_FREE, CHA_NONE, CHA_ROT } chaMode;
 
 i32 clamp_i32(i32 value, i32 min_val, i32 max_val);
 f32 clamp_f32(f32 value, f32 min_val, f32 max_val);

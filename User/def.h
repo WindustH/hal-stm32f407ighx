@@ -29,6 +29,8 @@
 #define MATH_EPSILON 1e-6f
 #endif
 
+#define YAW_SPEED 8.0f
+
 #ifndef NULL
 #define NULL ((void *)0)
 #endif

@@ -38,8 +38,8 @@ void wheel_pidx_update() {
     return;
   f32 dt = DWT_GetDeltaT(&dwt_cnt);
   wheel_pidx_stat.dt = dt;
-  f32 output = pw_pid_with_pw_i_gain_compute(
-      &wheel_pidx_stat, &wheel_pidx_arg, &wheel_pidx_ig_arg, *feedback);
+  f32 output = pw_pid_with_pw_i_gain_compute(&wheel_pidx_stat, &wheel_pidx_arg,
+                                             &wheel_pidx_ig_arg, *feedback);
   wheel_pidv_set_target(output + wheel_pidx_ff_sum());
 }
 
@@ -47,6 +47,12 @@ void wheel_pidx_set_target(f32 tgt) {
   if (!wheel_pidx_started)
     return;
   wheel_pidx_stat.target = tgt;
+}
+
+void wheel_pidx_target_add(f32 d) {
+  if (!wheel_pidx_started)
+    return;
+  wheel_pidx_stat.target += d;
 }
 
 void wheel_pidx_start() {
@@ -63,4 +69,6 @@ void wheel_reset_pidx_stat() {
   wheel_pidx_stat.d = 0.0f;
   wheel_pidx_stat.target = 0.0f;
 }
+
+f32 wheel_pidx_get_target() { return wheel_pidx_stat.target; }
 #endif
