@@ -7,7 +7,4 @@ void protect_dmj4310() {
   dmj4310_disable();
   dmj4310_reset_pos();
 }
-void lift_protect_dmj4310() {
-  dmj4310_protect_on = false;
-  dmj4310_reset_pos();
-}
+void lift_protect_dmj4310() { dmj4310_protect_on = false; }

@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include <math.h>
 
 void rc_ctrl_msg_parse_dr16(const volatile u8 *raw_data,
                             volatile rcCtrl_dr16 *out) {
@@ -44,10 +45,11 @@ void rc_ctrl_msg_parse_dr16(const volatile u8 *raw_data,
   u16 ch2_raw =
       ((raw_data[2] >> 6) | (raw_data[3] << 2) | (raw_data[4] << 10)) & 0x07ff;
   out->rc.ch2 =
-      ((f32)ch2_raw - (364.0f + 1684.0f) / 2) / (-364.0f + 1684.0f) * 2;
+      -((f32)ch2_raw - (364.0f + 1684.0f) / 2) / (-364.0f + 1684.0f) * 2;
   u16 ch3_raw = ((raw_data[4] >> 1) | (raw_data[5] << 7)) & 0x07ff;
   out->rc.ch3 =
       ((f32)ch3_raw - (364.0f + 1684.0f) / 2) / (-364.0f + 1684.0f) * 2;
+  out->rc.ch3 = cbrtf(out->rc.ch3);
   out->rc.s1 = ((raw_data[5] >> 4) & 0x000C) >> 2; //!< Switch left
   out->rc.s2 = ((raw_data[5] >> 4) & 0x0003);      //!< Switch right
 

@@ -6,7 +6,7 @@ volatile u32 gim_to_cha_can_id = 0x007U;
 volatile u32 cha_to_gim_can_id = 0x008U;
 
 #ifdef BOARD_CHASSIS
-#include "Drivers/BMI880/driver.h"
+#include "Drivers/BMI088/driver.h"
 static bComGimDat bc_gimbal_data = {0};
 static CAN_HandleTypeDef *hcanx_chassis_tx = NULL;
 static CAN_HandleTypeDef *hcanx_chassis_rx = NULL;

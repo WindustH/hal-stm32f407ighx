@@ -67,7 +67,7 @@ void wheel_reset_pidx_stat() {
   wheel_pidx_stat.p = 0.0f;
   wheel_pidx_stat.i = 0.0f;
   wheel_pidx_stat.d = 0.0f;
-  wheel_pidx_stat.target = 0.0f;
+  // wheel_pidx_stat.target = 0.0f;
 }
 
 f32 wheel_pidx_get_target() { return wheel_pidx_stat.target; }

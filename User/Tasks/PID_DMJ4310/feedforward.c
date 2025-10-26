@@ -1,4 +1,5 @@
 #include "feedforward.h" // 对应你的头文件
+#include "Drivers/BMI088/driver.h"
 #include "type.h"
 
 volatile ffSrcList dmj4310_pidx_ff_src_list = {.state = 0};
@@ -63,7 +64,13 @@ void dmj4310_pidx_ff_remove(u8 idx) {
   ff_remove(&dmj4310_pidx_ff_src_list, idx);
 }
 
-f32 dmj4310_pidx_ff_sum(void) { return ff_sum(&dmj4310_pidx_ff_src_list); }
+f32 dmj4310_pidx_ff_sum(void) {
+  if (bmi088_get_pose()->pitch > FF_MAX_PITCH ||
+      bmi088_get_pose()->pitch < FF_MIN_PITCH)
+    return 0.0f;
+  else
+    return ff_sum(&dmj4310_pidx_ff_src_list);
+}
 
 u8 dmj4310_pidv_ff_add(volatile f32 *ff_src, f32 coeff) {
   return ff_add(&dmj4310_pidv_ff_src_list, ff_src, coeff);

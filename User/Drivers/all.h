@@ -1,6 +1,6 @@
 #ifndef __USER_DRIVERS_ALL__
 #define __USER_DRIVERS_ALL__
-#include "Drivers/BMI880/driver.h"        // IWYU pragma: keep
+#include "Drivers/BMI088/driver.h"        // IWYU pragma: keep
 #include "Drivers/BOARD_CAN_COM/driver.h" // IWYU pragma: keep
 #include "Drivers/MOT_M3508/driver.h"     // IWYU pragma: keep
 #ifdef BOARD_GIMBAL

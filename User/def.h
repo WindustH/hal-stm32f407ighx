@@ -30,6 +30,12 @@
 #endif
 
 #define YAW_SPEED 8.0f
+#define PITCH_SPEED 2.0f
+#define FF_MAX_CNT 8
+#define MAX_PITCH 0.8f
+#define MIN_PITCH 0.1f
+#define FF_MAX_PITCH 0.75f
+#define FF_MIN_PITCH 0.15f
 
 #ifndef NULL
 #define NULL ((void *)0)

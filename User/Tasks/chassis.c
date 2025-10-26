@@ -32,9 +32,12 @@ void chassis_update() {
 
   if (cha_mode == CHA_FREE) {
   } else if (cha_mode == CHA_FOLLOW) {
+    // 更新云台的目标位置
+    gim_yaw += dt * YAW_SPEED * rc_yaw;
     // 根据旋转速度增加位置环目标
     wheel_pidx_target_add(dt * YAW_SPEED * rc_yaw);
   } else if (cha_mode == CHA_ROT) {
+    gim_yaw += dt * YAW_SPEED * rc_yaw;
     wheel_pidx_target_add(dt * rot_speed);
     // 拨杆 2 置于 2、3 时增加或减小转速
     if (bcgd->s2 == 2)
@@ -46,8 +49,6 @@ void chassis_update() {
   }
 
   if (cha_mode != CHA_NONE) {
-    // 更新云台的目标位置
-    gim_yaw += dt * YAW_SPEED * rc_yaw;
     // 解算和设置轮速
     chassis_update_wheel_speed();
   } else {

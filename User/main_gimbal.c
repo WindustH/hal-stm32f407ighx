@@ -11,6 +11,8 @@ volatile f32 *m3508_pidv_feedback[8] = {NULL};
 volatile f32 *m3508_pidx_feedback[8] = {NULL};
 volatile f32 *dmj6006_pidv_feedback;
 volatile f32 *dmj6006_pidx_feedback;
+volatile f32 *dmj4310_pidv_feedback;
+volatile f32 *dmj4310_pidx_feedback;
 
 void main_gimbal() {
   // 配置 DMJ4310
@@ -46,6 +48,8 @@ void main_gimbal() {
       bmi088_update_pose); // 接收到 BMI088 数据准备完成中断后更新姿态
   bsp_cron_job_add(bmi088_temp_ctrl); // 定期陀螺仪温控
 
+  bsp_cron_job_add(gimbal_update);
+
   start_hal_peripherals();
   // 外设启动后 --------------------------------------------
 
@@ -53,6 +57,7 @@ void main_gimbal() {
   gimbal_protect_start();                            // 启用云台保护
   // 启动 BMI088
   bmi088_start();
+  gimbal_start();
 
   for (u8 i = 0; i < 8; i++) {
     m3508_pidv_feedback[i] = &m3508_get_stat(i)->v;
@@ -76,5 +81,15 @@ void main_gimbal() {
   dmj6006_pidx_setup(dmj6006_pidx_feedback);
   bsp_cron_job_add(dmj6006_pidx_update);
   dmj6006_pidx_start();
+
+  dmj4310_pidv_feedback = &dmj4310_get_stat()->v;
+  dmj4310_pidv_setup(dmj4310_pidv_feedback);
+  bsp_cron_job_add(dmj4310_pidv_update);
+  dmj4310_pidv_start();
+
+  dmj4310_pidx_feedback = &bmi088_get_pose()->pitch;
+  dmj4310_pidx_setup(dmj4310_pidx_feedback);
+  bsp_cron_job_add(dmj4310_pidx_update);
+  dmj4310_pidx_start();
 }
 #endif

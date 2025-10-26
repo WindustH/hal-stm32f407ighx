@@ -64,5 +64,5 @@ void dmj6006_reset_pidx_stat() {
   dmj6006_pidx_stat.p = 0.0f;
   dmj6006_pidx_stat.i = 0.0f;
   dmj6006_pidx_stat.d = 0.0f;
-  dmj6006_pidx_stat.target = 0.0f;
+  // dmj6006_pidx_stat.target = 0.0f;
 }

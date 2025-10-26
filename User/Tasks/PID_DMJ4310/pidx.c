@@ -60,5 +60,11 @@ void dmj4310_reset_pidx_stat() {
   dmj4310_pidx_stat.p = 0.0f;
   dmj4310_pidx_stat.i = 0.0f;
   dmj4310_pidx_stat.d = 0.0f;
-  dmj4310_pidx_stat.target = 0.0f;
+  // dmj4310_pidx_stat.target = 0.0f;
+}
+void dmj4310_pidx_target_add(f32 d) {
+  if (!dmj4310_pidx_started)
+    return;
+  dmj4310_pidx_stat.target =
+      clamp_f32(dmj4310_pidx_stat.target + d, MIN_PITCH, MAX_PITCH);
 }

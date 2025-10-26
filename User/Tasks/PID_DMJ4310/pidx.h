@@ -12,4 +12,5 @@ void dmj4310_pidx_start();
 
 void dmj4310_pidx_stop();
 void dmj4310_reset_pidx_stat();
+void dmj4310_pidx_target_add(f32 d);
 #endif /* __USER_TASKS_PID_DMJ4310_PIDX__ */
