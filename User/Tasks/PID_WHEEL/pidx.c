@@ -1,4 +1,3 @@
-#ifdef BOARD_CHASSIS
 #include "pidx.h"
 #include "BSP/dwt.h"
 #include "Utils/piecewise_pid.h"
@@ -71,4 +70,3 @@ void wheel_reset_pidx_stat() {
 }
 
 f32 wheel_pidx_get_target() { return wheel_pidx_stat.target; }
-#endif

@@ -1,6 +1,6 @@
 #ifndef __USER_TASKS_PID_WHEEL_CONF__
 #define __USER_TASKS_PID_WHEEL_CONF__
-#ifdef BOARD_CHASSIS
+
 #define WHEEL_PIDV_KP 0.0f
 #define WHEEL_PIDV_KPR 0.0f
 #define WHEEL_PIDV_KI 0.0f
@@ -30,5 +30,5 @@
 #define WHEEL_PIDX_IGAIN_BIG_R 0.0f
 #define WHEEL_PIDX_IGAIN_K 0.0f
 #define WHEEL_PIDX_IGAIN_KR 0.0f
-#endif
+
 #endif /* __USER_TASKS_PID_WHEEL_CONF__ */

@@ -1,4 +1,4 @@
-#ifdef BOARD_CHASSIS
+
 #include "feedforward.h"
 #include "type.h"
 
@@ -60,9 +60,7 @@ u8 wheel_pidx_ff_add(volatile f32 *ff_src, f32 coeff) {
   return ff_add(&wheel_pidx_ff_src_list, ff_src, coeff);
 }
 
-void wheel_pidx_ff_remove(u8 idx) {
-  ff_remove(&wheel_pidx_ff_src_list, idx);
-}
+void wheel_pidx_ff_remove(u8 idx) { ff_remove(&wheel_pidx_ff_src_list, idx); }
 
 f32 wheel_pidx_ff_sum(void) { return ff_sum(&wheel_pidx_ff_src_list); }
 
@@ -70,9 +68,6 @@ u8 wheel_pidv_ff_add(volatile f32 *ff_src, f32 coeff) {
   return ff_add(&wheel_pidv_ff_src_list, ff_src, coeff);
 }
 
-void wheel_pidv_ff_remove(u8 idx) {
-  ff_remove(&wheel_pidv_ff_src_list, idx);
-}
+void wheel_pidv_ff_remove(u8 idx) { ff_remove(&wheel_pidv_ff_src_list, idx); }
 
 f32 wheel_pidv_ff_sum(void) { return ff_sum(&wheel_pidv_ff_src_list); }
-#endif

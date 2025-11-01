@@ -1,4 +1,3 @@
-#ifdef BOARD_GIMBAL
 #include "main_gimbal.h"
 #include "BSP/all.h"     // IWYU pragma: keep
 #include "Drivers/all.h" // IWYU pragma: keep
@@ -15,17 +14,6 @@ volatile f32 *dmj4310_pidv_feedback;
 volatile f32 *dmj4310_pidx_feedback;
 
 void main_gimbal() {
-  // 配置 DMJ4310
-  dmj4310_setup(&hcan1, 0x002U, 0x003U, 0, CAN_FILTER_FIFO0);
-  bsp_can_fifo0_cb_add(dmj4310_update_stat); // 从 CAN FIFO 中断接收更新
-  bsp_cron_job_add(dmj4310_send_ctrl_msg);   // 定期发送控制信号
-  dmj4310_set_torque(0.0f);
-
-  // 配置 DMJ6006
-  dmj6006_setup(&hcan1, 0x001U, 0x000U, 1, CAN_FILTER_FIFO1);
-  bsp_can_fifo1_cb_add(dmj6006_update_stat);
-  bsp_cron_job_add(dmj6006_send_ctrl_msg);
-  dmj6006_set_torque(0.0f);
 
   // 配置 M3508
   m3508_setup(&hcan2, 14, CAN_FILTER_FIFO0);
@@ -33,9 +21,7 @@ void main_gimbal() {
   bsp_cron_job_add(m3508_send_ctrl_msg);
 
   // 配置 RC DR16 和 板间通讯发送
-  bc_gim_tx_setup(&hcan1, 0x007U);
   rc_dr16_setup();
-  dr16_cb_add(bc_gim_send_msg);                  // 接收到遥控器信号转发给底盘
   dr16_cb_add(gimbal_protect_refresh_idle_time); // 接收到信号清零信号空闲时间
   // 配置板间通讯接收
   // bc_gim_rx_setup(&hcan1, 0x008U, 2, CAN_FILTER_FIFO0);
@@ -71,25 +57,4 @@ void main_gimbal() {
   m3508_pidv_start();
   m3508_pidx_start();
   m3508_pidx_set_target(0, 0.0f);
-
-  dmj6006_pidv_feedback = &dmj6006_get_stat()->v;
-  dmj6006_pidv_setup(dmj6006_pidv_feedback);
-  bsp_cron_job_add(dmj6006_pidv_update);
-  dmj6006_pidv_start();
-
-  dmj6006_pidx_feedback = &bmi088_get_pose()->yaw;
-  dmj6006_pidx_setup(dmj6006_pidx_feedback);
-  bsp_cron_job_add(dmj6006_pidx_update);
-  dmj6006_pidx_start();
-
-  dmj4310_pidv_feedback = &dmj4310_get_stat()->v;
-  dmj4310_pidv_setup(dmj4310_pidv_feedback);
-  bsp_cron_job_add(dmj4310_pidv_update);
-  dmj4310_pidv_start();
-
-  dmj4310_pidx_feedback = &bmi088_get_pose()->pitch;
-  dmj4310_pidx_setup(dmj4310_pidx_feedback);
-  bsp_cron_job_add(dmj4310_pidx_update);
-  dmj4310_pidx_start();
 }
-#endif

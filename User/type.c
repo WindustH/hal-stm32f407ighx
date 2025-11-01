@@ -37,5 +37,3 @@ i32 f32_to_i32(f32 x, f32 x_min, f32 x_max, i32 bits) {
   f32 offset = x_min;
   return (i32)((x - offset) * ((f32)((1 << bits) - 1)) / span);
 }
-
-const chaMode cha_mode_map[4] = {CHA_NONE, CHA_FREE, CHA_ROT, CHA_FOLLOW};

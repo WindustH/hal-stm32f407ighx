@@ -111,13 +111,8 @@ int main(void) {
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
-#ifdef BOARD_GIMBAL
   main_gimbal();
-#endif
-
-#ifdef BOARD_CHASSIS
   main_chassis();
-#endif
 
   /* USER CODE END 2 */
 

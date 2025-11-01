@@ -1,4 +1,3 @@
-#ifdef BOARD_CHASSIS
 #include "pidv.h"
 #include "BSP/dwt.h"
 #include "Tasks/chassis.h"
@@ -64,4 +63,3 @@ void wheel_reset_pidv_stat() {
   wheel_pidv_stat.d = 0.0f;
   wheel_pidv_stat.target = 0.0f;
 }
-#endif

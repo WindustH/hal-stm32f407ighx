@@ -1,4 +1,3 @@
-#ifdef BOARD_GIMBAL
 #include "driver.h"
 #include "main.h"
 #include "usart.h"
@@ -65,4 +64,3 @@ void USART3_IRQHandler(void) {
     }
   }
 }
-#endif
